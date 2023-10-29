@@ -1,0 +1,5 @@
+.selected-emoji {
+  box-shadow: none;
+  background-color: alpha(@accent_color, 0.35);
+  border-radius: 12px;
+}

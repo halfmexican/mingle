@@ -1,0 +1,6 @@
+data/com.github.halfmexican.Mingle.desktop.in
+data/com.github.halfmexican.Mingle.metainfo.xml.in
+data/com.github.halfmexican.Mingle.gschema.xml
+src/main.vala
+src/window.vala
+src/window.ui

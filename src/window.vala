@@ -26,6 +26,7 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
+        [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
         private Json.Node root_node;
         private Json.Array known_supported_emojis;
         private Json.Array curr_emoji_combinations;
@@ -143,44 +144,17 @@ namespace Mingle {
                 }
 
                 string gstatic_url = gstatic_url_node.get_value().get_string();
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url);
 
-                try {
-                // Fetch the image asynchronously
-                var input_stream = yield get_input_stream(gstatic_url);
-                var pixbuf = yield new Gdk.Pixbuf.from_stream_async(input_stream, null);
-                var texture = Gdk.Texture.for_pixbuf(pixbuf);
+                combined_emoji.copied.connect(() => {
+                    var toast = new Adw.Toast("Image copied to clipboard"){
+                        timeout = 3,
+                    };
+                    toast_overlay.add_toast(toast);
+                });
 
-                var picture = new Gtk.Picture() {
-                    vexpand = true,
-                    hexpand = true,
-                    width_request = 100,
-                    height_request = 100,
-                    content_fit = Gtk.ContentFit.CONTAIN
-                };
-
-                picture.set_paintable(texture);
-
-                combined_emojis_flow_box.append(picture);
-                } catch (Error e) {
-                    stderr.printf("Failed to load image: %s\n", e.message);
-                }
+                combined_emojis_flow_box.append(combined_emoji);
             }
-        }
-
-        private async InputStream? get_input_stream (string url) throws Error {
-            var session = new Soup.Session ();
-            var message = new Soup.Message.from_uri ("GET", Uri.parse (url, NONE));
-
-            InputStream input_stream = yield session.send_async (message, Priority.DEFAULT, null);
-
-            uint status_code = message.status_code;
-            string reason = message.reason_phrase;
-
-            if (status_code != 200) {
-                //throw new MessageError.FAILED (@"Got $status_code: $reason");
-            }
-
-            return input_stream;
         }
     }
 }

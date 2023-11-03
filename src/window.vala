@@ -71,7 +71,6 @@ namespace Mingle {
         }
 
         private void add_emojis_to_flowbox(Gtk.FlowBox flowbox) {
-            // Populate the flow box
             if(known_supported_emojis == null)
                 known_supported_emojis = get_emoji_data();
 
@@ -155,8 +154,8 @@ namespace Mingle {
                 string gstatic_url = gstatic_url_node.get_value().get_string();
                 string alt_name = alt_node.get_value().get_string();
                   if (!added_emojis.add(alt_name)) {
-                    // If the URL was already in the set, 'add' returns false
-                    continue;  // Skip this URL, it's a duplicate
+                    // If the emoji was already in the set, 'add' returns false
+                    continue;  // So skip this emoji, it's a duplicate
                  }
 
                 Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url);

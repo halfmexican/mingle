@@ -21,6 +21,7 @@ using Adw, Gtk, Soup;
 namespace Mingle {
     public class CombinedEmoji : Gtk.Button {
         private Gdk.Texture _texture;
+        public Gtk.Revealer revealer;
         public signal void copied ();
         public async CombinedEmoji (string gstatic_url) {
           try {
@@ -30,17 +31,31 @@ namespace Mingle {
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async(input_stream, null);
                 _texture = Gdk.Texture.for_pixbuf(pixbuf);
 
+                var overlay = new Gtk.Overlay (){
+                    child = new Gtk.Picture(){
+                        width_request = 100,
+                        height_request = 100,
+                        },
+                };
+
+               revealer = new Gtk.Revealer () {
+                    transition_duration = 700,
+                    transition_type = Gtk.RevealerTransitionType.CROSSFADE,
+                    reveal_child = false,
+                };
+
                 var picture = new Gtk.Picture() {
-                    vexpand = true,
+                    vexpand = false,
                     hexpand = true,
                     width_request = 100,
-                    height_request = 150,
+                    height_request = 100,
                     content_fit = Gtk.ContentFit.CONTAIN
                 };
 
+                this.set_child (overlay);
                 picture.set_paintable(_texture);
-
-                this.set_child (picture);
+                revealer.set_child (picture);
+                overlay.add_overlay (revealer);
 
            } catch (GLib.Error error) {
                 stderr.printf (error.message);

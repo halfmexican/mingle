@@ -3,9 +3,17 @@
 	<requires lib="gtk" version="4.0"/>
 	<requires lib="Adw" version="1.0"/>
 	<template class="MingleWindow" parent="AdwApplicationWindow">
+	  <property name="width-request">326</property>
+    <property name="height-request">200</property>
 		<property name="default-width">600</property>
 		<property name="default-height">300</property>
 		<property name="title" translatable="false">Mingle</property>
+	  <child>
+		  <object class="AdwBreakpoint">
+        <condition>min-width: 900sp</condition>
+        <setter object="combined_scrolled_window" property="width-request">400</setter>
+      </object>
+		</child>
 		<property name="content">
 			<object class="AdwToastOverlay" id="toast_overlay">
 				<child>
@@ -33,6 +41,7 @@
 								<child type="start">
 									<object class="GtkScrolledWindow">
 										<property name="propagate-natural-height">true</property>
+									  <property name="hexpand">true</property>
 										<property name="has-frame">false</property>
 										<property name="window-placement">GTK_CORNER_TOP_RIGHT</property>
 										<child>
@@ -55,17 +64,18 @@
 											</object>
 										</child>
 										<child type="center">
-											<object class="GtkScrolledWindow">
-												<property name="width-request">250</property>
+											<object class="GtkScrolledWindow" id="combined_scrolled_window">
+												<property name="width-request">200</property>
+											  <property name="hexpand">true</property>
 												<property name="propagate-natural-height">true</property>
 												<property name="has-frame">false</property>
 												<child>
 													<object class="GtkFlowBox" id="combined_emojis_flow_box">
 														<property name="orientation">0</property>
-														<property name="row-spacing">6</property>
+														<property name="row-spacing">0</property>
 														<property name="column-spacing">6</property>
 														<property name="homogeneous">true</property>
-														<property name="max-children-per-line">2</property>
+														<property name="max-children-per-line">3</property>
 														<property name="min-children-per-line">1</property>
 													  <property name="selection-mode">GTK_SELECTION_NONE</property>
 													</object>
@@ -82,6 +92,7 @@
 								<child type="end">
 									<object class="GtkScrolledWindow">
 										<property name="propagate-natural-height">true</property>
+									  <property name="hexpand">true</property>
 										<property name="has-frame">false</property>
 										<child>
 											<object class="GtkFlowBox" id="right_emojis_flow_box">

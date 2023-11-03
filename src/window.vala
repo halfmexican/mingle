@@ -18,7 +18,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Json, Soup;
+using Json, Soup, Gee;
 namespace Mingle {
     [GtkTemplate (ui = "/com/github/halfmexican/Mingle/window.ui")]
     public class Window : Adw.ApplicationWindow {
@@ -86,7 +86,7 @@ namespace Mingle {
                 string emoji = emoji_label.emoji;
                 stdout.printf("Unicode: %s, Emoji: %s\n", emoji_code, emoji);
                 curr_emoji_combinations = get_combinations_by_emoji_code(emoji_label.code_point_str);
-                populate_center_flow_box();
+                this.populate_center_flow_box();
             });
         }
 
@@ -121,21 +121,30 @@ namespace Mingle {
         }
 
         private async void populate_center_flow_box() {
+            Json.Array current_processing_combinations = curr_emoji_combinations;
+            Gee.HashSet<string> added_emojis = new HashSet<string>();
+
             if (curr_emoji_combinations == null) {
                 stderr.printf("Current emoji combinations are not set.\n");
                 return;
             }
-
-            // Clear existing Gtk.Pictures from center_flow_box if needed
             combined_emojis_flow_box.remove_all();
 
-            for (int i = 0; i < curr_emoji_combinations.get_length(); i++) {
-                Json.Node combination_node = curr_emoji_combinations.get_element(i);
+            for (int i = 0; i < current_processing_combinations.get_length(); i++) {
+                Json.Node combination_node = current_processing_combinations.get_element(i);
                 if (combination_node.get_node_type() != Json.NodeType.OBJECT) {
                     continue;
                 }
 
+
+                if (current_processing_combinations != this.curr_emoji_combinations) {
+                    combined_emojis_flow_box.remove_all();
+                    return;  // Stop the loop if the array has changed
+                }
+
+
                 Json.Object combination_object = combination_node.get_object();
+                Json.Node alt_node = combination_object.get_member("alt");
                 Json.Node gstatic_url_node = combination_object.get_member("gStaticUrl");
 
                 if (gstatic_url_node == null || gstatic_url_node.get_node_type() != Json.NodeType.VALUE) {
@@ -144,6 +153,12 @@ namespace Mingle {
                 }
 
                 string gstatic_url = gstatic_url_node.get_value().get_string();
+                string alt_name = alt_node.get_value().get_string();
+                  if (!added_emojis.add(alt_name)) {
+                    // If the URL was already in the set, 'add' returns false
+                    continue;  // Skip this URL, it's a duplicate
+                 }
+
                 Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url);
 
                 combined_emoji.copied.connect(() => {
@@ -154,6 +169,7 @@ namespace Mingle {
                 });
 
                 combined_emojis_flow_box.append(combined_emoji);
+                combined_emoji.revealer.reveal_child = true; //animate transition
             }
         }
     }

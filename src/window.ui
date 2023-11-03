@@ -52,6 +52,7 @@
 												<property name="homogeneous">true</property>
 												<property name="max-children-per-line">6</property>
 												<property name="min-children-per-line">1</property>
+											  <property name="selection-mode">GTK_SELECTION_SINGLE</property>
 											</object>
 										</child>
 									</object>
@@ -102,6 +103,7 @@
 												<property name="homogeneous">true</property>
 												<property name="max-children-per-line">6</property>
 												<property name="min-children-per-line">1</property>
+											  <property name="selection-mode">GTK_SELECTION_SINGLE</property>
 											</object>
 										</child>
 									</object>

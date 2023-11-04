@@ -87,7 +87,7 @@ namespace Mingle {
                 string emoji = emoji_label.emoji;
                 stdout.printf("Unicode: %s, Emoji: %s\n", emoji_code, emoji);
                 curr_emoji_combinations = get_combinations_by_emoji_code(emoji_label.code_point_str);
-                this.populate_center_flow_box();
+                this.populate_center_flow_box.begin();
             });
         }
 
@@ -175,4 +175,5 @@ namespace Mingle {
         }
     }
 }
+
 

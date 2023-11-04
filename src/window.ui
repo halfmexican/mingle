@@ -28,6 +28,12 @@
 										<property name="tooltip-text" translatable="yes">Menu</property>
 										<property name="menu-model">primary_menu</property>
 									</object>
+								  </child>
+								  <child type="start">
+									<object class="GtkButton">
+										<property name="icon-name">dice3-symbolic</property>
+										<property name="tooltip-text" translatable="yes">Randomize</property>
+							    </object>
 								</child>
 							</object>
 						</child>

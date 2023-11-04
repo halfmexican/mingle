@@ -30,6 +30,8 @@ namespace Mingle {
         private Json.Node root_node;
         private Json.Array known_supported_emojis;
         private Json.Array curr_emoji_combinations;
+        private string curr_left_emoji;
+        private string curr_right_emoji;
 
         public Window (Gtk.Application app) {
             GLib.Object (application: app);

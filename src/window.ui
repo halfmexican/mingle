@@ -40,21 +40,22 @@
 						<property name="content">
 							<object class="GtkCenterBox">
 								<property name="shrink-center-last">true</property>
-								<property name="margin-top">4</property>
-								<property name="margin-bottom">4</property>
-								<property name="margin-start">4</property>
-								<property name="margin-end">4</property>
 								<child type="start">
-									<object class="GtkScrolledWindow">
+									<object class="GtkScrolledWindow" id="left_scrolled_window">
 										<property name="propagate-natural-height">true</property>
-									  <property name="hexpand">true</property>
+										<property name="vadjustment" bind-source="right_scrolled_window" bind-property="vadjustment" bind-flags="sync-create|bidirectional"/>
+										<property name="hexpand">true</property>
 										<property name="has-frame">false</property>
 										<property name="window-placement">GTK_CORNER_TOP_RIGHT</property>
 										<child>
 											<object class="GtkFlowBox" id="left_emojis_flow_box">
+												<property name="margin-start">12</property>
+												<property name="margin-end">12</property>
+												<property name="margin-top">12</property>
+												<property name="margin-bottom">12</property>
 												<property name="orientation">0</property>
-												<property name="row-spacing">6</property>
-												<property name="column-spacing">6</property>
+												<property name="row-spacing">12</property>
+												<property name="column-spacing">12</property>
 												<property name="homogeneous">true</property>
 												<property name="max-children-per-line">6</property>
 												<property name="min-children-per-line">1</property>
@@ -78,6 +79,10 @@
 												<property name="has-frame">false</property>
 												<child>
 													<object class="GtkFlowBox" id="combined_emojis_flow_box">
+														<property name="margin-start">6</property>
+														<property name="margin-end">6</property>
+														<property name="margin-top">6</property>
+														<property name="margin-bottom">6</property>
 														<property name="orientation">0</property>
 														<property name="row-spacing">0</property>
 														<property name="column-spacing">6</property>
@@ -97,15 +102,20 @@
 									</object>
 								</child>
 								<child type="end">
-									<object class="GtkScrolledWindow">
+									<object class="GtkScrolledWindow" id="right_scrolled_window">
 										<property name="propagate-natural-height">true</property>
-									  <property name="hexpand">true</property>
+										<property name="vadjustment" bind-source="left_scrolled_window" bind-property="vadjustment" bind-flags="sync-create|bidirectional"/>
+										<property name="hexpand">true</property>
 										<property name="has-frame">false</property>
 										<child>
 											<object class="GtkFlowBox" id="right_emojis_flow_box">
+												<property name="margin-start">12</property>
+												<property name="margin-end">12</property>
+												<property name="margin-top">12</property>
+												<property name="margin-bottom">12</property>
 												<property name="orientation">0</property>
-												<property name="row-spacing">6</property>
-												<property name="column-spacing">6</property>
+												<property name="row-spacing">12</property>
+												<property name="column-spacing">12</property>
 												<property name="homogeneous">true</property>
 												<property name="max-children-per-line">6</property>
 												<property name="min-children-per-line">1</property>

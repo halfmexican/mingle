@@ -31,6 +31,7 @@ namespace Mingle {
         private Json.Node root_node;
         private Json.Array known_supported_emojis;
         private Json.Array curr_emoji_combinations;
+        HashSet<string> added_combinations = new HashSet<string>();
         string curr_left_emoji;
         string curr_right_emoji;
 
@@ -76,6 +77,7 @@ namespace Mingle {
             flowBox.child_activated.connect ((item) => {
                 Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) item.child;
                 handler(emoji_label);
+                combined_emojis_flow_box.remove_all();
             });
         }
 
@@ -86,8 +88,10 @@ namespace Mingle {
             curr_left_emoji = emoji_label.code_point_str;
             stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
             curr_emoji_combinations = get_combinations_by_emoji_code(curr_left_emoji);
-            if(curr_left_emoji != null && curr_right_emoji != null)
-             this.get_emoji_combination(curr_left_emoji, curr_right_emoji);
+            if(curr_left_emoji != null && curr_right_emoji != null){
+                this.get_emoji_combination(curr_left_emoji, curr_right_emoji);
+            }
+
             this.populate_center_flow_box.begin();
             right_emojis_flow_box.sensitive = true;
         }
@@ -243,48 +247,45 @@ namespace Mingle {
             toast_overlay.add_toast(toast);
         }
 
-    private async void populate_center_flow_box() {
-    // Early exit if the left emoji is not selected
-    if (curr_left_emoji == null || curr_left_emoji == "") {
-        stderr.printf("Left emoji is not selected.\n");
-        return;
-    }
+        private async void populate_center_flow_box() {
+            if (curr_left_emoji == null || curr_left_emoji == "") {
+                stderr.printf("Left emoji is not selected.\n");
+                return;
+            }
 
-    if (known_supported_emojis == null)
-        known_supported_emojis = get_emoji_data();
+            if (known_supported_emojis == null)
+                known_supported_emojis = get_emoji_data();
 
-    HashSet<string> added_combinations = new HashSet<string>();
+            added_combinations =  new HashSet<string>();
+            foreach (Json.Node emoji_node in known_supported_emojis.get_elements()) {
+                string rightEmojiCode = emoji_node.get_string();
+                string combinationKey = curr_left_emoji + "_" + rightEmojiCode;
 
-    foreach (Json.Node emoji_node in known_supported_emojis.get_elements()) {
-        string rightEmojiCode = emoji_node.get_string();
-        string combinationKey = curr_left_emoji + "_" + rightEmojiCode;
+                Json.Node combinationNode = combinations_map.get(combinationKey);
+                if (combinationNode == null || combinationNode.get_node_type() != Json.NodeType.OBJECT) {
+                    continue; // Skip if combination not found
+                }
 
-        // Check if combination already added
-        if (!added_combinations.add(combinationKey)) {
-            continue;
+                Json.Object combination_object = combinationNode.get_object();
+                string gstatic_url = combination_object.get_member("gStaticUrl").get_value().get_string();
+                string alt_name = combination_object.get_member("alt").get_value().get_string();
+
+                // Asynchronously create and append the emoji
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, false);
+
+                // Check if combination already added
+                if (!added_combinations.add(combinationKey)) {
+                    continue;
+                }
+
+                combined_emoji.copied.connect(() => {
+                    create_and_show_toast("Image copied to clipboard");
+                });
+
+                combined_emojis_flow_box.append(combined_emoji);
+                combined_emoji.revealer.reveal_child = true;
+            }
         }
-
-        Json.Node combinationNode = combinations_map.get(combinationKey);
-        if (combinationNode == null || combinationNode.get_node_type() != Json.NodeType.OBJECT) {
-            continue; // Skip if combination not found
-        }
-
-        Json.Object combination_object = combinationNode.get_object();
-        string gstatic_url = combination_object.get_member("gStaticUrl").get_value().get_string();
-        string alt_name = combination_object.get_member("alt").get_value().get_string();
-
-        // Asynchronously create and append the emoji
-        Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, false);
-        combined_emoji.copied.connect(() => {
-            weak Window self = this;
-            self.create_and_show_toast("Image copied to clipboard");
-        });
-
-        combined_emojis_flow_box.append(combined_emoji);
-        combined_emoji.revealer.reveal_child = true;
-    }
-}
-
     }
 }
 

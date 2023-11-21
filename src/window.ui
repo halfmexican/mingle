@@ -3,7 +3,7 @@
 	<requires lib="gtk" version="4.0"/>
 	<requires lib="Adw" version="1.0"/>
 	<template class="MingleWindow" parent="AdwApplicationWindow">
-	  <property name="width-request">326</property>
+	  <property name="width-request">346</property>
     <property name="height-request">200</property>
 		<property name="default-width">600</property>
 		<property name="default-height">300</property>
@@ -43,16 +43,17 @@
 								<child type="start">
 									<object class="GtkScrolledWindow" id="left_scrolled_window">
 										<property name="propagate-natural-height">true</property>
+									  <property name="hscrollbar-policy">GTK_POLICY_NEVER</property>
 										<property name="vadjustment" bind-source="right_scrolled_window" bind-property="vadjustment" bind-flags="sync-create|bidirectional"/>
 										<property name="hexpand">true</property>
 										<property name="has-frame">false</property>
 										<property name="window-placement">GTK_CORNER_TOP_RIGHT</property>
 										<child>
 											<object class="GtkFlowBox" id="left_emojis_flow_box">
-												<property name="margin-start">12</property>
-												<property name="margin-end">12</property>
-												<property name="margin-top">12</property>
-												<property name="margin-bottom">12</property>
+												<property name="margin-start">6</property>
+												<property name="margin-end">6</property>
+												<property name="margin-top">6</property>
+												<property name="margin-bottom">6</property>
 												<property name="orientation">0</property>
 												<property name="row-spacing">12</property>
 												<property name="column-spacing">12</property>
@@ -68,7 +69,6 @@
 									<object class="GtkCenterBox" id="combined_emoji_box">
 										<child type="start">
 											<object class="GtkSeparator">
-												<property name="margin-start">4</property>
 											</object>
 										</child>
 										<child type="center">
@@ -86,7 +86,7 @@
 														<property name="orientation">0</property>
 														<property name="row-spacing">0</property>
 														<property name="column-spacing">6</property>
-														<property name="homogeneous">false</property>
+														<property name="homogeneous">true</property>
 														<property name="max-children-per-line">3</property>
 														<property name="min-children-per-line">1</property>
 													  <property name="selection-mode">GTK_SELECTION_NONE</property>
@@ -96,7 +96,6 @@
 										</child>
 										<child type="end">
 											<object class="GtkSeparator">
-												<property name="margin-end">4</property>
 											</object>
 										</child>
 									</object>
@@ -104,15 +103,16 @@
 								<child type="end">
 									<object class="GtkScrolledWindow" id="right_scrolled_window">
 										<property name="propagate-natural-height">true</property>
+									  <property name="hscrollbar-policy">GTK_POLICY_NEVER</property>
 										<property name="vadjustment" bind-source="left_scrolled_window" bind-property="vadjustment" bind-flags="sync-create|bidirectional"/>
 										<property name="hexpand">true</property>
 										<property name="has-frame">false</property>
 										<child>
 											<object class="GtkFlowBox" id="right_emojis_flow_box">
-												<property name="margin-start">12</property>
-												<property name="margin-end">12</property>
-												<property name="margin-top">12</property>
-												<property name="margin-bottom">12</property>
+												<property name="margin-start">6</property>
+												<property name="margin-end">6</property>
+												<property name="margin-top">6</property>
+												<property name="margin-bottom">6</property>
 												<property name="orientation">0</property>
 												<property name="row-spacing">12</property>
 												<property name="column-spacing">12</property>

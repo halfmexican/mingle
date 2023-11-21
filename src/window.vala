@@ -215,6 +215,7 @@ namespace Mingle {
         private void add_emoji_to_flowbox(string emoji, Gtk.FlowBox flowbox) {
             var item = new Mingle.EmojiLabel (emoji) {};
             flowbox.append (item);
+            item.get_parent ().add_css_class ("card");
         }
 
         private Json.Array get_combinations_by_emoji_code(string emoji_code) {

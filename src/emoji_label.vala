@@ -27,7 +27,7 @@ namespace Mingle {
             this.code_point_str = code_point_str;
             this.emoji = code_point_str_to_emoji(code_point_str);
             this.child = new Gtk.Label(this.emoji) {
-                css_classes = { "emoji", "card", "title-1" },
+                css_classes = { "emoji", "title-1" },
                 vexpand = true,
                 hexpand = true,
                 width_request = 50,

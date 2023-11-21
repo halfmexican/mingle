@@ -23,11 +23,11 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
-        public async CombinedEmoji (string gstatic_url) {
+        public async CombinedEmoji (string gstatic_url, bool high_priority){
           try {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
-                var input_stream = yield get_input_stream(gstatic_url);
+                var input_stream = yield get_input_stream(gstatic_url, high_priority );
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async(input_stream, null);
                 _texture = Gdk.Texture.for_pixbuf(pixbuf);
 
@@ -39,8 +39,8 @@ namespace Mingle {
                 };
 
                revealer = new Gtk.Revealer () {
-                    transition_duration = 700,
-                    transition_type = Gtk.RevealerTransitionType.CROSSFADE,
+                    transition_duration = 900,
+                    transition_type = Gtk.RevealerTransitionType.SWING_UP,
                     reveal_child = false,
                 };
 
@@ -67,17 +67,21 @@ namespace Mingle {
             });
         }
 
-        private async InputStream? get_input_stream (string url) throws Error {
+        private async InputStream? get_input_stream (string url, bool high_priority) throws Error {
             var session = new Soup.Session ();
             var message = new Soup.Message.from_uri ("GET", Uri.parse (url, NONE));
-
-            InputStream input_stream = yield session.send_async (message, Priority.DEFAULT, null);
+            InputStream input_stream;
+            if (high_priority){
+                input_stream = yield session.send_async (message, Priority.HIGH, null);
+            } else {
+                input_stream = yield session.send_async (message, Priority.LOW, null);
+            }
 
             uint status_code = message.status_code;
             string reason = message.reason_phrase;
 
             if (status_code != 200) {
-                //throw new MessageError.FAILED (@"Got $status_code: $reason");
+                stderr.printf ("Status Code: %x\n Reason: %s", status_code, reason);
             }
 
             return input_stream;

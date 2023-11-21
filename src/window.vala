@@ -22,22 +22,147 @@ using Json, Soup, Gee;
 namespace Mingle {
     [GtkTemplate (ui = "/com/github/halfmexican/Mingle/window.ui")]
     public class Window : Adw.ApplicationWindow {
-
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
+
+        private Gee.HashMap<string, Json.Node> combinations_map;
         private Json.Node root_node;
         private Json.Array known_supported_emojis;
         private Json.Array curr_emoji_combinations;
-        private string curr_left_emoji;
-        private string curr_right_emoji;
+        private Gee.HashSet<string> added_emojis = new HashSet<string>();
+        string curr_left_emoji;
+        string curr_right_emoji;
+
+        private delegate void EmojiActionDelegate(Mingle.EmojiLabel emoji_label);
 
         public Window (Gtk.Application app) {
+            var window_timer = new GLib.Timer();
+            window_timer.start();
             GLib.Object (application: app);
+            setup_emoji_flow_boxes();
+            initialize_hashmap();
+            right_emojis_flow_box.sensitive = false;
+            window_timer.stop();
+            stdout.printf("\nWindow opened in %2f seconds\n\n", window_timer.elapsed());
+        }
+
+        private void initialize_hashmap() {
+            // MutiThreaded Hashmap implementation
+            if (!Thread.supported()) {
+                stderr.printf("Threads are not supported!\n");
+            }
+
+            try {
+                Thread<Gee.HashMap<string, Json.Node>> thread = new Thread<Gee.HashMap<string, Json.Node>>.try (
+                        "combinations_map_thread", () => {
+                        return populate_combinations_map();
+                    });
+                combinations_map = thread.join();
+            } catch (Error e) {
+                stderr.printf("Error: %s\n", e.message);
+            }
+        }
+
+        private void setup_emoji_flow_boxes() {
+            connect_flow_box_signals(left_emojis_flow_box, handle_left_emoji_activation);
+            connect_flow_box_signals(right_emojis_flow_box, handle_right_emoji_activation);
 
             add_emojis_to_flowbox(left_emojis_flow_box);
             add_emojis_to_flowbox(right_emojis_flow_box);
+        }
+
+        private void connect_flow_box_signals(Gtk.FlowBox flowBox, EmojiActionDelegate handler) {
+            flowBox.child_activated.connect ((item) => {
+                Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) item.child;
+                handler(emoji_label);
+            });
+        }
+
+        private void handle_left_emoji_activation(Mingle.EmojiLabel emoji_label) {
+            string emoji = emoji_label.emoji;
+            curr_left_emoji = emoji_label.code_point_str;
+            stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
+            curr_emoji_combinations = get_combinations_by_emoji_code(emoji_label.code_point_str);
+            added_emojis = new HashSet<string>();
+            this.populate_center_flow_box.begin();
+            this.get_emoji_combination(curr_left_emoji, curr_right_emoji);
+            right_emojis_flow_box.sensitive = true;
+        }
+
+        private void handle_right_emoji_activation(Mingle.EmojiLabel emoji_label) {
+            string emoji = emoji_label.emoji;
+            curr_right_emoji = emoji_label.code_point_str;
+            stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
+            added_emojis = new HashSet<string>();
+            curr_emoji_combinations = get_combinations_by_emoji_code(curr_left_emoji);
+            this.populate_center_flow_box.begin();
+            this.get_emoji_combination(curr_left_emoji, curr_right_emoji);
+        }
+
+        private async void get_emoji_combination(string left_codepoint, string right_codepoint) {
+            string combinationKey1 = left_codepoint + "_" + right_codepoint;
+            string combinationKey2 = right_codepoint + "_" + left_codepoint;
+
+            Json.Node combinationNode1 = combinations_map.get(combinationKey1);
+            Json.Node combinationNode2 = combinations_map.get(combinationKey2);
+
+            if (combinationNode1 != null) {
+                yield process_combination(combinationNode1);
+            } else if (combinationNode2 != null) {
+                yield process_combination(combinationNode2);
+            } else {
+                stderr.printf("Combination not found for the provided codepoints.\n");
+            }
+        }
+
+        private async void process_combination(Json.Node combinationNode) {
+            // Extract the data from the combinationNode
+            Json.Object combination_object = combinationNode.get_object();
+            Json.Node gstatic_url_node = combination_object.get_member("gStaticUrl");
+            Json.Node alt_node = combination_object.get_member("alt");
+            string alt_name = alt_node.get_value().get_string();
+            stdout.printf("\n%s\n",alt_name);
+            added_emojis.add(alt_name);
+
+            if (gstatic_url_node != null && gstatic_url_node.get_node_type() == Json.NodeType.VALUE) {
+                string gstatic_url = gstatic_url_node.get_value().get_string();
+
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, true);
+                combined_emojis_flow_box.insert(combined_emoji, 0);
+                combined_emoji.revealer.reveal_child = true;
+                combined_emoji.copied.connect(() => {
+                    create_and_show_toast("Image copied to clipboard");
+                });
+            } else {
+                stderr.printf("gStaticUrl is missing or not a value.\n");
+            }
+        }
+
+        private Gee.HashMap<string, Json.Node> populate_combinations_map() {
+            stdout.printf("populate_combinations_map thread started\n");
+            Json.Array emoji_data = get_emoji_data();
+            Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node>();
+
+            for (int i = 0; i < emoji_data.get_length(); i++) {
+                Json.Node emoji_node = emoji_data.get_element(i);
+                string emoji_code = emoji_node.get_string();
+                Json.Array combinations = get_combinations_by_emoji_code(emoji_code);
+
+                for (int j = 0; j < combinations.get_length(); j++) {
+                    Json.Node combination_node = combinations.get_element(j);
+                    Json.Object combination_object = combination_node.get_object();
+
+                    string leftEmojiCode = combination_object.get_member("leftEmojiCodepoint").get_value().get_string();
+                    string rightEmojiCode = combination_object.get_member("rightEmojiCodepoint").get_value().get_string();
+
+                    string combinationKey = leftEmojiCode + "_" + rightEmojiCode;
+                    combinations_map.set(combinationKey, combination_node);
+                }
+            }
+            stdout.printf("populate_combinations_map thread finishes\n");
+            return combinations_map;
         }
 
         private Json.Array get_emoji_data() {
@@ -80,15 +205,6 @@ namespace Mingle {
                 Json.Node emoji_node = known_supported_emojis.get_element(i);
                 add_emoji_to_flowbox(emoji_node.get_string(), flowbox);
             }
-
-            flowbox.child_activated.connect ((item) => {
-                Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) item.child;
-                string emoji_code = emoji_label.code_point_str;
-                string emoji = emoji_label.emoji;
-                stdout.printf("Unicode: %s, Emoji: %s\n", emoji_code, emoji);
-                curr_emoji_combinations = get_combinations_by_emoji_code(emoji_label.code_point_str);
-                this.populate_center_flow_box.begin();
-            });
         }
 
         private void add_emoji_to_flowbox(string emoji, Gtk.FlowBox flowbox) {
@@ -121,59 +237,50 @@ namespace Mingle {
             return combinations_node.get_array();
         }
 
-        private async void populate_center_flow_box() {
-            Json.Array current_processing_combinations = curr_emoji_combinations;
-            Gee.HashSet<string> added_emojis = new HashSet<string>();
-
-            if (curr_emoji_combinations == null) {
-                stderr.printf("Current emoji combinations are not set.\n");
-                return;
-            }
-            combined_emojis_flow_box.remove_all();
-
-            for (int i = 0; i < current_processing_combinations.get_length(); i++) {
-                Json.Node combination_node = current_processing_combinations.get_element(i);
-                if (combination_node.get_node_type() != Json.NodeType.OBJECT) {
-                    continue;
-                }
-
-
-                if (current_processing_combinations != this.curr_emoji_combinations) {
-                    combined_emojis_flow_box.remove_all();
-                    return;  // Stop the loop if the array has changed
-                }
-
-
-                Json.Object combination_object = combination_node.get_object();
-                Json.Node alt_node = combination_object.get_member("alt");
-                Json.Node gstatic_url_node = combination_object.get_member("gStaticUrl");
-
-                if (gstatic_url_node == null || gstatic_url_node.get_node_type() != Json.NodeType.VALUE) {
-                    stderr.printf("gStaticUrl is missing or not a value.\n");
-                    continue;
-                }
-
-                string gstatic_url = gstatic_url_node.get_value().get_string();
-                string alt_name = alt_node.get_value().get_string();
-                  if (!added_emojis.add(alt_name)) {
-                    // If the emoji was already in the set, 'add' returns false
-                    continue;  // So skip this emoji, it's a duplicate
-                 }
-
-                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url);
-
-                combined_emoji.copied.connect(() => {
-                    var toast = new Adw.Toast("Image copied to clipboard"){
-                        timeout = 3,
-                    };
-                    toast_overlay.add_toast(toast);
-                });
-
-                combined_emojis_flow_box.append(combined_emoji);
-                combined_emoji.revealer.reveal_child = true; //animate transition
-            }
+        private void create_and_show_toast(string message) {
+            var toast = new Adw.Toast(message) {timeout = 3};
+            toast_overlay.add_toast(toast);
         }
+
+       private async void populate_center_flow_box() {
+    // Early exit if no combinations are set
+    if (curr_emoji_combinations.get_length() == 0) {
+        stderr.printf("No emoji combinations to process.\n");
+        return;
+    }
+
+    // Clearing the existing emojis in the flow box
+    combined_emojis_flow_box.remove_all();
+
+    foreach (Json.Node combination_node in curr_emoji_combinations.get_elements()) {
+        // Check if the node is a valid JSON object
+        if (combination_node.get_node_type() != Json.NodeType.OBJECT) {
+            continue;
+        }
+
+        Json.Object combination_object = combination_node.get_object();
+        string alt_name = combination_object.get_member("alt").get_value().get_string();
+
+        // Skip duplicates
+        if (!added_emojis.add(alt_name)) {
+            continue;
+        }
+
+        string gstatic_url = combination_object.get_member("gStaticUrl").get_value().get_string();
+
+        // Asynchronously create and append the emoji
+        Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, false);
+        combined_emoji.copied.connect(() => {
+            weak Window self = this;
+            self.create_and_show_toast("Image copied to clipboard");
+        });
+
+        combined_emojis_flow_box.append(combined_emoji);
+        combined_emoji.revealer.reveal_child = true;
     }
 }
+    }
+}
+
 
 

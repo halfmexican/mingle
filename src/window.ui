@@ -81,7 +81,7 @@
 														<property name="orientation">0</property>
 														<property name="row-spacing">0</property>
 														<property name="column-spacing">6</property>
-														<property name="homogeneous">true</property>
+														<property name="homogeneous">false</property>
 														<property name="max-children-per-line">3</property>
 														<property name="min-children-per-line">1</property>
 													  <property name="selection-mode">GTK_SELECTION_NONE</property>

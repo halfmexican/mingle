@@ -2,7 +2,7 @@ using Json, Soup, Gee;
 
 namespace Mingle {
     public class EmojiDataManager {
-        // Currently this class loads our su
+        // Currently this class loads our supported emojis and nothing else
         private Json.Node root_node;
         private Json.Array supported_emojis;
 

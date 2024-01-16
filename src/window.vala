@@ -85,7 +85,7 @@ namespace Mingle {
             stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
             curr_emoji_combinations = get_combinations_by_emoji_code(curr_left_emoji);
             if(curr_left_emoji != null && curr_right_emoji != null){
-                this.get_emoji_combination(curr_left_emoji, curr_right_emoji);
+                this.get_emoji_combination.begin(curr_left_emoji, curr_right_emoji);
             }
 
             this.populate_center_flow_box.begin();
@@ -99,7 +99,7 @@ namespace Mingle {
             curr_right_emoji = emoji_label.code_point_str;
             stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
             curr_emoji_combinations = get_combinations_by_emoji_code(curr_left_emoji);
-            this.get_emoji_combination(curr_left_emoji, curr_right_emoji);
+            this.get_emoji_combination.begin(curr_left_emoji, curr_right_emoji);
             this.populate_center_flow_box.begin();
         }
 

@@ -27,9 +27,8 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
 
+        private EmojiDataManager emoji_manager = new EmojiDataManager();
         private Gee.HashMap<string, Json.Node> combinations_map;
-        private Json.Node root_node;
-        private Json.Array known_supported_emojis;
         private Json.Array curr_emoji_combinations;
         HashSet<string> added_combinations = new HashSet<string>();
         string curr_left_emoji;
@@ -65,8 +64,8 @@ namespace Mingle {
             connect_flow_box_signals(left_emojis_flow_box, handle_left_emoji_activation);
             connect_flow_box_signals(right_emojis_flow_box, handle_right_emoji_activation);
 
-            add_emojis_to_flowbox(left_emojis_flow_box);
-            add_emojis_to_flowbox(right_emojis_flow_box);
+            emoji_manager.add_emojis_to_flowbox(left_emojis_flow_box);
+            emoji_manager.add_emojis_to_flowbox(right_emojis_flow_box);
         }
 
         private void connect_flow_box_signals(Gtk.FlowBox flowBox, EmojiActionDelegate handler) {
@@ -83,7 +82,7 @@ namespace Mingle {
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
             stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
-            curr_emoji_combinations = get_combinations_by_emoji_code(curr_left_emoji);
+            curr_emoji_combinations = emoji_manager.get_combinations_by_emoji_code(curr_left_emoji);
             if(curr_left_emoji != null && curr_right_emoji != null){
                 this.get_emoji_combination.begin(curr_left_emoji, curr_right_emoji);
             }
@@ -98,7 +97,7 @@ namespace Mingle {
             string emoji = emoji_label.emoji;
             curr_right_emoji = emoji_label.code_point_str;
             stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
-            curr_emoji_combinations = get_combinations_by_emoji_code(curr_left_emoji);
+            curr_emoji_combinations = emoji_manager.get_combinations_by_emoji_code(curr_left_emoji);
             this.get_emoji_combination.begin(curr_left_emoji, curr_right_emoji);
             this.populate_center_flow_box.begin();
         }
@@ -143,13 +142,13 @@ namespace Mingle {
 
         private Gee.HashMap<string, Json.Node> populate_combinations_map() {
             stdout.printf("populate_combinations_map thread started\n");
-            Json.Array emoji_data = get_emoji_data();
+            Json.Array emoji_data = emoji_manager.get_supported_emojis();
             Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node>();
 
             for (int i = 0; i < emoji_data.get_length(); i++) {
                 Json.Node emoji_node = emoji_data.get_element(i);
                 string emoji_code = emoji_node.get_string();
-                Json.Array combinations = get_combinations_by_emoji_code(emoji_code);
+                Json.Array combinations = emoji_manager.get_combinations_by_emoji_code(emoji_code);
 
                 for (int j = 0; j < combinations.get_length(); j++) {
                     Json.Node combination_node = combinations.get_element(j);
@@ -166,79 +165,6 @@ namespace Mingle {
             return combinations_map;
         }
 
-        private Json.Array get_emoji_data() {
-            // JSON reading and parsing logic here
-            // Return the known_supported_array
-            string file_contents;
-            size_t length;
-
-            var input_stream = GLib.resources_open_stream("/com/github/halfmexican/Mingle/metadata.json", GLib.ResourceLookupFlags.NONE);
-            var data_stream = new GLib.DataInputStream(input_stream);
-            file_contents = data_stream.read_upto("", -1, out length);
-
-            Json.Parser parser = new Json.Parser ();
-            parser.load_from_data (file_contents, -1);
-
-            input_stream.close(null);
-            data_stream.close(null);
-
-            root_node = parser.get_root();
-            if (root_node.get_node_type() != Json.NodeType.OBJECT) {
-                stderr.printf ("Root node is not a JSON object.\n");
-            }
-
-            // Navigate to known_supported_emoji
-            Json.Object root_object = root_node.get_object ();
-            Json.Node known_supported_node = root_object.get_member("knownSupportedEmoji");
-            if (known_supported_node.get_node_type () != Json.NodeType.ARRAY) {
-                stderr.printf ("known_supported_emoji is not a JSON array.\n");
-            }
-
-            Json.Array known_supported_array = known_supported_node.get_array();
-            return known_supported_array;
-        }
-
-        private void add_emojis_to_flowbox(Gtk.FlowBox flowbox) {
-            if(known_supported_emojis == null)
-                known_supported_emojis = get_emoji_data();
-
-            for (int i = 0; i < known_supported_emojis.get_length(); i++) {
-                Json.Node emoji_node = known_supported_emojis.get_element(i);
-                add_emoji_to_flowbox(emoji_node.get_string(), flowbox);
-            }
-        }
-
-        private void add_emoji_to_flowbox(string emoji, Gtk.FlowBox flowbox) {
-            var item = new Mingle.EmojiLabel (emoji) {};
-            flowbox.append (item);
-            item.get_parent ().add_css_class ("card");
-        }
-
-        private Json.Array get_combinations_by_emoji_code(string emoji_code) {
-            Json.Node data_node = root_node.get_object().get_member("data");
-            if (data_node == null || data_node.get_node_type() != Json.NodeType.OBJECT) {
-                stderr.printf("Data node is missing or not an object.");
-            }
-
-            Json.Object data_object = data_node.get_object();
-
-            // Get the specific emoji data by code
-             Json.Node emoji_node = data_object.get_member(emoji_code);
-             if (emoji_node == null || emoji_node.get_node_type() != Json.NodeType.OBJECT) {
-                stderr.printf("Emoji code not found or data is not an object.");
-            }
-
-            Json.Object emoji_object = emoji_node.get_object();
-
-            // Get the combinations array
-            Json.Node combinations_node = emoji_object.get_member("combinations");
-            if (combinations_node == null || combinations_node.get_node_type() != Json.NodeType.ARRAY) {
-                stderr.printf("Combinations not found or not an array.");
-            }
-
-            return combinations_node.get_array();
-        }
-
         private void create_and_show_toast(string message) {
             var toast = new Adw.Toast(message) {timeout = 3};
             toast_overlay.add_toast(toast);
@@ -250,11 +176,11 @@ namespace Mingle {
                 return;
             }
 
-            if (known_supported_emojis == null)
-                known_supported_emojis = get_emoji_data();
+            //if (known_supported_emojis == null)
+                //known_supported_emojis = get_emoji_data();
 
             added_combinations =  new HashSet<string>();
-            foreach (Json.Node emoji_node in known_supported_emojis.get_elements()) {
+            foreach (Json.Node emoji_node in emoji_manager.get_supported_emojis().get_elements()) {
                 string rightEmojiCode = emoji_node.get_string();
                 string combinationKey = curr_left_emoji + "_" + rightEmojiCode;
 

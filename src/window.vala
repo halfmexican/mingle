@@ -38,14 +38,10 @@ namespace Mingle {
         private delegate void EmojiActionDelegate(Mingle.EmojiLabel emoji_label);
 
         public Window (Gtk.Application app) {
-            var window_timer = new GLib.Timer();
-            window_timer.start();
             GLib.Object (application: app);
             setup_emoji_flow_boxes();
             initialize_hashmap();
             right_emojis_flow_box.sensitive = false;
-            window_timer.stop();
-            stdout.printf("\nWindow opened in %2f seconds\n\n", window_timer.elapsed());
         }
 
         private void initialize_hashmap() {

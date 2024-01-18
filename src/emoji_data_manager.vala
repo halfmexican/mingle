@@ -144,15 +144,13 @@ namespace Mingle {
                     combinations_map.set(combinationKey2, combination_node);
                 }
             }
-            //stdout.printf("populate_combinations_map thread finishes\n");
             return combinations_map;
         }
 
-         public async Mingle.CombinedEmoji get_combined_emoji (string left_codepoint, string right_codepoint) {
-            string combinationKey1 = left_codepoint + "_" + right_codepoint;
-            string combinationKey2 = right_codepoint + "_" + left_codepoint;
+         public async Mingle.CombinedEmoji get_combined_emoji(string left_codepoint, string right_codepoint) {
+            string combinationKey = left_codepoint + "_" + right_codepoint; // The key is always left + right
 
-            Json.Node combinationNode = combinations_map.get(combinationKey1) ?? combinations_map.get(combinationKey2);
+            Json.Node combinationNode = combinations_map.get(combinationKey);
 
             if (combinationNode != null) {
                 Json.Object combination_object = combinationNode.get_object();
@@ -166,10 +164,9 @@ namespace Mingle {
                     stderr.printf("gStaticUrl is missing or not a value.\n");
                 }
             } else {
-                stderr.printf("Combination not found for the provided codepoints.\n");
-            }
+            stderr.printf("Combination not found for the provided codepoints.\n");
+        }
             return null;
         }
-
     }
 }

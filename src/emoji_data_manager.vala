@@ -138,8 +138,6 @@ namespace Mingle {
                     string leftEmojiCode = combination_object.get_member("leftEmojiCodepoint").get_value().get_string();
                     string rightEmojiCode = combination_object.get_member("rightEmojiCodepoint").get_value().get_string();
 
-                    string combinationKey = leftEmojiCode + "_" + rightEmojiCode;
-
                     string combinationKey1 = leftEmojiCode + "_" + rightEmojiCode;
                     string combinationKey2 = rightEmojiCode + "_" + leftEmojiCode;
                     combinations_map.set(combinationKey1, combination_node);

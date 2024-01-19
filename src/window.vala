@@ -29,8 +29,11 @@ namespace Mingle {
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
 
         private EmojiDataManager emoji_manager = new EmojiDataManager();
-        string curr_left_emoji;
-        string curr_right_emoji;
+        private string curr_left_emoji;
+        private string curr_right_emoji;
+        private string left_right_emoji;
+        private string prev_right_emoji;
+
 
         // lazy loading properties
         private const int BATCH_SIZE = 20;
@@ -79,11 +82,12 @@ namespace Mingle {
         }
 
         private void handle_right_emoji_activation(Mingle.EmojiLabel emoji_label) {
-             // Clearing the existing emojis in the flow box
-            string emoji = emoji_label.emoji;
-            curr_right_emoji = emoji_label.code_point_str;
-            stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
-            this.add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
+            string right_emoji_code = emoji_label.code_point_str;
+
+            if (right_emoji_code != prev_right_emoji) {
+                prev_right_emoji = right_emoji_code; // Update the last right emoji code
+                add_combined_emoji.begin(curr_left_emoji, right_emoji_code);
+            }
         }
 
         private void create_and_show_toast(string message) {
@@ -93,6 +97,11 @@ namespace Mingle {
 
         private async void add_combined_emoji (string leftEmojiCode, string RightEmojiCode) {
             var combined_emoji = yield emoji_manager.get_combined_emoji(leftEmojiCode, RightEmojiCode);
+
+            if(combined_emoji == null){
+                return;
+            }
+
             combined_emojis_flow_box.prepend(combined_emoji);
             combined_emoji.revealer.reveal_child = true;
             combined_emoji.copied.connect(() => {

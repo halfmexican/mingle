@@ -121,7 +121,7 @@ namespace Mingle {
             return relevantCombinations;
         }
 
-        public Gee.List<Json.Node> get_combinations_for_emoji_lazy(string emojiCode, int offset, int limit) {
+        public Gee.List<Json.Node> get_combinations_for_emoji_lazy(string emojiCode, uint offset, int limit) {
             Json.Array allCombinations = get_combinations_array_for_emoji(emojiCode);
             Gee.List<Json.Node> batch = new Gee.ArrayList<Json.Node>();
 

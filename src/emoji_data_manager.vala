@@ -2,7 +2,6 @@ using Json, Soup, Gee;
 
 namespace Mingle {
     public class EmojiDataManager {
-        // Currently this class loads our supported emojis and nothing else
         private Json.Node root_node;
         private Json.Array supported_emojis;
         private Gee.HashMap<string, Json.Node> combinations_map;
@@ -16,6 +15,7 @@ namespace Mingle {
         private void initialize_combinations_map() {
             if (!Thread.supported()) {
                 stderr.printf("Threads are not supported!\n");
+                combinations_map = populate_combinations_map();
                 return;
             }
 
@@ -87,7 +87,7 @@ namespace Mingle {
         }
 
 
-        public Json.Array get_combinations_by_emoji_code(string emoji_code) {
+        public Json.Array get_combinations_array_for_emoji(string emoji_code) {
             Json.Node data_node = root_node.get_object().get_member("data");
             Json.Object data_object = data_node.get_object();
 
@@ -121,6 +121,21 @@ namespace Mingle {
             return relevantCombinations;
         }
 
+        public Gee.List<Json.Node> get_combinations_for_emoji_lazy(string emojiCode, int offset, int limit) {
+            Json.Array allCombinations = get_combinations_array_for_emoji(emojiCode);
+            Gee.List<Json.Node> batch = new Gee.ArrayList<Json.Node>();
+
+            // Ensure we do not go out of bounds
+           uint endIndex = offset + limit < allCombinations.get_length() ? offset + limit : allCombinations.get_length();
+
+            for (uint i = offset; i < endIndex; i++) {
+                batch.add(allCombinations.get_element(i));
+            }
+
+            return batch;
+        }
+
+
         private Gee.HashMap<string, Json.Node> populate_combinations_map() {
             stdout.printf("populate_combinations_map thread started\n");
             Json.Array emoji_data = get_supported_emojis();
@@ -129,7 +144,7 @@ namespace Mingle {
             for (int i = 0; i < emoji_data.get_length(); i++) {
                 Json.Node emoji_node = emoji_data.get_element(i);
                 string emoji_code = emoji_node.get_string();
-                Json.Array combinations = get_combinations_by_emoji_code(emoji_code);
+                Json.Array combinations = get_combinations_array_for_emoji(emoji_code);
 
                 for (int j = 0; j < combinations.get_length(); j++) {
                     Json.Node combination_node = combinations.get_element(j);

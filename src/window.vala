@@ -25,11 +25,17 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
+        [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
 
         private EmojiDataManager emoji_manager = new EmojiDataManager();
         string curr_left_emoji;
         string curr_right_emoji;
+
+        // lazy loading properties
+        private const int BATCH_SIZE = 20;
+        private uint batch_offset = 0;
+        private bool is_loading = false;
 
         private delegate void EmojiActionDelegate(Mingle.EmojiLabel emoji_label);
 
@@ -37,6 +43,7 @@ namespace Mingle {
             GLib.Object (application: app);
             setup_emoji_flow_boxes();
             right_emojis_flow_box.sensitive = false;
+            combined_scrolled_window.edge_overshot.connect(on_edge_reached);
         }
 
         private void setup_emoji_flow_boxes() {
@@ -60,12 +67,15 @@ namespace Mingle {
             combined_emojis_flow_box.remove_all();
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
+
             stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
 
+            // Reset the offset for lazy loading
+            batch_offset = 0;
             if(curr_left_emoji != null && curr_right_emoji != null){
                 this.add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
             }
-            this.populate_center_flow_box.begin(curr_left_emoji);
+            this.populate_center_flow_box_lazy.begin();
             right_emojis_flow_box.sensitive = true;
         }
 
@@ -76,7 +86,6 @@ namespace Mingle {
             curr_right_emoji = emoji_label.code_point_str;
             stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
             this.add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
-            this.populate_center_flow_box.begin(curr_left_emoji);
         }
 
         private void create_and_show_toast(string message) {
@@ -93,27 +102,48 @@ namespace Mingle {
             });
         }
 
-        private async void populate_center_flow_box(string leftEmojiCode) {
-            if (leftEmojiCode == null || leftEmojiCode == "") {
+        // Modify populate_center_flow_box to use lazy loading
+        private async void populate_center_flow_box_lazy() {
+
+            if (is_loading) {
+                stderr.printf("Already loading, aborting new call.\n");
+                return; // Early return if already loading
+            }
+            is_loading = true;
+
+            if (curr_left_emoji == null || curr_left_emoji == "") {
                 stderr.printf("Left emoji is not selected.\n");
+                is_loading = false;
                 return;
             }
 
-            var relevantCombinations = emoji_manager.get_combinations_for_emoji(leftEmojiCode);
+            // Clear the flowbox if we're loading from the beginning
+            if (batch_offset == 0) {
+                combined_emojis_flow_box.remove_all();
+            }
 
-            foreach (Json.Node combinationNode in relevantCombinations) {
+            Gee.List<Json.Node> batch = emoji_manager.get_combinations_for_emoji_lazy(curr_left_emoji, batch_offset, BATCH_SIZE);
+
+            if (batch.size == 0) {
+                stderr.printf("No more combinations to load.\n");
+                is_loading = false; // Reset the loading state
+                return;
+            }
+
+            uint added_count = 0;
+            foreach (Json.Node combinationNode in batch) {
+                // Check if the left emoji has changed during this operation
                 Json.Object combination_object = combinationNode.get_object();
                 string rightEmojiCode = combination_object.get_member("rightEmojiCodepoint").get_value().get_string();
 
-                if (rightEmojiCode == leftEmojiCode) {
+                if (rightEmojiCode == curr_left_emoji) {
                    rightEmojiCode = combination_object.get_member("leftEmojiCodepoint").get_value().get_string();
                 }
 
-                string combinationKey = leftEmojiCode + "_" + rightEmojiCode;
+                string combinationKey = curr_left_emoji + "_" + rightEmojiCode;
 
                 if (!emoji_manager.is_combination_added(combinationKey)) {
-                    //stdout.printf("Attempting to add combination: %s\n", combinationKey);
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji(leftEmojiCode, rightEmojiCode);
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji(curr_left_emoji, rightEmojiCode);
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect(() => {
@@ -124,8 +154,24 @@ namespace Mingle {
                         combined_emoji.revealer.reveal_child = true;
 
                         emoji_manager.add_combination(combinationKey);
+                        added_count++;
+
                     }
                 }
+            }
+            batch_offset += added_count;
+            is_loading = false;
+        }
+
+        private void on_edge_reached(Gtk.ScrolledWindow scrolled_window, Gtk.PositionType pos_type) {
+            if (pos_type != Gtk.PositionType.BOTTOM) {
+                return; // We are only interested in the bottom edge
+            }
+
+            if (!is_loading) {
+                // Load the next batch of combined emojis
+                stderr.printf("Edge Overshot!\n");
+                populate_center_flow_box_lazy.begin();
             }
         }
     }

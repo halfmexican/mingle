@@ -83,7 +83,7 @@ namespace Mingle {
             }
 
             // If there's a valid right emoji selected, add its combination with the new left emoji
-            if (curr_right_emoji != null) {
+            if (curr_right_emoji != null && prev_right_emoji != curr_right_emoji) {
                 add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
             }
         }

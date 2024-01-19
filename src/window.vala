@@ -76,13 +76,12 @@ namespace Mingle {
 
                 // Reset the offset for lazy loading
                 batch_offset = 0;
+                        emoji_manager.clear_added_combinations();
                 this.populate_center_flow_box_lazy.begin();
                  if (curr_right_emoji != null) {
                     add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
                 }
                 right_emojis_flow_box.sensitive = true;
-            } else {
-            // If the same left emoji is selected, do nothing or implement other desired behavior
             }
 
             // If there's a valid right emoji selected, add its combination with the new left emoji

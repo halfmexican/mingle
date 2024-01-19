@@ -31,7 +31,7 @@ namespace Mingle {
         private EmojiDataManager emoji_manager = new EmojiDataManager();
         private string curr_left_emoji;
         private string curr_right_emoji;
-        private string left_right_emoji;
+        private string prev_left_emoji;
         private string prev_right_emoji;
 
 
@@ -46,7 +46,7 @@ namespace Mingle {
             GLib.Object (application: app);
             setup_emoji_flow_boxes();
             right_emojis_flow_box.sensitive = false;
-            combined_scrolled_window.edge_overshot.connect(on_edge_reached);
+            combined_scrolled_window.edge_overshot.connect(on_edge_overshot);
         }
 
         private void setup_emoji_flow_boxes() {
@@ -65,28 +65,37 @@ namespace Mingle {
         }
 
         private void handle_left_emoji_activation(Mingle.EmojiLabel emoji_label) {
-             // Clearing the existing emojis in the flow box
-            combined_emojis_flow_box.remove_all();
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
-
             stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
 
-            // Reset the offset for lazy loading
-            batch_offset = 0;
-            if(curr_left_emoji != null && curr_right_emoji != null){
-                this.add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
+            if (curr_left_emoji != prev_left_emoji) {
+                // Clearing the existing emojis in the flow box only if a different left emoji is selected
+                combined_emojis_flow_box.remove_all();
+                prev_left_emoji = curr_left_emoji;
+
+                // Reset the offset for lazy loading
+                batch_offset = 0;
+                this.populate_center_flow_box_lazy.begin();
+                right_emojis_flow_box.sensitive = true;
+            } else {
+            // If the same left emoji is selected, do nothing or implement other desired behavior
             }
-            this.populate_center_flow_box_lazy.begin();
-            right_emojis_flow_box.sensitive = true;
+
+            // If there's a valid right emoji selected, add its combination with the new left emoji
+            if (curr_right_emoji != null) {
+                add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
+            }
         }
 
         private void handle_right_emoji_activation(Mingle.EmojiLabel emoji_label) {
-            string right_emoji_code = emoji_label.code_point_str;
+            string emoji = emoji_label.emoji;
+            curr_right_emoji = emoji_label.code_point_str;
 
-            if (right_emoji_code != prev_right_emoji) {
-                prev_right_emoji = right_emoji_code; // Update the last right emoji code
-                add_combined_emoji.begin(curr_left_emoji, right_emoji_code);
+            stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
+            if (curr_right_emoji != prev_right_emoji) {
+                prev_right_emoji = curr_right_emoji; // Update the last right emoji code
+                add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);
             }
         }
 
@@ -109,9 +118,7 @@ namespace Mingle {
             });
         }
 
-        // Modify populate_center_flow_box to use lazy loading
         private async void populate_center_flow_box_lazy() {
-                stderr.printf("populate.\n");
             if (is_loading) {
                 stderr.printf("Already loading, aborting new call.\n");
                 return; // Early return if already loading
@@ -170,7 +177,7 @@ namespace Mingle {
             is_loading = false;
         }
 
-        private void on_edge_reached(Gtk.ScrolledWindow scrolled_window, Gtk.PositionType pos_type) {
+        private void on_edge_overshot(Gtk.PositionType pos_type) {
             if (pos_type != Gtk.PositionType.BOTTOM) {
                 return; // We are only interested in the bottom edge
             }

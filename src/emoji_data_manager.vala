@@ -90,7 +90,6 @@ namespace Mingle {
             added_combinations.clear();
         }
 
-
         public Json.Array get_combinations_array_for_emoji(string emoji_code) {
             Json.Node data_node = root_node.get_object().get_member("data");
             Json.Object data_object = data_node.get_object();

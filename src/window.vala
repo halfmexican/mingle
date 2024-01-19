@@ -92,7 +92,7 @@ namespace Mingle {
             string emoji = emoji_label.emoji;
             curr_right_emoji = emoji_label.code_point_str;
 
-            stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
+            stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
                 add_combined_emoji.begin(curr_left_emoji, curr_right_emoji);

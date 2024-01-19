@@ -58,7 +58,6 @@ namespace Mingle {
             flowBox.child_activated.connect ((item) => {
                 Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) item.child;
                 handler(emoji_label);
-                combined_emojis_flow_box.remove_all();
             });
         }
 
@@ -81,7 +80,6 @@ namespace Mingle {
 
         private void handle_right_emoji_activation(Mingle.EmojiLabel emoji_label) {
              // Clearing the existing emojis in the flow box
-            combined_emojis_flow_box.remove_all();
             string emoji = emoji_label.emoji;
             curr_right_emoji = emoji_label.code_point_str;
             stdout.printf("Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
@@ -104,7 +102,7 @@ namespace Mingle {
 
         // Modify populate_center_flow_box to use lazy loading
         private async void populate_center_flow_box_lazy() {
-
+                stderr.printf("populate.\n");
             if (is_loading) {
                 stderr.printf("Already loading, aborting new call.\n");
                 return; // Early return if already loading

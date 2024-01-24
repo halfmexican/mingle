@@ -17,9 +17,20 @@ mingle_deps = [
   dependency('gee-0.8')
 ]
 
+# Custom target for Blueprint files
+blueprints = custom_target('blueprints',
+  input: files(
+    'window.blp',
+    'gtk/help-overlay.blp'# Replace with your actual Blueprint file
+  ),
+  output: '.',
+  command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
+)
+
 mingle_sources += gnome.compile_resources('mingle-resources',
   'mingle.gresource.xml',
-  c_name: 'mingle'
+  c_name: 'mingle',
+  dependencies: blueprints,
 )
 
 executable('mingle', mingle_sources,

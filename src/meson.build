@@ -20,8 +20,8 @@ mingle_deps = [
 # Custom target for Blueprint files
 blueprints = custom_target('blueprints',
   input: files(
-    'window.blp',
-    'gtk/help-overlay.blp'# Replace with your actual Blueprint file
+    'ui/window.blp',
+    'ui/help-overlay.blp'
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],

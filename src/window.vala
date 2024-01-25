@@ -20,7 +20,7 @@
 
 using Json, Soup, Gee;
 namespace Mingle {
-    [GtkTemplate (ui = "/com/github/halfmexican/Mingle/ui/window.ui")]
+    [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/window.ui")]
     public class Window : Adw.ApplicationWindow {
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
@@ -46,7 +46,7 @@ namespace Mingle {
             GLib.Object (application: app);
             setup_emoji_flow_boxes();
             right_emojis_flow_box.sensitive = false;
-            combined_scrolled_window.edge_overshot.connect(on_edge_overshot);
+            combined_scrolled_window.edge_reached.connect(on_edge_overshot);
         }
 
         private void setup_emoji_flow_boxes() {

@@ -1,6 +1,6 @@
 /* application.vala
  *
- * Copyright 2023 José Hunter
+ * Copyright 2023-2024 José Hunter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

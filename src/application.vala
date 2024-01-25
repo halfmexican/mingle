@@ -20,6 +20,7 @@
 
 namespace Mingle {
     public class Application : Adw.Application {
+        public static GLib.Settings settings = new GLib.Settings ("com.github.halfmexican.Mingle");
         public Application () {
             Object (application_id: "com.github.halfmexican.Mingle", flags: ApplicationFlags.DEFAULT_FLAGS);
         }
@@ -60,6 +61,10 @@ namespace Mingle {
 
         private void on_preferences_action () {
             message ("app.preferences action activated");
+            var prefs = new Mingle.PrefsWindow (){
+                    transient_for = this.active_window,
+                };
+            prefs.present ();
         }
     }
 }

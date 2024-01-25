@@ -85,19 +85,43 @@ namespace Mingle {
         }
 
         public void add_emojis_to_flowbox(Gtk.FlowBox flowbox) {
-            if(supported_emojis == null)
+            if (supported_emojis == null)
                 supported_emojis = populate_supported_emojis_array();
 
-            for (int i = 0; i < supported_emojis.get_length(); i++) {
-                Json.Node emoji_node = supported_emojis.get_element(i);
-                add_emoji_to_flowbox(emoji_node.get_string(), flowbox);
-            }
+            Json.Object data_object = root_node.get_object().get_member("data").get_object();
+
+            ArrayForeach array_foreach_func = (array, index_, element_node) => {
+                if (element_node.get_node_type() == Json.NodeType.VALUE) {
+                    string emoji_code = element_node.get_string();
+                    Json.Node emoji_node = data_object.get_member(emoji_code);
+
+                    if (emoji_node != null && emoji_node.get_node_type() == Json.NodeType.OBJECT) {
+                        Json.Object emoji_object = emoji_node.get_object();
+                        string alt_name = prettify_alt_name(emoji_object.get_string_member("alt"));
+                        Json.Array? keywords = emoji_object.get_array_member("keywords");
+                        add_emoji_to_flowbox(emoji_code, alt_name, keywords, flowbox);
+                    }
+                }
+            };
+
+            supported_emojis.foreach_element(array_foreach_func);
         }
 
-        public void add_emoji_to_flowbox(string emoji, Gtk.FlowBox flowbox) { // Helper Method for emojis
-            var item = new Mingle.EmojiLabel (emoji) {};
-            flowbox.append (item);
-            item.get_parent ().add_css_class ("card");
+        public void add_emoji_to_flowbox(string emoji_code, string alt_name, Json.Array? keywords, Gtk.FlowBox flowbox) {
+            var item = new Mingle.EmojiLabel(emoji_code, alt_name, keywords) {};
+            flowbox.append(item);
+            item.get_parent().add_css_class("card");
+        }
+
+        public string prettify_alt_name(string alt_name) {
+            var words = alt_name.replace("_", " ").down().split(" ");
+            string pretty_name = "";
+
+            foreach (var word in words) {
+                if (word.length > 0)
+                    pretty_name += word[0].to_string().up() + word.substring(1) + " ";
+            }
+            return pretty_name;
         }
 
         public bool is_combination_added(string combinationKey) {
@@ -142,7 +166,6 @@ namespace Mingle {
                     relevantCombinations.add(combinations_map.get(key));
                 }
             }
-
             return relevantCombinations;
         }
 

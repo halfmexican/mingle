@@ -23,17 +23,23 @@ namespace Mingle {
     public class EmojiLabel : Adw.Bin {
         public string code_point_str;
         public string emoji;
+        public string alt_name;
+        public Json.Array? keywords;
 
-        public EmojiLabel(string code_point_str) {
+        public EmojiLabel(string code_point_str, string alt_name, Json.Array? keywords) {
             this.code_point_str = code_point_str;
+            this.alt_name = alt_name;
+            this.keywords = keywords;
             this.emoji = code_point_str_to_emoji(code_point_str);
-            this.child = new Gtk.Label(this.emoji) {
+            var label = new Gtk.Label(this.emoji) {
                 css_classes = { "emoji", "title-1" },
                 vexpand = true,
                 hexpand = true,
                 width_request = 50,
                 height_request = 50,
             };
+            this.child = label;
+            label.set_tooltip_text(alt_name);
         }
 
          private string code_point_str_to_emoji(string code_point_str) {

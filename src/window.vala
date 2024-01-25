@@ -143,7 +143,6 @@ namespace Mingle {
 
             uint added_count = 0;
             foreach (Json.Node combinationNode in batch) {
-                // Check if the left emoji has changed during this operation
                 Json.Object combination_object = combinationNode.get_object();
                 string rightEmojiCode = combination_object.get_member("rightEmojiCodepoint").get_value().get_string();
 
@@ -181,7 +180,6 @@ namespace Mingle {
 
             if (!is_loading) {
                 // Load the next batch of combined emojis
-                stderr.printf("Edge Overshot!\n");
                 populate_center_flow_box_lazy.begin();
             }
         }

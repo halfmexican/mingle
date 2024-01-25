@@ -5,7 +5,8 @@ mingle_sources = [
   'utils.vala',
   'emoji_label.vala',
   'combined_emoji.vala',
-  'emoji_data_manager.vala'
+  'emoji_data_manager.vala',
+  'prefs.vala'
 ]
 
 mingle_deps = [
@@ -21,7 +22,8 @@ mingle_deps = [
 blueprints = custom_target('blueprints',
   input: files(
     'gtk/window.blp',
-    'gtk/help-overlay.blp'
+    'gtk/help-overlay.blp',
+    'gtk/prefs.blp'
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],

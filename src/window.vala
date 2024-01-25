@@ -34,7 +34,6 @@ namespace Mingle {
         private string prev_left_emoji;
         private string prev_right_emoji;
 
-
         // lazy loading properties
         private const int BATCH_SIZE = 20;
         private uint batch_offset = 0;
@@ -46,7 +45,7 @@ namespace Mingle {
             GLib.Object (application: app);
             setup_emoji_flow_boxes();
             right_emojis_flow_box.sensitive = false;
-            combined_scrolled_window.edge_reached.connect(on_edge_overshot);
+            combined_scrolled_window.edge_overshot.connect(on_edge_overshot);
         }
 
         private void setup_emoji_flow_boxes() {

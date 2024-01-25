@@ -35,5 +35,6 @@ mingle_sources += gnome.compile_resources('mingle-resources',
 
 executable('mingle', mingle_sources,
   dependencies: mingle_deps,
-       install: true,
+	vala_args: [ '--gresourcesdir=src/' ],
+  install: true,
 )

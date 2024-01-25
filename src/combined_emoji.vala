@@ -1,6 +1,6 @@
 /* combined_emojji.vala
  *
- * Copyright 2023 José Hunter
+ * Copyright 2023-2024 José Hunter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+
 using Adw, Gtk, Soup;
 namespace Mingle {
     public class CombinedEmoji : Gtk.Button {

@@ -53,9 +53,8 @@ namespace Mingle {
                 developer_name = "José Hunter",
                 version = "0.1.0",
                 developers = developers,
-                copyright = "© 2023 José Hunter",
+                copyright = "© 2024 José Hunter",
             };
-
             about.present ();
         }
 

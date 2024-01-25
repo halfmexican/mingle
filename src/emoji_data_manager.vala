@@ -40,9 +40,11 @@ namespace Mingle {
             }
 
             try {
+                stdout.printf("populate_combinations_map thread started\n");
                 Thread<Gee.HashMap<string, Json.Node>> thread = new Thread<Gee.HashMap<string, Json.Node>>.try (
                     "combinations_map_thread", populate_combinations_map);
                 combinations_map = thread.join();
+                stdout.printf("populate_combinations_map thread end\n");
             } catch (Error e) {
                 stderr.printf("Error: %s\n", e.message);
             }
@@ -160,7 +162,6 @@ namespace Mingle {
 
 
         private Gee.HashMap<string, Json.Node> populate_combinations_map() {
-            stdout.printf("populate_combinations_map thread started\n");
             Json.Array emoji_data = get_supported_emojis();
             Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node>();
 

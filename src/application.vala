@@ -20,7 +20,7 @@
 
 namespace Mingle {
     public class Application : Adw.Application {
-        public static GLib.Settings settings = new GLib.Settings ("com.github.halfmexican.Mingle");
+        public GLib.Settings settings = new GLib.Settings ("com.github.halfmexican.Mingle");
         public Application () {
             Object (application_id: "com.github.halfmexican.Mingle", flags: ApplicationFlags.DEFAULT_FLAGS);
         }
@@ -39,7 +39,7 @@ namespace Mingle {
             base.activate ();
             var win = this.active_window;
             if (win == null) {
-                win = new Mingle.Window (this);
+                win = new Mingle.Window (this, settings);
             }
             win.present ();
         }

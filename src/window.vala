@@ -28,6 +28,7 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
 
+        private GLib.Settings settings;
         private EmojiDataManager emoji_manager = new EmojiDataManager();
         private string curr_left_emoji;
         private string curr_right_emoji;
@@ -41,10 +42,11 @@ namespace Mingle {
 
         private delegate void EmojiActionDelegate(Mingle.EmojiLabel emoji_label);
 
-        public Window (Gtk.Application app) {
+        public Window (Gtk.Application app, GLib.Settings settings) {
             GLib.Object (application: app);
             setup_emoji_flow_boxes();
             right_emojis_flow_box.sensitive = false;
+            this.settings = settings;
             combined_scrolled_window.edge_overshot.connect(on_edge_overshot);
         }
 
@@ -67,6 +69,14 @@ namespace Mingle {
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
             stdout.printf("Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
+
+            if (settings.get_boolean("first-launch")) {
+                // It's the first launch, show the toast.
+                create_and_show_toast("Scroll down to load more emojis");
+
+                // Now set the key to false so that this doesn't appear again.
+                settings.set_boolean("first-launch", false);
+            }
 
             if (curr_left_emoji != prev_left_emoji) {
                 // Clearing the existing emojis in the flow box only if a different left emoji is selected

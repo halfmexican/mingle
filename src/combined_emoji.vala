@@ -24,11 +24,11 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
-        public async CombinedEmoji (string gstatic_url, bool high_priority){
+        public async CombinedEmoji (string gstatic_url){
           try {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
-                var input_stream = yield get_input_stream(gstatic_url, high_priority );
+                var input_stream = yield get_input_stream(gstatic_url);
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async(input_stream, null);
                 _texture = Gdk.Texture.for_pixbuf(pixbuf);
 
@@ -68,15 +68,11 @@ namespace Mingle {
             });
         }
 
-        private async InputStream? get_input_stream (string url, bool high_priority) throws Error {
+        private async InputStream? get_input_stream (string url) throws Error {
             var session = new Soup.Session ();
             var message = new Soup.Message.from_uri ("GET", Uri.parse (url, NONE));
             InputStream input_stream;
-            if (high_priority){
-                input_stream = yield session.send_async (message, Priority.HIGH, null);
-            } else {
-                input_stream = yield session.send_async (message, Priority.LOW, null);
-            }
+            input_stream = yield session.send_async (message, Priority.HIGH, null);
 
             uint status_code = message.status_code;
             string reason = message.reason_phrase;

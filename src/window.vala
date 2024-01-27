@@ -27,6 +27,7 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
         [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
+        [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
 
         private GLib.Settings settings;
         private EmojiDataManager emoji_manager = new EmojiDataManager();
@@ -48,6 +49,9 @@ namespace Mingle {
             right_emojis_flow_box.sensitive = false;
             this.settings = settings;
             combined_scrolled_window.edge_overshot.connect(on_edge_overshot);
+
+            Mingle.StyleSwitcher s = new Mingle.StyleSwitcher();
+            popover_menu.add_child(s, "style-switcher");
         }
 
         private void setup_emoji_flow_boxes() {

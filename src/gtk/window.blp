@@ -24,7 +24,10 @@ template $MingleWindow : Adw.ApplicationWindow {
           primary: true;
           icon-name: "open-menu-symbolic";
           tooltip-text: _("Menu");
-          menu-model: primary_menu;
+
+          popover: Gtk.PopoverMenu popover_menu {
+            menu-model: primary_menu;
+          };
         }
 
         [start]
@@ -121,6 +124,11 @@ template $MingleWindow : Adw.ApplicationWindow {
 }
 
 menu primary_menu {
+  section {
+    item {
+      custom: "style-switcher";
+    }
+  }
   section {
     item {
       label: _("_Preferences");

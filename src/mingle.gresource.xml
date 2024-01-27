@@ -4,6 +4,7 @@
     <file preprocess="xml-stripblanks">gtk/window.ui</file>
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
     <file preprocess="xml-stripblanks">gtk/prefs.ui</file>
+    <file preprocess="xml-stripblanks">gtk/style-switcher.ui</file>
     <file preprocess="json-stripblanks">emoji_data/metadata.json</file>
     <file>style.css</file>
   </gresource>

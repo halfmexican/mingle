@@ -1,0 +1,93 @@
+using Gtk 4.0;
+
+template $MingleStyleSwitcher : Widget {
+ styles ["style-switcher"]
+  Box box {
+    orientation: horizontal;
+    homogeneous: true;
+    spacing: 18;
+
+    Overlay {
+      visible: bind MingleStyleSwitcher.show-system;
+      halign: center;
+
+      CheckButton system_selector {
+        tooltip-text: _("Use System Colors");
+        active: true;
+        toggled => $theme_check_active_changed();
+
+        styles [
+          "system",
+        ]
+      }
+
+      [overlay]
+      Image {
+        visible: bind system_selector.active;
+        icon-name: "checkmark-small-symbolic";
+        pixel-size: 13;
+        halign: end;
+        valign: end;
+
+        styles [
+          "check",
+        ]
+      }
+    }
+
+    Overlay {
+      halign: center;
+
+      CheckButton light_selector {
+        group: system_selector;
+        tooltip-text: _("Use Light Colors");
+        toggled => $theme_check_active_changed();
+
+        styles [
+          "light",
+        ]
+      }
+
+      [overlay]
+      Image {
+        visible: bind light_selector.active;
+        icon-name: "checkmark-small-symbolic";
+        pixel-size: 13;
+        halign: end;
+        valign: end;
+
+        styles [
+          "check",
+        ]
+      }
+    }
+
+    Overlay {
+      halign: center;
+
+      CheckButton dark_selector {
+        group: system_selector;
+        tooltip-text: _("Use Dark Colors");
+        halign: center;
+        toggled => $theme_check_active_changed();
+
+        styles [
+          "dark",
+        ]
+      }
+
+      [overlay]
+      Image {
+        visible: bind dark_selector.active;
+        icon-name: "checkmark-small-symbolic";
+        pixel-size: 13;
+        halign: end;
+        valign: end;
+
+        styles [
+          "check",
+        ]
+      }
+    }
+  }
+}

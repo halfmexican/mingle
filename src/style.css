@@ -1,0 +1,48 @@
+.style-switcher {
+  padding: 6px;
+}
+
+.style-switcher .check {
+  background: @accent_bg_color;
+  color: @accent_fg_color;
+  padding: 2px;
+  border-radius: 17px;
+  margin: 3px;
+}
+
+/* Adapted from https://gitlab.gnome.org/GNOME/gnome-text-editor/-/blob/bf8c0c249f06a0be69e65aed3b786ba02a9f999e/src/TextEditor.css#L51 */
+
+.style-switcher checkbutton {
+  outline-offset: 1px;
+  transition: none;
+}
+
+.style-switcher checkbutton radio {
+  -gtk-icon-source: none;
+  background: none;
+  padding: 12px;
+  min-height: 24px;
+  min-width: 24px;
+  border: none;
+  transition: none;
+  box-shadow: inset 0 0 0 1px @borders;
+}
+
+.style-switcher checkbutton radio:checked {
+  box-shadow: inset 0 0 0 2px @accent_bg_color;
+}
+
+.style-switcher checkbutton.system radio {
+  background: linear-gradient(-45deg, #1e1e1e 49.99%, white 50.01%);
+}
+
+.style-switcher checkbutton.light radio {
+  color: alpha(black, 0.8);
+  background-color: white;
+}
+
+.style-switcher checkbutton.dark radio {
+  color: white;
+  background-color: #1e1e1e;
+}
+

@@ -6,7 +6,8 @@ mingle_sources = [
   'emoji_label.vala',
   'combined_emoji.vala',
   'emoji_data_manager.vala',
-  'prefs.vala'
+  'prefs.vala',
+  'style_switcher.vala'
 ]
 
 mingle_deps = [
@@ -23,7 +24,8 @@ blueprints = custom_target('blueprints',
   input: files(
     'gtk/window.blp',
     'gtk/help-overlay.blp',
-    'gtk/prefs.blp'
+    'gtk/prefs.blp',
+    'gtk/style-switcher.blp'
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
@@ -40,3 +42,4 @@ executable('mingle', mingle_sources,
 	vala_args: [ '--gresourcesdir=src/' ],
   install: true,
 )
+

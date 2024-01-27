@@ -13,7 +13,8 @@ install_data(
 )
 
 
-action_dir = join_paths('hicolor', 'symbolic', 'actions')
+
+action_dir = join_paths('hicolor', 'scalable', 'actions')
 action_icons = [
     # each icon must be registered here
     join_paths(action_dir, 'dice3-symbolic.svg'),
@@ -22,5 +23,5 @@ action_icons = [
 
 install_data(
   action_icons,
-  install_dir: get_option('datadir') / 'icons'/ action_dir
+  install_dir: join_paths(get_option('datadir'), 'icons', action_dir)
 )

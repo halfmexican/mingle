@@ -124,12 +124,12 @@ namespace Mingle {
             return pretty_name;
         }
 
-        public bool is_combination_added(string combinationKey) {
-            return added_combinations.contains(combinationKey);
+        public bool is_combination_added(string combination_key) {
+            return added_combinations.contains(combination_key);
         }
 
-        public void add_combination(string combinationKey) {
-            added_combinations.add(combinationKey);
+        public void add_combination(string combination_key) {
+            added_combinations.add(combination_key);
         }
 
         public void clear_added_combinations() {
@@ -158,28 +158,24 @@ namespace Mingle {
         }
 
         public Gee.List<Json.Node> get_combinations_for_emoji(string leftEmojiCode) {
-            Gee.List<Json.Node> relevantCombinations = new Gee.ArrayList<Json.Node>();
-
-            // Retrieve all combinations that include the EmojiCode, regardless of whether it is on the left or right
+            Gee.List<Json.Node> relevant_combinations = new Gee.ArrayList<Json.Node>();
             foreach (var key in combinations_map.keys) {
                 if (key.contains(leftEmojiCode)) {
-                    relevantCombinations.add(combinations_map.get(key));
+                    relevant_combinations.add(combinations_map.get(key));
                 }
             }
-            return relevantCombinations;
+            return relevant_combinations;
         }
 
         public Gee.List<Json.Node> get_combinations_for_emoji_lazy(string emojiCode, uint offset, int limit) {
-            Json.Array allCombinations = get_combinations_array_for_emoji(emojiCode);
+            Json.Array all_combinations = get_combinations_array_for_emoji(emojiCode);
             Gee.List<Json.Node> batch = new Gee.ArrayList<Json.Node>();
 
             // Ensure we do not go out of bounds
-           uint endIndex = offset + limit < allCombinations.get_length() ? offset + limit : allCombinations.get_length();
-
+           uint endIndex = offset + limit < all_combinations.get_length() ? offset + limit : all_combinations.get_length();
             for (uint i = offset; i < endIndex; i++) {
-                batch.add(allCombinations.get_element(i));
+                batch.add(all_combinations.get_element(i));
             }
-
             return batch;
         }
 
@@ -196,30 +192,30 @@ namespace Mingle {
                     Json.Node combination_node = combinations.get_element(j);
                     Json.Object combination_object = combination_node.get_object();
 
-                    string leftEmojiCode = combination_object.get_member("leftEmojiCodepoint").get_value().get_string();
-                    string rightEmojiCode = combination_object.get_member("rightEmojiCodepoint").get_value().get_string();
+                    string left_emoji_code = combination_object.get_member("leftEmojiCodepoint").get_value().get_string();
+                    string right_emoji_code = combination_object.get_member("rightEmojiCodepoint").get_value().get_string();
 
-                    string combinationKey1 = leftEmojiCode + "_" + rightEmojiCode;
-                    string combinationKey2 = rightEmojiCode + "_" + leftEmojiCode;
-                    combinations_map.set(combinationKey1, combination_node);
-                    combinations_map.set(combinationKey2, combination_node);
+                    string combination_key1 = left_emoji_code + "_" + right_emoji_code;
+                    string combination_key2 = right_emoji_code + "_" + left_emoji_code;
+                    combinations_map.set(combination_key1, combination_node);
+                    combinations_map.set(combination_key2, combination_node);
                 }
             }
             return combinations_map;
         }
 
          public async Mingle.CombinedEmoji get_combined_emoji(string left_codepoint, string right_codepoint) {
-            string combinationKey = left_codepoint + "_" + right_codepoint; // The key is always left + right
+            string combination_key = left_codepoint + "_" + right_codepoint; // The key is always left + right
 
-            Json.Node combinationNode = combinations_map.get(combinationKey);
+            Json.Node combination_node = combinations_map.get(combination_key);
 
-            if (combinationNode != null) {
-                Json.Object combination_object = combinationNode.get_object();
+            if (combination_node != null) {
+                Json.Object combination_object = combination_node.get_object();
                 Json.Node gstatic_url_node = combination_object.get_member("gStaticUrl");
 
                 if (gstatic_url_node != null && gstatic_url_node.get_node_type() == Json.NodeType.VALUE) {
                     string gstatic_url = gstatic_url_node.get_value().get_string();
-                    Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, true);
+                    Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url);
                     return combined_emoji;
                 } else {
                     stderr.printf("gStaticUrl is missing or not a value.\n");

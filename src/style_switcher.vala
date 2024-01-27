@@ -9,11 +9,25 @@ namespace Mingle {
         [GtkChild] unowned Gtk.CheckButton dark_selector;
 
         private Adw.StyleManager style_manager;
-
+        private GLib.Settings settings = new GLib.Settings ("com.github.halfmexican.Mingle");
         public bool show_system { get; set; default = true; }
 
         public StyleSwitcher () {
-            style_manager = Adw.StyleManager.get_default ();
+            this.style_manager = Adw.StyleManager.get_default ();
+            switch (this.settings.get_int ("color-scheme") ) {
+                case 0:
+                    style_manager.set_color_scheme (Adw.ColorScheme.DEFAULT);
+                    system_selector.activate ();
+                    break;
+                case 1:
+                    style_manager.set_color_scheme (Adw.ColorScheme.FORCE_LIGHT);
+                    light_selector.activate ();
+                    break;
+                case 2:
+                    style_manager.set_color_scheme (Adw.ColorScheme.FORCE_DARK);
+                    dark_selector.activate ();
+                    break;
+            }
         }
 
         static construct {
@@ -24,10 +38,13 @@ namespace Mingle {
         private void theme_check_active_changed () {
             if (this.system_selector.active) {
                 style_manager.set_color_scheme (Adw.ColorScheme.DEFAULT);
+                settings.set_int ("color-scheme", 0);
             } else if (this.light_selector.active) {
                 style_manager.set_color_scheme (Adw.ColorScheme.FORCE_LIGHT);
+                settings.set_int ("color-scheme", 1);
             } else if (this.dark_selector.active) {
                 style_manager.set_color_scheme (Adw.ColorScheme.FORCE_DARK);
+                settings.set_int ("color-scheme", 2);
             }
         }
     }

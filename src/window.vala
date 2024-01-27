@@ -45,9 +45,9 @@ namespace Mingle {
 
         public Window (Gtk.Application app, GLib.Settings settings) {
             GLib.Object (application: app);
+            this.settings = settings;
             setup_emoji_flow_boxes ();
             right_emojis_flow_box.sensitive = false;
-            this.settings = settings;
             combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
 
             Mingle.StyleSwitcher s = new Mingle.StyleSwitcher ();
@@ -75,10 +75,8 @@ namespace Mingle {
             stdout.printf ("←Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
 
             if (settings.get_boolean ("first-launch")) {
-                // It's the first launch, show the toast.
                 create_and_show_toast ("Scroll down to load more emojis");
 
-                // Now set the key to false so that this doesn't appear again.
                 settings.set_boolean ("first-launch", false);
             }
 

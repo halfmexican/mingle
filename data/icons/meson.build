@@ -22,5 +22,5 @@ action_icons = [
 
 install_data(
   action_icons,
-   install_dir :get_option('datadir')/ 'icons'/ action_dir
+  install_dir: get_option('datadir') / 'icons'/ action_dir
 )

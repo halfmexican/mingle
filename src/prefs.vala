@@ -20,10 +20,10 @@
 
 using Gtk, Adw, GLib;
 namespace Mingle {
-    [GtkTemplate(ui = "/com/github/halfmexican/Mingle/gtk/prefs.ui")]
+    [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/prefs.ui")]
     public class PrefsWindow : Adw.PreferencesWindow {
 
-        public PrefsWindow() {
+        public PrefsWindow () {
             Mingle.Window mingle_window = this.transient_for as Mingle.Window;
         }
     }

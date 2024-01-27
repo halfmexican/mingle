@@ -24,28 +24,30 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
-        public async CombinedEmoji (string gstatic_url){
-          try {
+
+        public async CombinedEmoji (string gstatic_url) {
+            try {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
-                var input_stream = yield get_input_stream(gstatic_url);
-                var pixbuf = yield new Gdk.Pixbuf.from_stream_async(input_stream, null);
-                _texture = Gdk.Texture.for_pixbuf(pixbuf);
+                var input_stream = yield get_input_stream (gstatic_url);
 
-                var overlay = new Gtk.Overlay (){
-                    child = new Gtk.Picture(){
+                var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
+                _texture = Gdk.Texture.for_pixbuf (pixbuf);
+
+                var overlay = new Gtk.Overlay () {
+                    child = new Gtk.Picture () {
                         width_request = 100,
                         height_request = 100,
-                        },
+                    },
                 };
 
-               revealer = new Gtk.Revealer () {
+                revealer = new Gtk.Revealer () {
                     transition_duration = 900,
                     transition_type = Gtk.RevealerTransitionType.SWING_UP,
                     reveal_child = false,
                 };
 
-                var picture = new Gtk.Picture() {
+                var picture = new Gtk.Picture () {
                     vexpand = false,
                     hexpand = true,
                     width_request = 100,
@@ -54,21 +56,20 @@ namespace Mingle {
                 };
 
                 this.set_child (overlay);
-                picture.set_paintable(_texture);
+                picture.set_paintable (_texture);
                 revealer.set_child (picture);
                 overlay.add_overlay (revealer);
-
-           } catch (GLib.Error error) {
+            } catch (GLib.Error error) {
                 stderr.printf (error.message);
             }
 
             this.clicked.connect (() => {
                 this.copy_image_to_clipboard (this._texture);
-                this.copied();
+                this.copied ();
             });
         }
 
-        private async InputStream? get_input_stream (string url) throws Error {
+        private async InputStream ? get_input_stream (string url) throws Error {
             var session = new Soup.Session ();
             var message = new Soup.Message.from_uri ("GET", Uri.parse (url, NONE));
             InputStream input_stream;
@@ -84,9 +85,9 @@ namespace Mingle {
             return input_stream;
         }
 
-        public void copy_image_to_clipboard(Gdk.Texture texture) {
-            var clipboard = Gdk.Display.get_default().get_clipboard();
-            clipboard.set_texture(texture);
+        public void copy_image_to_clipboard (Gdk.Texture texture) {
+            var clipboard = Gdk.Display.get_default ().get_clipboard ();
+            clipboard.set_texture (texture);
         }
     }
 }

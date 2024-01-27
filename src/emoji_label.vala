@@ -24,14 +24,14 @@ namespace Mingle {
         public string code_point_str;
         public string emoji;
         public string alt_name;
-        public Json.Array? keywords;
+        public Json.Array ? keywords;
 
-        public EmojiLabel(string code_point_str, string alt_name, Json.Array? keywords) {
+        public EmojiLabel (string code_point_str, string alt_name, Json.Array ? keywords) {
             this.code_point_str = code_point_str;
             this.alt_name = alt_name;
             this.keywords = keywords;
-            this.emoji = code_point_str_to_emoji(code_point_str);
-            var label = new Gtk.Label(this.emoji) {
+            this.emoji = code_point_str_to_emoji (code_point_str);
+            var label = new Gtk.Label (this.emoji) {
                 css_classes = { "emoji", "title-1" },
                 vexpand = true,
                 hexpand = true,
@@ -39,13 +39,13 @@ namespace Mingle {
                 height_request = 50,
             };
             this.child = label;
-            label.set_tooltip_text(alt_name);
+            label.set_tooltip_text (alt_name);
         }
 
-         private string code_point_str_to_emoji(string code_point_str) {
+        private string code_point_str_to_emoji (string code_point_str) {
             string emoji = "";
-            foreach (string part in code_point_str.split("-")) {
-                int64 code_point = int64.parse("0x" + part);
+            foreach (string part in code_point_str.split ("-")) {
+                int64 code_point = int64.parse ("0x" + part);
                 unichar emoji_char = (unichar) code_point;
                 emoji += @"$(emoji_char)";
             }

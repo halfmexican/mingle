@@ -32,7 +32,7 @@ namespace Mingle {
                 { "quit", this.quit }
             };
             this.add_action_entries (action_entries, this);
-            this.set_accels_for_action ("app.quit", {"<primary>q"});
+            this.set_accels_for_action ("app.quit", { "<primary>q" });
         }
 
         public override void activate () {
@@ -60,9 +60,9 @@ namespace Mingle {
 
         private void on_preferences_action () {
             message ("app.preferences action activated");
-            var prefs = new Mingle.PrefsWindow (){
-                    transient_for = this.active_window,
-                };
+            var prefs = new Mingle.PrefsWindow () {
+                transient_for = this.active_window,
+            };
             prefs.present ();
         }
     }

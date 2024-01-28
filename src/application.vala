@@ -45,7 +45,7 @@ namespace Mingle {
         }
 
         private void on_about_action () {
-            string[] developers = { "José Hunter" };
+            string[] developers = { "José Hunter", "kramo" };
             var about = new Adw.AboutWindow () {
                 transient_for = this.active_window,
                 application_name = "mingle",

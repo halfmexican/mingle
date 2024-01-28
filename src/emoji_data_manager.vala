@@ -25,7 +25,7 @@ namespace Mingle {
         private Json.Node root_node;
         private Json.Array supported_emojis;
         private Gee.HashMap<string, Json.Node> combinations_map;
-        public HashSet<string> added_combinations = new HashSet<string>();
+        public HashSet<string> added_combinations = new HashSet<string> ();
 
         public EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
@@ -162,7 +162,7 @@ namespace Mingle {
         }
 
         public Gee.List<Json.Node> get_combinations_for_emoji (string leftEmojiCode) {
-            Gee.List<Json.Node> relevant_combinations = new Gee.ArrayList<Json.Node>();
+            Gee.List<Json.Node> relevant_combinations = new Gee.ArrayList<Json.Node> ();
             foreach (var key in combinations_map.keys) {
                 if (key.contains (leftEmojiCode)) {
                     relevant_combinations.add (combinations_map.get (key));
@@ -171,13 +171,13 @@ namespace Mingle {
             return relevant_combinations;
         }
 
-        public Gee.List<Json.Node> get_combinations_for_emoji_lazy (string emojiCode, uint offset, int limit) {
-            Json.Array all_combinations = get_combinations_array_for_emoji (emojiCode);
-            Gee.List<Json.Node> batch = new Gee.ArrayList<Json.Node>();
+        public Gee.List<Json.Node> get_combinations_for_emoji_lazy (string emoji_code, uint offset, int limit) {
+            Json.Array all_combinations = get_combinations_array_for_emoji (emoji_code);
+            Gee.List<Json.Node> batch = new Gee.ArrayList<Json.Node> ();
 
             // Ensure we do not go out of bounds
-            uint endIndex = offset + limit < all_combinations.get_length () ? offset + limit : all_combinations.get_length ();
-            for (uint i = offset; i < endIndex; i++) {
+            uint end_index = offset + limit < all_combinations.get_length () ? offset + limit : all_combinations.get_length ();
+            for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_element (i));
             }
             return batch;
@@ -185,7 +185,7 @@ namespace Mingle {
 
         private Gee.HashMap<string, Json.Node> populate_combinations_map () {
             Json.Array emoji_data = get_supported_emojis ();
-            Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node>();
+            Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node> ();
 
             for (int i = 0; i < emoji_data.get_length (); i++) {
                 Json.Node emoji_node = emoji_data.get_element (i);

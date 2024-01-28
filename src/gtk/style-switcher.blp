@@ -8,7 +8,7 @@ template $MingleStyleSwitcher : Widget {
     spacing: 18;
 
     Overlay {
-      visible: bind MingleStyleSwitcher.show-system;
+      visible: bind template.show-system;
       halign: center;
 
       CheckButton system_selector {

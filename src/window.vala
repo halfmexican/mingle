@@ -50,8 +50,8 @@ namespace Mingle {
             right_emojis_flow_box.sensitive = false;
             combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
 
-            Mingle.StyleSwitcher s = new Mingle.StyleSwitcher ();
-            popover_menu.add_child (s, "style-switcher");
+            Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
+            popover_menu.add_child (style_switcher, "style-switcher");
         }
 
         private void setup_emoji_flow_boxes () {
@@ -62,8 +62,8 @@ namespace Mingle {
             emoji_manager.add_emojis_to_flowbox (right_emojis_flow_box);
         }
 
-        private void connect_flow_box_signals (Gtk.FlowBox flowBox, EmojiActionDelegate handler) {
-            flowBox.child_activated.connect ((item) => {
+        private void connect_flow_box_signals (Gtk.FlowBox flowbox, EmojiActionDelegate handler) {
+            flowbox.child_activated.connect ((item) => {
                 Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) item.child;
                 handler (emoji_label);
             });
@@ -108,6 +108,16 @@ namespace Mingle {
             }
         }
 
+        [GtkCallback]
+        private void on_select_random () {
+            uint flowbox_length = this.emoji_manager.get_supported_emojis_length ();
+            uint random_index = GLib.Random.int_range (0, (int32) flowbox_length);
+
+            var child = left_emojis_flow_box.get_child_at_index ((int) random_index);
+            left_emojis_flow_box.select_child (child);
+            child.activate ();
+        }
+
         private void create_and_show_toast (string message) {
             var toast = new Adw.Toast (message) {
                 timeout = 3
@@ -115,8 +125,8 @@ namespace Mingle {
             toast_overlay.add_toast (toast);
         }
 
-        private async void add_combined_emoji (string leftEmojiCode, string RightEmojiCode) {
-            var combined_emoji = yield emoji_manager.get_combined_emoji (leftEmojiCode, RightEmojiCode);
+        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code) {
+            var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code);
 
             if (combined_emoji == null) {
                 return;
@@ -156,18 +166,18 @@ namespace Mingle {
             }
 
             uint added_count = 0;
-            foreach (Json.Node combinationNode in batch) {
-                Json.Object combination_object = combinationNode.get_object ();
-                string rightEmojiCode = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();
+            foreach (Json.Node combination_node in batch) {
+                Json.Object combination_object = combination_node.get_object ();
+                string right_emoji_code = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();
 
-                if (rightEmojiCode == curr_left_emoji) {
-                    rightEmojiCode = combination_object.get_member ("leftEmojiCodepoint").get_value ().get_string ();
+                if (right_emoji_code == curr_left_emoji) {
+                    right_emoji_code = combination_object.get_member ("leftEmojiCodepoint").get_value ().get_string ();
                 }
 
-                string combinationKey = curr_left_emoji + "_" + rightEmojiCode;
+                string combinationKey = curr_left_emoji + "_" + right_emoji_code;
 
                 if (!emoji_manager.is_combination_added (combinationKey)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, rightEmojiCode);
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code);
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {

@@ -5,9 +5,19 @@ template $MinglePrefsWindow : Adw.PreferencesWindow {
   Adw.PreferencesPage {
     Adw.PreferencesGroup {
       title: _("Preferences");
+
+      Adw.ComboRow headerbar_row {
+        title: _("Headerbar Style");
+        selected: 2;
+        model: StringList {
+          strings [
+            "Flat",
+            "Raised",
+            "Raised + Border",
+          ]
+        };
+
+      }
     }
-
-
   }
-
 }

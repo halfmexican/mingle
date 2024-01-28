@@ -39,7 +39,7 @@ namespace Mingle {
             base.activate ();
             var win = this.active_window;
             if (win == null) {
-                win = new Mingle.Window (this, settings);
+                win = new Mingle.Window (this);
             }
             win.present ();
         }
@@ -60,7 +60,7 @@ namespace Mingle {
 
         private void on_preferences_action () {
             message ("app.preferences action activated");
-            var prefs = new Mingle.PrefsWindow () {
+            var prefs = new Mingle.PrefsWindow (this) {
                 transient_for = this.active_window,
             };
             prefs.present ();

@@ -22,9 +22,19 @@ using Gtk, Adw, GLib;
 namespace Mingle {
     [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/prefs.ui")]
     public class PrefsWindow : Adw.PreferencesWindow {
+    [GtkChild] private unowned Adw.ComboRow headerbar_row;
+    private GLib.Settings settings;
 
-        public PrefsWindow () {
-            Mingle.Window mingle_window = this.transient_for as Mingle.Window;
+        public PrefsWindow (Mingle.Application app) {
+            this.settings = app.settings;
+            headerbar_row.notify["selected"].connect (update_headerbar_style);
+            update_headerbar_style ();
+        }
+
+        private void update_headerbar_style () {
+            int selected = (int) headerbar_row.get_selected ();
+            this.settings.set_int ("headerbar-style", selected);
+
         }
     }
 }

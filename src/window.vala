@@ -28,6 +28,7 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
+        [GtkChild] private unowned Adw.ToolbarView toolbar;
 
         private GLib.Settings settings;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
@@ -43,9 +44,14 @@ namespace Mingle {
 
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
-        public Window (Gtk.Application app, GLib.Settings settings) {
+        public Window (Mingle.Application app) {
             GLib.Object (application: app);
-            this.settings = settings;
+            this.settings = app.settings;
+            this.settings.changed.connect ((key) => {
+                if (key == "headerbar-style")
+                    apply_toolbar_style();
+            });
+            apply_toolbar_style ();
             setup_emoji_flow_boxes ();
             right_emojis_flow_box.sensitive = false;
             combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
@@ -125,6 +131,25 @@ namespace Mingle {
             toast_overlay.add_toast (toast);
         }
 
+        private void apply_toolbar_style() {
+            var style = get_toolbar_style();
+            toolbar.set_top_bar_style(style);
+        }
+
+        private Adw.ToolbarStyle get_toolbar_style() {
+            int style = this.settings.get_int("headerbar-style");
+            switch (style) {
+                case 0:
+                    return Adw.ToolbarStyle.FLAT;
+                case 1:
+                    return Adw.ToolbarStyle.RAISED;
+                case 2:
+                    return Adw.ToolbarStyle.RAISED_BORDER;
+                default:
+                    return Adw.ToolbarStyle.FLAT;
+            }
+        }
+
         private async void add_combined_emoji (string left_emoji_code, string right_emoji_code) {
             var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code);
 
@@ -174,9 +199,9 @@ namespace Mingle {
                     right_emoji_code = combination_object.get_member ("leftEmojiCodepoint").get_value ().get_string ();
                 }
 
-                string combinationKey = curr_left_emoji + "_" + right_emoji_code;
+                string combination_key = curr_left_emoji + "_" + right_emoji_code;
 
-                if (!emoji_manager.is_combination_added (combinationKey)) {
+                if (!emoji_manager.is_combination_added (combination_key)) {
                     Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code);
 
                     if (combined_emoji != null) {
@@ -187,7 +212,7 @@ namespace Mingle {
                         combined_emojis_flow_box.append (combined_emoji);
                         combined_emoji.revealer.reveal_child = true;
 
-                        emoji_manager.add_combination (combinationKey);
+                        emoji_manager.add_combination (combination_key);
                         added_count++;
                     }
                 }

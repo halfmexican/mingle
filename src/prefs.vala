@@ -28,7 +28,7 @@ namespace Mingle {
         public PrefsWindow (Mingle.Application app) {
             this.settings = app.settings;
             headerbar_row.notify["selected"].connect (update_headerbar_style);
-            update_headerbar_style ();
+            headerbar_row.set_selected (this.settings.get_int ("headerbar-style"));
         }
 
         private void update_headerbar_style () {

@@ -50,6 +50,7 @@ namespace Mingle {
                 transient_for = this.active_window,
                 application_name = "mingle",
                 application_icon = "com.github.halfmexican.Mingle",
+                website = "https://github.com/halfmexican/mingle",
                 developer_name = "José Hunter",
                 version = "0.1.0",
                 developers = developers,

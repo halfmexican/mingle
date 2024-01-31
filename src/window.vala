@@ -76,6 +76,7 @@ namespace Mingle {
         }
 
         private void handle_left_emoji_activation (Mingle.EmojiLabel emoji_label) {
+            right_emojis_flow_box.invalidate_filter ();
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
             stdout.printf ("←Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
@@ -101,6 +102,7 @@ namespace Mingle {
                 }
                 right_emojis_flow_box.sensitive = true;
             }
+             right_emojis_flow_box.set_filter_func (filter_right_emoji_func);
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
@@ -219,6 +221,14 @@ namespace Mingle {
             }
             batch_offset += added_count;
             is_loading = false;
+        }
+
+        private bool filter_right_emoji_func(Gtk.FlowBoxChild child) {
+            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel)child.get_child();
+            string right_emoji_code = emoji_label.code_point_str;
+
+            // Use the emoji_manager to check if the combination is valid
+            return emoji_manager.is_valid_combination(curr_left_emoji, right_emoji_code);
         }
 
         private void on_edge_overshot (Gtk.PositionType pos_type) {

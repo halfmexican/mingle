@@ -161,6 +161,11 @@ namespace Mingle {
             return combinations_node.get_array ();
         }
 
+        public bool is_valid_combination (string left_emoji_code, string right_emoji_code) {
+            string combination_key = left_emoji_code + "_" + right_emoji_code;
+            return combinations_map.has_key (combination_key);
+        }
+
         public Gee.List<Json.Node> get_combinations_for_emoji (string leftEmojiCode) {
             Gee.List<Json.Node> relevant_combinations = new Gee.ArrayList<Json.Node> ();
             foreach (var key in combinations_map.keys) {

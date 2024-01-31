@@ -49,7 +49,7 @@ namespace Mingle {
             this.settings = app.settings;
             this.settings.changed.connect ((key) => {
                 if (key == "headerbar-style")
-                    apply_toolbar_style();
+                    apply_toolbar_style ();
             });
             apply_toolbar_style ();
             setup_emoji_flow_boxes ();
@@ -131,13 +131,13 @@ namespace Mingle {
             toast_overlay.add_toast (toast);
         }
 
-        private void apply_toolbar_style() {
-            var style = get_toolbar_style();
-            toolbar.set_top_bar_style(style);
+        private void apply_toolbar_style () {
+            var style = get_toolbar_style ();
+            toolbar.set_top_bar_style (style);
         }
 
-        private Adw.ToolbarStyle get_toolbar_style() {
-            int style = this.settings.get_int("headerbar-style");
+        private Adw.ToolbarStyle get_toolbar_style () {
+            int style = this.settings.get_int ("headerbar-style");
             switch (style) {
                 case 0:
                     return Adw.ToolbarStyle.FLAT;

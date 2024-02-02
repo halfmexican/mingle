@@ -102,7 +102,7 @@ namespace Mingle {
                 }
                 right_emojis_flow_box.sensitive = true;
             }
-             right_emojis_flow_box.set_filter_func (filter_right_emoji_func);
+            this.update_sensitivity_of_all_children ();
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
@@ -223,12 +223,27 @@ namespace Mingle {
             is_loading = false;
         }
 
-        private bool filter_right_emoji_func(Gtk.FlowBoxChild child) {
+        private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel)child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
 
             // Use the emoji_manager to check if the combination is valid
-            return emoji_manager.is_valid_combination(curr_left_emoji, right_emoji_code);
+            bool is_valid = emoji_manager.is_valid_combination(curr_left_emoji, right_emoji_code);
+
+            // Set the sensitivity of the flowbox child based on the validity of the emoji combination
+            child.set_sensitive(is_valid);
+        }
+
+        private void update_sensitivity_of_all_children() {
+            Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index(0);
+            int index = 0;
+
+            while (child != null) {
+                set_child_sensitivity (child);
+
+                index++;
+                child = right_emojis_flow_box.get_child_at_index(index);
+            }
         }
 
         private void on_edge_overshot (Gtk.PositionType pos_type) {

@@ -46,3 +46,6 @@
   background-color: #1e1e1e;
 }
 
+.unvalid {
+  opacity: 0.3;
+}

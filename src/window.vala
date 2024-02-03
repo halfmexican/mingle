@@ -228,10 +228,10 @@ namespace Mingle {
             string right_emoji_code = emoji_label.code_point_str;
 
             // Use the emoji_manager to check if the combination is valid
-            bool is_valid = emoji_manager.is_valid_combination(curr_left_emoji, right_emoji_code);
+            bool is_valid = emoji_manager.is_valid_combination (curr_left_emoji, right_emoji_code);
 
             // Set the sensitivity of the flowbox child based on the validity of the emoji combination
-            child.set_sensitive(is_valid);
+            child.set_sensitive (is_valid);
         }
 
         private void update_sensitivity_of_all_children() {
@@ -239,8 +239,15 @@ namespace Mingle {
             int index = 0;
 
             while (child != null) {
-                set_child_sensitivity (child);
+                if (child is Gtk.Widget) {
+                    set_child_sensitivity (child);
 
+                    if (!child.get_sensitive()) {
+                        child.add_css_class("invalid");
+                    } else {
+                        child.remove_css_class("invalid");
+                    }
+                }
                 index++;
                 child = right_emojis_flow_box.get_child_at_index(index);
             }

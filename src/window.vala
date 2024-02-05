@@ -47,17 +47,23 @@ namespace Mingle {
         public Window (Mingle.Application app) {
             GLib.Object (application: app);
             this.settings = app.settings;
-            this.settings.changed.connect ((key) => {
-                if (key == "headerbar-style")
-                    apply_toolbar_style ();
-            });
+            this.settings.changed.connect (handle_pref_change);
+            combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
             apply_toolbar_style ();
             setup_emoji_flow_boxes ();
-            right_emojis_flow_box.sensitive = false;
-            combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
 
             Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
             popover_menu.add_child (style_switcher, "style-switcher");
+        }
+
+        private void handle_pref_change (string key) {
+            switch (key) {
+
+                case "headerbar-style" :
+                    apply_toolbar_style ();
+                    break;
+
+            }
         }
 
         private void setup_emoji_flow_boxes () {
@@ -116,48 +122,11 @@ namespace Mingle {
             }
         }
 
-        [GtkCallback]
-        private void on_select_random () {
-            uint flowbox_length = this.emoji_manager.get_supported_emojis_length ();
-            uint random_index = GLib.Random.int_range (0, (int32) flowbox_length);
-
-            var child = left_emojis_flow_box.get_child_at_index ((int) random_index);
-            left_emojis_flow_box.select_child (child);
-            child.activate ();
-        }
-
-        private void create_and_show_toast (string message) {
-            var toast = new Adw.Toast (message) {
-                timeout = 3
-            };
-            toast_overlay.add_toast (toast);
-        }
-
-        private void apply_toolbar_style () {
-            var style = get_toolbar_style ();
-            toolbar.set_top_bar_style (style);
-        }
-
-        private Adw.ToolbarStyle get_toolbar_style () {
-            int style = this.settings.get_int ("headerbar-style");
-            switch (style) {
-                case 0:
-                    return Adw.ToolbarStyle.FLAT;
-                case 1:
-                    return Adw.ToolbarStyle.RAISED;
-                case 2:
-                    return Adw.ToolbarStyle.RAISED_BORDER;
-                default:
-                    return Adw.ToolbarStyle.FLAT;
-            }
-        }
-
         private async void add_combined_emoji (string left_emoji_code, string right_emoji_code) {
             var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code);
 
-            if (combined_emoji == null) {
+            if (combined_emoji == null)
                 return;
-            }
 
             combined_emojis_flow_box.prepend (combined_emoji);
             combined_emoji.revealer.reveal_child = true;
@@ -223,14 +192,47 @@ namespace Mingle {
             is_loading = false;
         }
 
+        [GtkCallback]
+        private void on_select_random () {
+            uint flowbox_length = this.emoji_manager.get_supported_emojis_length ();
+            uint random_index = GLib.Random.int_range (0, (int32) flowbox_length);
+
+            var child = left_emojis_flow_box.get_child_at_index ((int) random_index);
+            left_emojis_flow_box.select_child (child);
+            child.activate ();
+        }
+
+        private void create_and_show_toast (string message) {
+            var toast = new Adw.Toast (message) {
+                timeout = 3
+            };
+            toast_overlay.add_toast (toast);
+        }
+
+        private void apply_toolbar_style () {
+            var style = get_toolbar_style ();
+            toolbar.set_top_bar_style (style);
+        }
+
+        private Adw.ToolbarStyle get_toolbar_style () {
+            int style = this.settings.get_int ("headerbar-style");
+            switch (style) {
+                case 0:
+                    return Adw.ToolbarStyle.FLAT;
+                case 1:
+                    return Adw.ToolbarStyle.RAISED;
+                case 2:
+                    return Adw.ToolbarStyle.RAISED_BORDER;
+                default:
+                    return Adw.ToolbarStyle.FLAT;
+            }
+        }
+
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel)child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
 
-            // Use the emoji_manager to check if the combination is valid
             bool is_valid = emoji_manager.is_valid_combination (curr_left_emoji, right_emoji_code);
-
-            // Set the sensitivity of the flowbox child based on the validity of the emoji combination
             child.set_sensitive (is_valid);
         }
 
@@ -265,3 +267,4 @@ namespace Mingle {
         }
     }
 }
+

@@ -126,7 +126,6 @@ namespace Mingle {
                     }
                 }
             };
-
             supported_emojis.foreach_element (array_foreach_func);
         }
 
@@ -217,7 +216,7 @@ namespace Mingle {
             return batch;
         }
 
-        public async Mingle.CombinedEmoji get_combined_emoji (string left_codepoint, string right_codepoint) {
+        public async Mingle.CombinedEmoji? get_combined_emoji (string left_codepoint, string right_codepoint) {
             // Asynchronously instantiate and return a CombinedEmoji given both left and right code_points
             string combination_key = left_codepoint + "_" + right_codepoint;
 

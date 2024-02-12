@@ -2,7 +2,6 @@ mingle_sources = [
   'main.vala',
   'application.vala',
   'window.vala',
-  'utils.vala',
   'emoji_label.vala',
   'combined_emoji.vala',
   'emoji_data_manager.vala',

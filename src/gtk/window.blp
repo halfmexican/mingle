@@ -34,7 +34,7 @@ template $MingleWindow : Adw.ApplicationWindow {
         Button {
           icon-name: "dice3-symbolic";
           tooltip-text: _("Randomize");
-          clicked => $on_select_random();
+          clicked => $select_random();
         }
       }
       content: CenterBox {

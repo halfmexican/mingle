@@ -237,22 +237,22 @@ namespace Mingle {
             child.set_sensitive (is_valid);
         }
 
-        private void update_sensitivity_of_all_children() {
-            Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index(0);
+        private void update_sensitivity_of_all_children () {
+            Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
             int index = 0;
 
             while (child != null) {
                 if (child is Gtk.Widget) {
                     set_child_sensitivity (child);
 
-                    if (!child.get_sensitive()) {
-                        child.add_css_class("invalid");
+                    if (!child.get_sensitive ()) {
+                        child.add_css_class ("invalid");
                     } else {
-                        child.remove_css_class("invalid");
+                        child.remove_css_class ("invalid");
                     }
                 }
                 index++;
-                child = right_emojis_flow_box.get_child_at_index(index);
+                child = right_emojis_flow_box.get_child_at_index (index);
             }
         }
 
@@ -268,4 +268,3 @@ namespace Mingle {
         }
     }
 }
-

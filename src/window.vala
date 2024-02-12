@@ -82,14 +82,13 @@ namespace Mingle {
         }
 
         private void handle_left_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            right_emojis_flow_box.invalidate_filter ();
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
             stdout.printf ("←Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
 
+            // Check for first-launch to determine if we show a little tip
             if (settings.get_boolean ("first-launch")) {
                 create_and_show_toast ("Scroll down to load more emojis");
-
                 settings.set_boolean ("first-launch", false);
             }
 
@@ -193,7 +192,9 @@ namespace Mingle {
         }
 
         [GtkCallback]
-        private void on_select_random () {
+        private void select_random () {
+            // Called when user clicks the "🎲" button
+            // selects and activates a random emoji in the left flow box
             uint flowbox_length = this.emoji_manager.get_supported_emojis_length ();
             uint random_index = GLib.Random.int_range (0, (int32) flowbox_length);
 
@@ -229,29 +230,29 @@ namespace Mingle {
         }
 
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
-            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel)child.get_child();
+            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
 
             bool is_valid = emoji_manager.is_valid_combination (curr_left_emoji, right_emoji_code);
             child.set_sensitive (is_valid);
         }
 
-        private void update_sensitivity_of_all_children() {
-            Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index(0);
+        private void update_sensitivity_of_all_children () {
+            Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
             int index = 0;
 
             while (child != null) {
                 if (child is Gtk.Widget) {
                     set_child_sensitivity (child);
 
-                    if (!child.get_sensitive()) {
-                        child.add_css_class("invalid");
+                    if (!child.get_sensitive ()) {
+                        child.add_css_class ("invalid");
                     } else {
-                        child.remove_css_class("invalid");
+                        child.remove_css_class ("invalid");
                     }
                 }
                 index++;
-                child = right_emojis_flow_box.get_child_at_index(index);
+                child = right_emojis_flow_box.get_child_at_index (index);
             }
         }
 
@@ -267,4 +268,3 @@ namespace Mingle {
         }
     }
 }
-

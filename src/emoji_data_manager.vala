@@ -33,6 +33,7 @@ namespace Mingle {
         }
 
         private void initialize_combinations_map () {
+            // Starts a separate thread if possible to populate this.combinations_map
             if (!Thread.supported ()) {
                 stderr.printf ("Threads are not supported!\n");
                 combinations_map = populate_combinations_map ();
@@ -50,8 +51,34 @@ namespace Mingle {
             }
         }
 
+        private Gee.HashMap<string, Json.Node> populate_combinations_map () {
+            // Returns a Hashmap of all possible emoji combinations
+            Json.Array emoji_data = get_supported_emojis ();
+            Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node> ();
+
+            for (int i = 0; i < emoji_data.get_length (); i++) {
+                Json.Node emoji_node = emoji_data.get_element (i);
+                string emoji_code = emoji_node.get_string ();
+                Json.Array combinations = get_combinations_array_for_emoji (emoji_code);
+
+                for (int j = 0; j < combinations.get_length (); j++) {
+                    Json.Node combination_node = combinations.get_element (j);
+                    Json.Object combination_object = combination_node.get_object ();
+
+                    string left_emoji_code = combination_object.get_member ("leftEmojiCodepoint").get_value ().get_string ();
+                    string right_emoji_code = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();
+
+                    string combination_key1 = left_emoji_code + "_" + right_emoji_code;
+                    string combination_key2 = right_emoji_code + "_" + left_emoji_code;
+                    combinations_map.set (combination_key1, combination_node);
+                    combinations_map.set (combination_key2, combination_node);
+                }
+            }
+            return combinations_map;
+        }
+
         private Json.Array populate_supported_emojis_array () {
-            // Returns the known_supported_array
+            // Returns the known_supported_array by parsing metadata.json
             string file_contents;
             size_t length;
 
@@ -79,11 +106,8 @@ namespace Mingle {
             }
         }
 
-        public Json.Array get_supported_emojis () {
-            return supported_emojis;
-        }
-
         public void add_emojis_to_flowbox (Gtk.FlowBox flowbox) {
+            // Adds all the emojis from this.supported_emojis to the flowbox
             if (supported_emojis == null)
                 supported_emojis = populate_supported_emojis_array ();
 
@@ -102,8 +126,11 @@ namespace Mingle {
                     }
                 }
             };
-
             supported_emojis.foreach_element (array_foreach_func);
+        }
+
+        public Json.Array get_supported_emojis () {
+            return supported_emojis;
         }
 
         public void add_emoji_to_flowbox (string emoji_code, string alt_name, Json.Array ? keywords, Gtk.FlowBox flowbox) {
@@ -162,6 +189,7 @@ namespace Mingle {
         }
 
         public bool is_valid_combination (string left_emoji_code, string right_emoji_code) {
+            // Returns true if the given combination is in our HashMap
             string combination_key = left_emoji_code + "_" + right_emoji_code;
             return combinations_map.has_key (combination_key);
         }
@@ -188,33 +216,9 @@ namespace Mingle {
             return batch;
         }
 
-        private Gee.HashMap<string, Json.Node> populate_combinations_map () {
-            Json.Array emoji_data = get_supported_emojis ();
-            Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node> ();
-
-            for (int i = 0; i < emoji_data.get_length (); i++) {
-                Json.Node emoji_node = emoji_data.get_element (i);
-                string emoji_code = emoji_node.get_string ();
-                Json.Array combinations = get_combinations_array_for_emoji (emoji_code);
-
-                for (int j = 0; j < combinations.get_length (); j++) {
-                    Json.Node combination_node = combinations.get_element (j);
-                    Json.Object combination_object = combination_node.get_object ();
-
-                    string left_emoji_code = combination_object.get_member ("leftEmojiCodepoint").get_value ().get_string ();
-                    string right_emoji_code = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();
-
-                    string combination_key1 = left_emoji_code + "_" + right_emoji_code;
-                    string combination_key2 = right_emoji_code + "_" + left_emoji_code;
-                    combinations_map.set (combination_key1, combination_node);
-                    combinations_map.set (combination_key2, combination_node);
-                }
-            }
-            return combinations_map;
-        }
-
-        public async Mingle.CombinedEmoji get_combined_emoji (string left_codepoint, string right_codepoint) {
-            string combination_key = left_codepoint + "_" + right_codepoint; // The key is always left + right
+        public async Mingle.CombinedEmoji? get_combined_emoji (string left_codepoint, string right_codepoint) {
+            // Asynchronously instantiate and return a CombinedEmoji given both left and right code_points
+            string combination_key = left_codepoint + "_" + right_codepoint;
 
             Json.Node combination_node = combinations_map.get (combination_key);
 

@@ -193,6 +193,8 @@ namespace Mingle {
 
         [GtkCallback]
         private void select_random () {
+            // Called when user clicks the "🎲" button
+            // selects and activates a random emoji in the left flow box
             uint flowbox_length = this.emoji_manager.get_supported_emojis_length ();
             uint random_index = GLib.Random.int_range (0, (int32) flowbox_length);
 

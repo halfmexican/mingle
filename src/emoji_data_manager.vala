@@ -134,8 +134,7 @@ namespace Mingle {
         }
 
         public void add_emoji_to_flowbox (string emoji_code, string alt_name, Json.Array ? keywords, Gtk.FlowBox flowbox) {
-            var item = new Mingle.EmojiLabel (emoji_code, alt_name, keywords) {
-            };
+            var item = new Mingle.EmojiLabel (emoji_code, alt_name, keywords);
             flowbox.append (item);
             item.get_parent ().add_css_class ("card");
         }

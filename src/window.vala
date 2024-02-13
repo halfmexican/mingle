@@ -40,7 +40,7 @@ namespace Mingle {
         // lazy loading properties
         private const int BATCH_SIZE = 20;
         private uint batch_offset = 0;
-        private bool is_loading = false;
+        public bool is_loading {get; set; default = false;}
 
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
@@ -49,11 +49,12 @@ namespace Mingle {
             this.settings = app.settings;
             this.settings.changed.connect (handle_pref_change);
             combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
+
             apply_toolbar_style ();
             setup_emoji_flow_boxes ();
-
             Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
             popover_menu.add_child (style_switcher, "style-switcher");
+            this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
         }
 
         private void handle_pref_change (string key) {
@@ -92,7 +93,7 @@ namespace Mingle {
                 settings.set_boolean ("first-launch", false);
             }
 
-            if (curr_left_emoji != prev_left_emoji) {
+            if (curr_left_emoji != prev_left_emoji && !is_loading) {
                 // Clearing the existing emojis in the flow box only if a different left emoji is selected
                 combined_emojis_flow_box.remove_all ();
                 prev_left_emoji = curr_left_emoji;

@@ -89,7 +89,7 @@ namespace Mingle {
 
             // Check for first-launch to determine if we show a little tip
             if (settings.get_boolean ("first-launch")) {
-                create_and_show_toast ("Scroll down to load more emojis");
+                create_and_show_toast ("Scroll down to load more emojis", 5);
                 settings.set_boolean ("first-launch", false);
             }
 
@@ -131,7 +131,7 @@ namespace Mingle {
             combined_emojis_flow_box.prepend (combined_emoji);
             combined_emoji.revealer.reveal_child = true;
             combined_emoji.copied.connect (() => {
-                create_and_show_toast ("Image copied to clipboard");
+                create_and_show_toast ("Image copied to clipboard", 3);
             });
         }
 
@@ -177,7 +177,7 @@ namespace Mingle {
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {
-                            create_and_show_toast ("Image copied to clipboard");
+                            create_and_show_toast ("Image copied to clipboard", 3);
                         });
 
                         combined_emojis_flow_box.append (combined_emoji);
@@ -204,9 +204,9 @@ namespace Mingle {
             child.activate ();
         }
 
-        private void create_and_show_toast (string message) {
+        private void create_and_show_toast (string message, int duration) {
             var toast = new Adw.Toast (message) {
-                timeout = 3
+                timeout = duration
             };
             toast_overlay.add_toast (toast);
         }
@@ -226,7 +226,7 @@ namespace Mingle {
                 case 2:
                     return Adw.ToolbarStyle.RAISED_BORDER;
                 default:
-                    return Adw.ToolbarStyle.FLAT;
+                    return Adw.ToolbarStyle.RAISED;
             }
         }
 
@@ -263,6 +263,7 @@ namespace Mingle {
             }
 
             if (!is_loading) {
+                create_and_show_toast("Loading More Combinations...", 2);
                 // Load the next batch of combined emojis
                 populate_center_flow_box_lazy.begin ();
             }

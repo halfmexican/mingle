@@ -48,31 +48,32 @@ namespace Mingle {
             GLib.Object (application: app);
             this.settings = app.settings;
             this.settings.changed.connect (handle_pref_change);
-            combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
+            this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
+            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
 
             apply_toolbar_style ();
+            setup_style_switcher ();
             setup_emoji_flow_boxes ();
-            Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
-            popover_menu.add_child (style_switcher, "style-switcher");
-            this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
         }
 
         private void handle_pref_change (string key) {
             switch (key) {
-
                 case "headerbar-style" :
                     apply_toolbar_style ();
                     break;
-
             }
         }
 
         private void setup_emoji_flow_boxes () {
             connect_flow_box_signals (left_emojis_flow_box, handle_left_emoji_activation);
             connect_flow_box_signals (right_emojis_flow_box, handle_right_emoji_activation);
-
             emoji_manager.add_emojis_to_flowbox (left_emojis_flow_box);
             emoji_manager.add_emojis_to_flowbox (right_emojis_flow_box);
+        }
+
+        private void setup_style_switcher () {
+            Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
+            popover_menu.add_child (style_switcher, "style-switcher");
         }
 
         private void connect_flow_box_signals (Gtk.FlowBox flowbox, EmojiActionDelegate handler) {
@@ -101,14 +102,14 @@ namespace Mingle {
                 // Reset the offset for lazy loading
                 batch_offset = 0;
                 emoji_manager.clear_added_combinations ();
-                this.populate_center_flow_box_lazy.begin ();
+                populate_center_flow_box_lazy.begin ();
 
                 if (curr_right_emoji != null) {
                     add_combined_emoji.begin (curr_left_emoji, curr_right_emoji);
                 }
                 right_emojis_flow_box.sensitive = true;
             }
-            this.update_sensitivity_of_right_flowbox ();
+            update_sensitivity_of_right_flowbox ();
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
@@ -142,12 +143,6 @@ namespace Mingle {
             }
             is_loading = true;
 
-            if (curr_left_emoji == null || curr_left_emoji == "") {
-                stderr.printf ("Left emoji is not selected.\n");
-                is_loading = false;
-                return;
-            }
-
             // Clear the flowbox if we're loading from the beginning
             if (batch_offset == 0) {
                 combined_emojis_flow_box.remove_all ();
@@ -157,8 +152,11 @@ namespace Mingle {
 
             if (batch.size == 0) {
                 stderr.printf ("No more combinations to load.\n");
+                create_and_show_toast ("No more combinations", 4);
                 is_loading = false; // Reset the loading state
                 return;
+            } else if (batch_offset > 1) {
+                create_and_show_toast("Loading More Combinations...", 2);
             }
 
             uint added_count = 0;
@@ -196,7 +194,7 @@ namespace Mingle {
         private void select_random () {
             // Called when user clicks the "🎲" button
             // selects and activates a random emoji in the left flow box
-            uint flowbox_length = this.emoji_manager.get_supported_emojis_length ();
+            uint flowbox_length = emoji_manager.get_supported_emojis_length ();
             uint random_index = GLib.Random.int_range (0, (int32) flowbox_length);
 
             var child = left_emojis_flow_box.get_child_at_index ((int) random_index);
@@ -217,7 +215,7 @@ namespace Mingle {
         }
 
         private Adw.ToolbarStyle get_toolbar_style () {
-            int style = this.settings.get_int ("headerbar-style");
+            int style = settings.get_int ("headerbar-style");
             switch (style) {
                 case 0:
                     return Adw.ToolbarStyle.FLAT;
@@ -263,7 +261,6 @@ namespace Mingle {
             }
 
             if (!is_loading) {
-                create_and_show_toast("Loading More Combinations...", 2);
                 // Load the next batch of combined emojis
                 populate_center_flow_box_lazy.begin ();
             }

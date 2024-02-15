@@ -108,7 +108,7 @@ namespace Mingle {
                 }
                 right_emojis_flow_box.sensitive = true;
             }
-            this.update_sensitivity_of_all_children ();
+            this.update_sensitivity_of_right_flowbox ();
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
@@ -238,7 +238,7 @@ namespace Mingle {
             child.set_sensitive (is_valid);
         }
 
-        private void update_sensitivity_of_all_children () {
+        private void update_sensitivity_of_right_flowbox () {
             Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
             int index = 0;
 

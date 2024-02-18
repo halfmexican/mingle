@@ -156,7 +156,7 @@ namespace Mingle {
                 is_loading = false; // Reset the loading state
                 return;
             } else if (batch_offset > 1) {
-                create_and_show_toast("Loading More Combinations...", 2);
+                create_and_show_toast("Loading More Combinations…", 2);
             }
 
             uint added_count = 0;

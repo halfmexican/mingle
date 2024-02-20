@@ -29,9 +29,8 @@ namespace Mingle {
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
-
-        private GLib.Settings settings;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
+        private GLib.Settings settings;
         private string curr_left_emoji;
         private string curr_right_emoji;
         private string prev_left_emoji;

@@ -25,7 +25,7 @@ namespace Mingle {
         public Gtk.Revealer revealer;
         public signal void copied ();
 
-        public async CombinedEmoji (string gstatic_url) {
+        public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition) {
             try {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
@@ -42,8 +42,8 @@ namespace Mingle {
                 };
 
                 revealer = new Gtk.Revealer () {
-                    transition_duration = 900,
-                    transition_type = Gtk.RevealerTransitionType.SWING_UP,
+                    transition_duration = 800,
+                    transition_type = transition,
                     reveal_child = false,
                 };
 

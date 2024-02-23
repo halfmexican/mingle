@@ -36,6 +36,8 @@ namespace Mingle {
         private string curr_right_emoji;
         private string prev_left_emoji;
         private string prev_right_emoji;
+        private Gtk.RevealerTransitionType transition
+
 
         // lazy loading properties
         private const int BATCH_SIZE = 20;
@@ -105,7 +107,7 @@ namespace Mingle {
                 populate_center_flow_box_lazy.begin ();
 
                 if (curr_right_emoji != null) {
-                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji);
+                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, Gtk.RevealerTransitionType.SLIDE_RIGHT);
                 }
                 right_emojis_flow_box.sensitive = true;
             }
@@ -119,12 +121,12 @@ namespace Mingle {
             stdout.printf ("→Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
-                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji);
+                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, Gtk.RevealerTransitionType.SLIDE_LEFT);
             }
         }
 
-        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code) {
-            var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code);
+        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code, transition);
 
             if (combined_emoji == null)
                 return;
@@ -171,7 +173,7 @@ namespace Mingle {
                 string combination_key = curr_left_emoji + "_" + right_emoji_code;
 
                 if (!emoji_manager.is_combination_added (combination_key)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code);
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code, Gtk.RevealerTransitionType.SLIDE_RIGHT);
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {

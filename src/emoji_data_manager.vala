@@ -215,7 +215,7 @@ namespace Mingle {
             return batch;
         }
 
-        public async Mingle.CombinedEmoji? get_combined_emoji (string left_codepoint, string right_codepoint) {
+        public async Mingle.CombinedEmoji? get_combined_emoji (string left_codepoint, string right_codepoint, Gtk.RevealerTransitionType transition) {
             // Asynchronously instantiate and return a CombinedEmoji given both left and right code_points
             string combination_key = left_codepoint + "_" + right_codepoint;
 
@@ -227,7 +227,7 @@ namespace Mingle {
 
                 if (gstatic_url_node != null && gstatic_url_node.get_node_type () == Json.NodeType.VALUE) {
                     string gstatic_url = gstatic_url_node.get_value ().get_string ();
-                    Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url);
+                    Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
                     return combined_emoji;
                 } else {
                     stderr.printf ("gStaticUrl is missing or not a value.\n");

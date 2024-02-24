@@ -36,8 +36,14 @@ namespace Mingle {
         private string curr_right_emoji;
         private string prev_left_emoji;
         private string prev_right_emoji;
-        private Gtk.RevealerTransitionType transition
 
+        private enum Transition {
+           NONE,
+           CROSSFADE,
+           SLIDE,
+           SWING,
+        }
+        private Transition revealer_transition;
 
         // lazy loading properties
         private const int BATCH_SIZE = 20;
@@ -62,6 +68,9 @@ namespace Mingle {
             switch (key) {
                 case "headerbar-style" :
                     apply_toolbar_style ();
+                    break;
+                case "transition-type":
+
                     break;
             }
         }
@@ -217,7 +226,7 @@ namespace Mingle {
         }
 
         private Adw.ToolbarStyle get_toolbar_style () {
-            int style = settings.get_int ("headerbar-style");
+            uint style = settings.get_int ("headerbar-style");
             switch (style) {
                 case 0:
                     return Adw.ToolbarStyle.FLAT;
@@ -227,6 +236,27 @@ namespace Mingle {
                     return Adw.ToolbarStyle.RAISED_BORDER;
                 default:
                     return Adw.ToolbarStyle.RAISED;
+            }
+        }
+
+        private void update_transition_type () {
+            this.revealer_transition = get_transition_type ();
+        }
+        private Transition get_transition_type () {
+            uint transition = settings.get_int ("transition-type");
+
+            switch (transition) {
+                case 0:
+                    return Transition.NONE;
+                case 1:
+                    return Transition.CROSSFADE;
+                case 2:
+                    return Transition.SLIDE;
+                case 3:
+                    return Transition.SWING;
+                default:
+                // Handle invalid value (e.g., return a default value or throw an error)
+                return Transition.NONE; // Or consider throwing an error
             }
         }
 

@@ -12,5 +12,8 @@
 	  <key name="headerbar-style" type="i">
       <default>2</default>
     </key>
+	    <key name="transition-type" type="i">
+      <default>2</default>
+    </key>
 	</schema>
 </schemalist>

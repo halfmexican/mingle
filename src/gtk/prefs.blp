@@ -16,7 +16,19 @@ template $MinglePrefsWindow : Adw.PreferencesWindow {
             "Raised + Border",
           ]
         };
-
+      }
+      Adw.ComboRow transition_row {
+        title: _("Transition Type");
+        subtitle: _("The transition used when loading combined emojis");
+        selected: 2;
+        model: StringList {
+          strings [
+            "None",
+            "Crossfade",
+            "Slide",
+            "Swing"
+          ]
+        };
       }
     }
   }

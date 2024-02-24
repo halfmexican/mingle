@@ -29,6 +29,7 @@ namespace Mingle {
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
+        [GtkChild] private unowned Adw.Breakpoint breakpoint;
 
         private GLib.Settings settings;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
@@ -42,6 +43,7 @@ namespace Mingle {
            CROSSFADE,
            SLIDE,
            SWING,
+           SWING_UP,
         }
         private Transition revealer_transition;
 
@@ -58,8 +60,20 @@ namespace Mingle {
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
+            breakpoint.apply.connect (() => {
+                if (get_transition_type () == Transition.NONE) {
+                    this.revealer_transition = Transition.NONE;
+                } else if (get_transition_type () == Transition.CROSSFADE) {
+                    this.revealer_transition = Transition.CROSSFADE;
+                } else {
+                    this.revealer_transition = Transition.SWING_UP;
+                }
+            });
+
+            breakpoint.unapply.connect (() => {this.revealer_transition = get_transition_type ();});
 
             apply_toolbar_style ();
+            update_transition_type ();
             setup_style_switcher ();
             setup_emoji_flow_boxes ();
         }
@@ -70,7 +84,7 @@ namespace Mingle {
                     apply_toolbar_style ();
                     break;
                 case "transition-type":
-
+                    update_transition_type ();
                     break;
             }
         }
@@ -116,7 +130,7 @@ namespace Mingle {
                 populate_center_flow_box_lazy.begin ();
 
                 if (curr_right_emoji != null) {
-                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, Gtk.RevealerTransitionType.SLIDE_RIGHT);
+                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (true));
                 }
                 right_emojis_flow_box.sensitive = true;
             }
@@ -130,7 +144,7 @@ namespace Mingle {
             stdout.printf ("→Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
-                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, Gtk.RevealerTransitionType.SLIDE_LEFT);
+                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (false));
             }
         }
 
@@ -182,7 +196,7 @@ namespace Mingle {
                 string combination_key = curr_left_emoji + "_" + right_emoji_code;
 
                 if (!emoji_manager.is_combination_added (combination_key)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code, Gtk.RevealerTransitionType.SLIDE_RIGHT);
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code, create_combined_emoji_revealer_transition (true));
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {
@@ -257,6 +271,29 @@ namespace Mingle {
                 default:
                 // Handle invalid value (e.g., return a default value or throw an error)
                 return Transition.NONE; // Or consider throwing an error
+            }
+        }
+
+        private Gtk.RevealerTransitionType create_combined_emoji_revealer_transition (bool direction) {
+            // Returns a RevealerTranstionType based on user settings
+            // 0 is left, 1 is right
+            switch (this.revealer_transition) {
+                case Transition.NONE:
+                    return Gtk.RevealerTransitionType.NONE;
+                case Transition.CROSSFADE:
+                    return Gtk.RevealerTransitionType.CROSSFADE;
+                case Transition.SLIDE:
+                    if (direction)
+                        return Gtk.RevealerTransitionType.SLIDE_RIGHT;
+                    return Gtk.RevealerTransitionType.SLIDE_LEFT;
+                case Transition.SWING:
+                    if (direction)
+                        return Gtk.RevealerTransitionType.SWING_RIGHT;
+                    return Gtk.RevealerTransitionType.SWING_LEFT;
+                case Transition.SWING_UP:
+                    return Gtk.RevealerTransitionType.SWING_UP;
+                default :
+                    return Gtk.RevealerTransitionType.CROSSFADE;
             }
         }
 

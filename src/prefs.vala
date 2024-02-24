@@ -23,18 +23,25 @@ namespace Mingle {
     [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/prefs.ui")]
     public class PrefsWindow : Adw.PreferencesWindow {
     [GtkChild] private unowned Adw.ComboRow headerbar_row;
+    [GtkChild] private unowned Adw.ComboRow transition_row;
     private GLib.Settings settings;
 
         public PrefsWindow (Mingle.Application app) {
             this.settings = app.settings;
             headerbar_row.notify["selected"].connect (update_headerbar_style);
             headerbar_row.set_selected (this.settings.get_int ("headerbar-style"));
+            transition_row.notify["selected"].connect (update_revealer_transition);
+            transition_row.set_selected (this.settings.get_int ("transition-type"));
         }
 
         private void update_headerbar_style () {
             int selected = (int) headerbar_row.get_selected ();
             this.settings.set_int ("headerbar-style", selected);
+        }
 
+        private void update_revealer_transition () {
+            int selected = (int) transition_row.get_selected ();
+            this.settings.set_int ("transition-type", selected);
         }
     }
 }

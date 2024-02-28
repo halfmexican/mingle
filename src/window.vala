@@ -29,12 +29,22 @@ namespace Mingle {
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
+        [GtkChild] private unowned Adw.Breakpoint breakpoint;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
         private GLib.Settings settings;
         private string curr_left_emoji;
         private string curr_right_emoji;
         private string prev_left_emoji;
         private string prev_right_emoji;
+        private bool breakpoint_applied;
+        private enum Transition {
+           NONE,
+           CROSSFADE,
+           SLIDE,
+           SWING,
+           SWING_UP,
+        }
+        private Transition revealer_transition;
 
         // lazy loading properties
         private const int BATCH_SIZE = 20;
@@ -48,9 +58,10 @@ namespace Mingle {
             this.settings = app.settings;
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
-            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
-
+            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            setup_breakpoints ();
             apply_toolbar_style ();
+            update_transition_type ();
             setup_style_switcher ();
             setup_emoji_flow_boxes ();
         }
@@ -60,6 +71,9 @@ namespace Mingle {
                 case "headerbar-style" :
                     apply_toolbar_style ();
                     break;
+                case "transition-type":
+                    update_transition_type ();
+                    break;
             }
         }
 
@@ -68,6 +82,18 @@ namespace Mingle {
             connect_flow_box_signals (right_emojis_flow_box, handle_right_emoji_activation);
             emoji_manager.add_emojis_to_flowbox (left_emojis_flow_box);
             emoji_manager.add_emojis_to_flowbox (right_emojis_flow_box);
+        }
+
+        private void setup_breakpoints () {
+            // Updates `breakpoint_applied` and our transition type
+            breakpoint.apply.connect (() => {
+                this.breakpoint_applied = true;
+                update_transition_type ();
+            });
+            breakpoint.unapply.connect (() => {
+                this.breakpoint_applied = false;
+                update_transition_type ();
+            });
         }
 
         private void setup_style_switcher () {
@@ -104,7 +130,7 @@ namespace Mingle {
                 populate_center_flow_box_lazy.begin ();
 
                 if (curr_right_emoji != null) {
-                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji);
+                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (true));
                 }
                 right_emojis_flow_box.sensitive = true;
             }
@@ -118,12 +144,12 @@ namespace Mingle {
             stdout.printf ("→Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
-                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji);
+                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (false));
             }
         }
 
-        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code) {
-            var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code);
+        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code, transition);
 
             if (combined_emoji == null)
                 return;
@@ -170,7 +196,7 @@ namespace Mingle {
                 string combination_key = curr_left_emoji + "_" + right_emoji_code;
 
                 if (!emoji_manager.is_combination_added (combination_key)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code);
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code, create_combined_emoji_revealer_transition (true));
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {
@@ -208,13 +234,14 @@ namespace Mingle {
             toast_overlay.add_toast (toast);
         }
 
+        // Toolbar Style
         private void apply_toolbar_style () {
             var style = get_toolbar_style ();
             toolbar.set_top_bar_style (style);
         }
 
         private Adw.ToolbarStyle get_toolbar_style () {
-            int style = settings.get_int ("headerbar-style");
+            uint style = settings.get_int ("headerbar-style");
             switch (style) {
                 case 0:
                     return Adw.ToolbarStyle.FLAT;
@@ -227,6 +254,56 @@ namespace Mingle {
             }
         }
 
+        // Combined Emoji Loading Transitions
+        private void update_transition_type () {
+            if (!breakpoint_applied) {
+                this.revealer_transition = get_transition_type ();
+            } else {
+                 if (get_transition_type () == Transition.NONE) {
+                    this.revealer_transition = Transition.NONE;
+                } else if (get_transition_type () == Transition.CROSSFADE) {
+                    this.revealer_transition = Transition.CROSSFADE;
+                } else {
+                    this.revealer_transition = Transition.SWING_UP;
+                }
+            }
+        }
+
+        private Transition get_transition_type () {
+            uint transition = settings.get_int ("transition-type");
+            switch (transition) {
+                case 0: return Transition.NONE;
+                case 1: return Transition.CROSSFADE;
+                case 2: return Transition.SLIDE;
+                case 3: return Transition.SWING;
+                default: return Transition.NONE;
+            }
+        }
+
+        private Gtk.RevealerTransitionType create_combined_emoji_revealer_transition (bool direction) {
+            // Returns a RevealerTranstionType based on user settings
+            // 0 is left, 1 is right
+            switch (this.revealer_transition) {
+                case Transition.NONE:
+                    return Gtk.RevealerTransitionType.NONE;
+                case Transition.CROSSFADE:
+                    return Gtk.RevealerTransitionType.CROSSFADE;
+                case Transition.SLIDE:
+                    if (direction)
+                        return Gtk.RevealerTransitionType.SLIDE_RIGHT;
+                    return Gtk.RevealerTransitionType.SLIDE_LEFT;
+                case Transition.SWING:
+                    if (direction)
+                        return Gtk.RevealerTransitionType.SWING_RIGHT;
+                    return Gtk.RevealerTransitionType.SWING_LEFT;
+                case Transition.SWING_UP:
+                    return Gtk.RevealerTransitionType.SWING_UP;
+                default :
+                    return Gtk.RevealerTransitionType.CROSSFADE;
+            }
+        }
+
+        // ChildFlowbox CSS
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
@@ -255,6 +332,7 @@ namespace Mingle {
         }
 
         private void on_edge_overshot (Gtk.PositionType pos_type) {
+            // Loads more emojis when we scroll
             if (pos_type != Gtk.PositionType.BOTTOM) {
                 return; // We are only interested in the bottom edge
             }

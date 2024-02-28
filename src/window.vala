@@ -58,7 +58,7 @@ namespace Mingle {
             this.settings = app.settings;
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
-            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
+            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
             setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();

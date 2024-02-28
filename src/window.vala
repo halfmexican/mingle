@@ -30,14 +30,13 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
-
-        private GLib.Settings settings;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
+        private GLib.Settings settings;
         private string curr_left_emoji;
         private string curr_right_emoji;
         private string prev_left_emoji;
         private string prev_right_emoji;
-
+        private bool breakpoint_applied;
         private enum Transition {
            NONE,
            CROSSFADE,
@@ -60,17 +59,14 @@ namespace Mingle {
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
-            breakpoint.apply.connect (() => {
-                if (get_transition_type () == Transition.NONE) {
-                    this.revealer_transition = Transition.NONE;
-                } else if (get_transition_type () == Transition.CROSSFADE) {
-                    this.revealer_transition = Transition.CROSSFADE;
-                } else {
-                    this.revealer_transition = Transition.SWING_UP;
-                }
+            this.breakpoint.apply.connect (() => {
+                this.breakpoint_applied = true;
+                update_transition_type ();
             });
-
-            breakpoint.unapply.connect (() => {this.revealer_transition = get_transition_type ();});
+            this.breakpoint.unapply.connect (() => {
+                this.breakpoint_applied = false;
+                update_transition_type ();
+            });
 
             apply_toolbar_style ();
             update_transition_type ();
@@ -234,6 +230,7 @@ namespace Mingle {
             toast_overlay.add_toast (toast);
         }
 
+        // Toolbar Style
         private void apply_toolbar_style () {
             var style = get_toolbar_style ();
             toolbar.set_top_bar_style (style);
@@ -253,24 +250,29 @@ namespace Mingle {
             }
         }
 
+        // Combined Emoji Loading Transitions
         private void update_transition_type () {
-            this.revealer_transition = get_transition_type ();
+            if (!breakpoint_applied) {
+                this.revealer_transition = get_transition_type ();
+            } else {
+                 if (get_transition_type () == Transition.NONE) {
+                    this.revealer_transition = Transition.NONE;
+                } else if (get_transition_type () == Transition.CROSSFADE) {
+                    this.revealer_transition = Transition.CROSSFADE;
+                } else {
+                    this.revealer_transition = Transition.SWING_UP;
+                }
+            }
         }
+
         private Transition get_transition_type () {
             uint transition = settings.get_int ("transition-type");
-
             switch (transition) {
-                case 0:
-                    return Transition.NONE;
-                case 1:
-                    return Transition.CROSSFADE;
-                case 2:
-                    return Transition.SLIDE;
-                case 3:
-                    return Transition.SWING;
-                default:
-                // Handle invalid value (e.g., return a default value or throw an error)
-                return Transition.NONE; // Or consider throwing an error
+                case 0: return Transition.NONE;
+                case 1: return Transition.CROSSFADE;
+                case 2: return Transition.SLIDE;
+                case 3: return Transition.SWING;
+                default: return Transition.NONE;
             }
         }
 
@@ -297,6 +299,7 @@ namespace Mingle {
             }
         }
 
+        // ChildFlowbox CSS
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
@@ -325,6 +328,7 @@ namespace Mingle {
         }
 
         private void on_edge_overshot (Gtk.PositionType pos_type) {
+            // Loads more emojis when we scroll
             if (pos_type != Gtk.PositionType.BOTTOM) {
                 return; // We are only interested in the bottom edge
             }

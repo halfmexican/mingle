@@ -27,12 +27,14 @@ namespace Mingle {
 
         construct {
             ActionEntry[] action_entries = {
+                { "select_random", this.select_random},
                 { "about", this.on_about_action },
                 { "preferences", this.on_preferences_action },
                 { "quit", this.quit }
             };
             this.add_action_entries (action_entries, this);
             this.set_accels_for_action ("app.quit", { "<primary>q" });
+            this.set_accels_for_action("app.select_random", {"<Ctrl>R", "R"});
         }
 
         public override void activate () {
@@ -42,6 +44,11 @@ namespace Mingle {
                 win = new Mingle.Window (this);
             }
             win.present ();
+        }
+
+        private void select_random () {
+            var win = this.active_window as Mingle.Window;
+            win.select_random();
         }
 
         private void on_about_action () {

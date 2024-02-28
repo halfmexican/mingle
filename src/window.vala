@@ -59,15 +59,7 @@ namespace Mingle {
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot);
-            this.breakpoint.apply.connect (() => {
-                this.breakpoint_applied = true;
-                update_transition_type ();
-            });
-            this.breakpoint.unapply.connect (() => {
-                this.breakpoint_applied = false;
-                update_transition_type ();
-            });
-
+            setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();
             setup_style_switcher ();
@@ -90,6 +82,18 @@ namespace Mingle {
             connect_flow_box_signals (right_emojis_flow_box, handle_right_emoji_activation);
             emoji_manager.add_emojis_to_flowbox (left_emojis_flow_box);
             emoji_manager.add_emojis_to_flowbox (right_emojis_flow_box);
+        }
+
+        private void setup_breakpoints () {
+            // Updates `breakpoint_applied` and our transition type
+            breakpoint.apply.connect (() => {
+                this.breakpoint_applied = true;
+                update_transition_type ();
+            });
+            breakpoint.unapply.connect (() => {
+                this.breakpoint_applied = false;
+                update_transition_type ();
+            });
         }
 
         private void setup_style_switcher () {

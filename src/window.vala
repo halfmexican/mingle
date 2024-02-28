@@ -111,7 +111,7 @@ namespace Mingle {
         private void handle_left_emoji_activation (Mingle.EmojiLabel emoji_label) {
             string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
-            stdout.printf ("←Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
+            message ("←Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
 
             // Check for first-launch to determine if we show a little tip
             if (settings.get_boolean ("first-launch")) {
@@ -141,7 +141,7 @@ namespace Mingle {
             string emoji = emoji_label.emoji;
             curr_right_emoji = emoji_label.code_point_str;
 
-            stdout.printf ("→Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
+            message ("→Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
                 add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (false));
@@ -163,7 +163,7 @@ namespace Mingle {
 
         private async void populate_center_flow_box_lazy () {
             if (is_loading) {
-                stderr.printf ("Already loading, aborting new call.\n");
+                warning ("Already loading, aborting new call.\n");
                 return; // Early return if already loading
             }
             is_loading = true;
@@ -176,7 +176,7 @@ namespace Mingle {
             Gee.List<Json.Node> batch = emoji_manager.get_combinations_for_emoji_lazy (curr_left_emoji, batch_offset, BATCH_SIZE);
 
             if (batch.size == 0) {
-                stderr.printf ("No more combinations to load.\n");
+                message ("No more combinations to load.\n");
                 create_and_show_toast ("No more combinations", 4);
                 is_loading = false; // Reset the loading state
                 return;
@@ -216,7 +216,7 @@ namespace Mingle {
         }
 
         [GtkCallback]
-        private void select_random () {
+        public void select_random () {
             // Called when user clicks the "🎲" button
             // selects and activates a random emoji in the left flow box
             uint flowbox_length = emoji_manager.get_supported_emojis_length ();

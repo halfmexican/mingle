@@ -305,9 +305,8 @@ namespace Mingle {
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
-
-            bool is_valid = emoji_manager.is_valid_combination (curr_left_emoji, right_emoji_code);
-            child.set_sensitive (is_valid);
+            string combination_key = curr_left_emoji + "_" + right_emoji_code;
+            child.set_sensitive (combination_key in emoji_manager);
         }
 
         private void update_sensitivity_of_right_flowbox () {

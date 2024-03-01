@@ -51,5 +51,9 @@ namespace Mingle {
             }
             return emoji;
         }
+
+        public string to_string() {
+            return this.emoji;
+        }
     }
 }

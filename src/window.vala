@@ -109,9 +109,8 @@ namespace Mingle {
         }
 
         private void handle_left_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            string emoji = emoji_label.emoji;
             curr_left_emoji = emoji_label.code_point_str;
-            message ("←Left Unicode: %s, Emoji: %s\n", curr_left_emoji, emoji);
+            message (@"←Left Unicode: $curr_left_emoji, Emoji: $emoji_label");
 
             // Check for first-launch to determine if we show a little tip
             if (settings.get_boolean ("first-launch")) {
@@ -138,10 +137,9 @@ namespace Mingle {
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            string emoji = emoji_label.emoji;
             curr_right_emoji = emoji_label.code_point_str;
 
-            message ("→Right Unicode: %s, Emoji: %s\n", curr_right_emoji, emoji);
+            message (@"→Right Unicode: $curr_right_emoji, Emoji: $emoji_label\n");
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
                 add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (false));
@@ -307,9 +305,8 @@ namespace Mingle {
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
             string right_emoji_code = emoji_label.code_point_str;
-
-            bool is_valid = emoji_manager.is_valid_combination (curr_left_emoji, right_emoji_code);
-            child.set_sensitive (is_valid);
+            string combination_key = curr_left_emoji + "_" + right_emoji_code;
+            child.set_sensitive (combination_key in emoji_manager);
         }
 
         private void update_sensitivity_of_right_flowbox () {

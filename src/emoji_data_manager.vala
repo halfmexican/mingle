@@ -35,17 +35,17 @@ namespace Mingle {
         private void initialize_combinations_map () {
             // Starts a separate thread if possible to populate this.combinations_map
             if (!Thread.supported ()) {
-                stderr.printf ("Threads are not supported!\n");
+                warning ("Threads are not supported!\n");
                 combinations_map = populate_combinations_map ();
                 return;
             }
 
             try {
-                stdout.printf ("populate_combinations_map thread started\n");
+                message ("populate_combinations_map thread started\n");
                 Thread<Gee.HashMap<string, Json.Node> > thread = new Thread<Gee.HashMap<string, Json.Node> >.try ("combinations_map_thread", populate_combinations_map);
 
                 combinations_map = thread.join ();
-                stdout.printf ("populate_combinations_map thread end\n");
+                message ("populate_combinations_map thread end\n");
             } catch (Error e) {
                 stderr.printf ("Error: %s\n", e.message);
             }
@@ -173,7 +173,7 @@ namespace Mingle {
             // Get the specific emoji data by code
             Json.Node emoji_node = data_object.get_member (emoji_code);
             if (emoji_node == null || emoji_node.get_node_type () != Json.NodeType.OBJECT) {
-                stderr.printf ("Emoji code not found or data is not an object.");
+                error ("Emoji code not found or data is not an object.");
             }
 
             Json.Object emoji_object = emoji_node.get_object ();
@@ -181,15 +181,15 @@ namespace Mingle {
             // Get the combinations array
             Json.Node combinations_node = emoji_object.get_member ("combinations");
             if (combinations_node == null || combinations_node.get_node_type () != Json.NodeType.ARRAY) {
-                stderr.printf ("Combinations not found or not an array.");
+                error ("Combinations not found or not an array.");
             }
 
             return combinations_node.get_array ();
         }
 
-        public bool is_valid_combination (string left_emoji_code, string right_emoji_code) {
+        public bool contains (string combination_key) {
             // Returns true if the given combination is in our HashMap
-            string combination_key = left_emoji_code + "_" + right_emoji_code;
+            // leftEMoji_rightEMoji
             return combinations_map.has_key (combination_key);
         }
 
@@ -230,10 +230,10 @@ namespace Mingle {
                     Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
                     return combined_emoji;
                 } else {
-                    stderr.printf ("gStaticUrl is missing or not a value.\n");
+                    error ("gStaticUrl is missing or not a value.\n");
                 }
             } else {
-                stderr.printf ("Combination not found for the provided codepoints.\n");
+                warning ("Combination not found for the provided codepoints.\n");
             }
             return null;
         }

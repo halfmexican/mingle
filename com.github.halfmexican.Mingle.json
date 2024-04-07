@@ -38,7 +38,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "https://github.com/halfmexican/mingle.git"
+                    "url" : "https://github.com/halfmexican/mingle.git",
+                    "branch": "main"
                 }
             ]
         }

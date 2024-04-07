@@ -38,7 +38,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "file:///home/josehunter/Projects"
+                    "url" : "https://github.com/halfmexican/mingle.git"
                 }
             ]
         }

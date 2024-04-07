@@ -53,6 +53,7 @@ namespace Mingle {
 
         private Gee.HashMap<string, Json.Node> populate_combinations_map () {
             // Returns a Hashmap of all possible emoji combinations
+            // this a comment
             Json.Array emoji_data = get_supported_emojis ();
             Gee.HashMap<string, Json.Node> combinations_map = new Gee.HashMap<string, Json.Node> ();
 

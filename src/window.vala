@@ -22,6 +22,7 @@ using Json, Soup, Gee;
 namespace Mingle {
     [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/window.ui")]
     public class Window : Adw.ApplicationWindow {
+        // UI
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
@@ -30,13 +31,17 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
+        private bool breakpoint_applied;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
         private GLib.Settings settings;
+
+        // Codepoints
         private string curr_left_emoji;
         private string curr_right_emoji;
         private string prev_left_emoji;
         private string prev_right_emoji;
-        private bool breakpoint_applied;
+        
+        // Trasitions used for loading combined emojis
         private enum Transition {
            NONE,
            CROSSFADE,
@@ -46,11 +51,10 @@ namespace Mingle {
         }
         private Transition revealer_transition;
 
-        // lazy loading properties
+        // Lazy loading 
         private const int BATCH_SIZE = 20;
         private uint batch_offset = 0;
         public bool is_loading {get; set; default = false;}
-
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
         public Window (Mingle.Application app) {

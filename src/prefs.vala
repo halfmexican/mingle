@@ -21,12 +21,12 @@
 using Gtk, Adw, GLib;
 namespace Mingle {
     [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/prefs.ui")]
-    public class PrefsWindow : Adw.PreferencesWindow {
+    public class PrefsDialog : Adw.PreferencesDialog {
     [GtkChild] private unowned Adw.ComboRow headerbar_row;
     [GtkChild] private unowned Adw.ComboRow transition_row;
     private GLib.Settings settings;
 
-        public PrefsWindow (Mingle.Application app) {
+        public PrefsDialog (Mingle.Application app) {
             this.settings = app.settings;
             headerbar_row.notify["selected"].connect (update_headerbar_style);
             headerbar_row.set_selected (this.settings.get_int ("headerbar-style"));

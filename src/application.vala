@@ -47,14 +47,13 @@ namespace Mingle {
         }
 
         private void select_random () {
-            var win = this.active_window as Mingle.Window;
+            var win = (Mingle.Window) this.active_window;
             win.select_random();
         }
 
         private void on_about_action () {
             string[] developers = { "José Hunter", "kramo" };
-            var about = new Adw.AboutWindow () {
-                transient_for = this.active_window,
+            var about = new Adw.AboutDialog () {
                 application_name = "mingle",
                 application_icon = "com.github.halfmexican.Mingle",
                 website = "https://github.com/halfmexican/mingle",
@@ -65,15 +64,13 @@ namespace Mingle {
                 copyright = "© 2024 José Hunter",
                 license_type = Gtk.License.GPL_3_0,
             };
-            about.present ();
+            about.present (this.active_window);
         }
 
         private void on_preferences_action () {
             message ("app.preferences action activated");
-            var prefs = new Mingle.PrefsWindow (this) {
-                transient_for = this.active_window,
-            };
-            prefs.present ();
+            var prefs = new Mingle.PrefsDialog (this);
+            prefs.present (this.active_window);
         }
     }
 }

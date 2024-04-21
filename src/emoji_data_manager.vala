@@ -84,7 +84,7 @@ namespace Mingle {
             size_t length;
 
             try {
-                var input_stream = GLib.resources_open_stream ("/com/github/halfmexican/Mingle/emoji_data/metadata.json", GLib.ResourceLookupFlags.NONE);
+                var input_stream = GLib.resources_open_stream ("/io/github/halfmexican/Mingle/emoji_data/metadata.json", GLib.ResourceLookupFlags.NONE);
                 var data_stream = new GLib.DataInputStream (input_stream);
                 file_contents = data_stream.read_upto ("", -1, out length);
 

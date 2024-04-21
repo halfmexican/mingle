@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-	<id>com.github.halfmexican.Mingle.desktop</id>
-  <launchable type="desktop-id">com.github.halfmexican.Mingle.desktop</launchable>
+	<id>io.github.halfmexican.Mingle.desktop</id>
+  <launchable type="desktop-id">io.github.halfmexican.Mingle.desktop</launchable>
   <name>Mingle</name>
   <summary>Combine emojis with Google's Emoji Kitchen</summary>
 	<metadata_license>CC0-1.0</metadata_license>

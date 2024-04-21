@@ -1,4 +1,4 @@
-application_id = 'com.github.halfmexican.Mingle'
+application_id = 'io.github.halfmexican.Mingle'
 
 scalable_dir = 'hicolor' / 'scalable' / 'apps'
 install_data(

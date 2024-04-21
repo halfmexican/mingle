@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Mingle
 Exec=mingle
-Icon=com.github.halfmexican.Mingle
+Icon=io.github.halfmexican.Mingle
 Terminal=false
 Type=Application
 Categories=Utility;GTK;

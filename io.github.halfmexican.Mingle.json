@@ -1,5 +1,5 @@
 {
-    "app-id" : "com.github.halfmexican.Mingle",
+    "app-id" : "io.github.halfmexican.Mingle",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "46",
     "sdk" : "org.gnome.Sdk",

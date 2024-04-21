@@ -28,7 +28,7 @@ namespace Mingle {
         [GtkChild] unowned Gtk.CheckButton dark_selector;
 
         private Adw.StyleManager style_manager;
-        private GLib.Settings settings = new GLib.Settings ("com.github.halfmexican.Mingle");
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         public bool show_system { get; set; default = true; }
 
         public StyleSwitcher () {

@@ -20,7 +20,7 @@
 using Adw;
 
 namespace Mingle {
-    [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/style-switcher.ui")]
+    [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/style-switcher.ui")]
     public class StyleSwitcher : Gtk.Widget {
 
         [GtkChild] unowned Gtk.CheckButton system_selector;

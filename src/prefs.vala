@@ -20,7 +20,7 @@
 
 using Gtk, Adw, GLib;
 namespace Mingle {
-    [GtkTemplate (ui = "/com/github/halfmexican/Mingle/gtk/prefs.ui")]
+    [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/prefs.ui")]
     public class PrefsDialog : Adw.PreferencesDialog {
     [GtkChild] private unowned Adw.ComboRow headerbar_row;
     [GtkChild] private unowned Adw.ComboRow transition_row;

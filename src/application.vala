@@ -20,9 +20,9 @@
 
 namespace Mingle {
     public class Application : Adw.Application {
-        public GLib.Settings settings = new GLib.Settings ("com.github.halfmexican.Mingle");
+        public GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         public Application () {
-            Object (application_id: "com.github.halfmexican.Mingle", flags: ApplicationFlags.DEFAULT_FLAGS);
+            Object (application_id: "io.github.halfmexican.Mingle", flags: ApplicationFlags.DEFAULT_FLAGS);
         }
 
         construct {
@@ -55,7 +55,7 @@ namespace Mingle {
             string[] developers = { "José Hunter", "kramo" };
             var about = new Adw.AboutDialog () {
                 application_name = "mingle",
-                application_icon = "com.github.halfmexican.Mingle",
+                application_icon = "io.github.halfmexican.Mingle",
                 website = "https://github.com/halfmexican/mingle",
                 issue_url = "https://github.com/halfmexican/mingle/issues",
                 developer_name = "José Hunter",

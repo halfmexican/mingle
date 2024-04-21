@@ -15,4 +15,19 @@
     <content_attribute id="sex-themes">mild</content_attribute>
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
+  <url type="homepage">https://github.com/halfmexican/mingle</url>
+  <developer id="@halfmexican@fosstodon.org">
+    <name>halfmexican</name>
+  </developer>
+  <branding>
+    <color type="primary" scheme_preference="light">#67234d</color>
+    <color type="primary" scheme_preference="dark">#c1381d</color>
+  </branding>
+  <releases>
+    <release version="0.10" date="2024-04-20">
+      <description>
+        <p>Initial Release ;D</p>
+      </description>
+    </release>
+  </releases>
 </component>

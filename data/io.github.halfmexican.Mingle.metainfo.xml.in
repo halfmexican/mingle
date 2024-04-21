@@ -23,6 +23,19 @@
     <color type="primary" scheme_preference="light">#67234d</color>
     <color type="primary" scheme_preference="dark">#c1381d</color>
   </branding>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv1.png</image>
+      <caption>Funny Penguins</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv2.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv3.png</image>
+      <caption>Settings</caption>
+    </screenshot>
+  </screenshots>
   <releases>
     <release version="0.10" date="2024-04-20">
       <description>

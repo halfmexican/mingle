@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="mingle">
-	<schema id="com.github.halfmexican.Mingle" path="/com/github/halfmexican/Mingle/">
+	<schema id="io.github.halfmexican.Mingle" path="/io/github/halfmexican/Mingle/">
 	   <key name="first-launch" type="b">
       <default>true</default>
       <summary>first-launch</summary>

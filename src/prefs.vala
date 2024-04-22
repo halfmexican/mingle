@@ -24,10 +24,9 @@ namespace Mingle {
     public class PrefsDialog : Adw.PreferencesDialog {
     [GtkChild] private unowned Adw.ComboRow headerbar_row;
     [GtkChild] private unowned Adw.ComboRow transition_row;
-    private GLib.Settings settings;
+    private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
-        public PrefsDialog (Mingle.Application app) {
-            this.settings = app.settings;
+        public PrefsDialog () {
             headerbar_row.notify["selected"].connect (update_headerbar_style);
             headerbar_row.set_selected (this.settings.get_int ("headerbar-style"));
             transition_row.notify["selected"].connect (update_revealer_transition);

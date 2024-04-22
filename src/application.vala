@@ -69,7 +69,7 @@ namespace Mingle {
 
         private void on_preferences_action () {
             message ("app.preferences action activated");
-            var prefs = new Mingle.PrefsDialog (this);
+            var prefs = new Mingle.PrefsDialog ();
             prefs.present (this.active_window);
         }
     }

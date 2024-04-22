@@ -33,7 +33,7 @@ namespace Mingle {
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
         private bool breakpoint_applied;
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
-        private GLib.Settings settings;
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         // Codepoints
         private string curr_left_emoji;
@@ -59,7 +59,6 @@ namespace Mingle {
 
         public Window (Mingle.Application app) {
             GLib.Object (application: app);
-            this.settings = app.settings;
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll

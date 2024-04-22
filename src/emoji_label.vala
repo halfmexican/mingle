@@ -21,9 +21,9 @@
 using Gtk;
 namespace Mingle {
     public class EmojiLabel : Adw.Bin {
-        public string code_point_str;
-        public string emoji;
-        public string alt_name;
+        private string code_point_str;
+        private string emoji;
+        private string alt_name;
         public Json.Array ? keywords;
 
         public EmojiLabel (string code_point_str, string alt_name, Json.Array ? keywords) {
@@ -54,6 +54,10 @@ namespace Mingle {
 
         public string to_string() {
             return this.emoji;
+        }
+
+        public string get_code_point_str () {
+            return this.code_point_str;
         }
     }
 }

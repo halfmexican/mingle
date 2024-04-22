@@ -47,7 +47,7 @@ namespace Mingle {
                 combinations_map = thread.join ();
                 message ("populate_combinations_map thread end\n");
             } catch (Error e) {
-                stderr.printf ("Error: %s\n", e.message);
+                error ("Error: %s\n", e.message);
             }
         }
 
@@ -102,8 +102,7 @@ namespace Mingle {
                 Json.Array known_supported_array = known_supported_node.get_array ();
                 return known_supported_array;
             } catch (Error e) {
-                stderr.printf ("Error: %s\n", e.message);
-                return new Json.Array ();
+                error ("Error: %s\n", e.message);
             }
         }
 

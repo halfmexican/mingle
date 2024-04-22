@@ -79,7 +79,7 @@ namespace Mingle {
             string reason = message.reason_phrase;
 
             if (status_code != 200) {
-                stderr.printf ("Status Code: %x\n Reason: %s", status_code, reason);
+                warning ("Status Code: %x\n Reason: %s", status_code, reason);
             }
 
             return input_stream;

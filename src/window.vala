@@ -174,7 +174,7 @@ namespace Mingle {
                 combined_emojis_flow_box.remove_all ();
             }
 
-            Gee.List<Json.Node> batch = emoji_manager.get_combinations_for_emoji_lazy (curr_left_emoji, batch_offset, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (curr_left_emoji, batch_offset, BATCH_SIZE);
 
             if (batch.size == 0) {
                 message ("No more combinations to load.\n");
@@ -186,8 +186,7 @@ namespace Mingle {
             }
 
             uint added_count = 0;
-            foreach (Json.Node combination_node in batch) {
-                Json.Object combination_object = combination_node.get_object ();
+            foreach (Json.Object combination_object in batch) {
                 string right_emoji_code = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();
 
                 if (right_emoji_code == curr_left_emoji) {

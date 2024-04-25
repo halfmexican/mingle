@@ -62,6 +62,7 @@ namespace Mingle {
 
                 for (int j = 0; j < combinations.get_length (); j++) {
                     Json.Object combination_object = combinations.get_object_element (j);
+                    combination_object.ref();
 
                     string left_emoji_code = combination_object.get_string_member ("leftEmojiCodepoint");
                     string right_emoji_code = combination_object.get_string_member ("rightEmojiCodepoint");

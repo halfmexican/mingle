@@ -175,8 +175,7 @@ namespace Mingle {
             }
 
             Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (curr_left_emoji, batch_offset, BATCH_SIZE);
-
-            if (batch.size == 0) {
+            if (batch.size <= 0) {
                 message ("No more combinations to load.\n");
                 create_and_show_toast ("No more combinations", 4);
                 is_loading = false; // Reset the loading state
@@ -184,7 +183,6 @@ namespace Mingle {
             } else if (batch_offset > 1) {
                 create_and_show_toast("Loading More Combinations…", 2);
             }
-
             uint added_count = 0;
             foreach (Json.Object combination_object in batch) {
                 string right_emoji_code = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();

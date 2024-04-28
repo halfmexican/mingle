@@ -2,8 +2,7 @@
 
 An application to combine emojis using Google's Emoji Kitchen.
 
-![image](https://github.com/halfmexican/mingle/assets/103920890/fb0c1ae7-4193-4361-a6c2-37497e35bf05)
-
+![image](https://github.com/halfmexican/mingle/assets/103920890/57dec847-e622-4540-a75c-f59d53433139)
 
 ## Download
 <a href='https://flathub.org/apps/io.github.halfmexican.Mingle'>

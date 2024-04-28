@@ -54,7 +54,7 @@ namespace Mingle {
         // Lazy loading 
         private const int BATCH_SIZE = 20;
         private uint batch_offset = 0;
-        public bool is_loading {get; set; default = false;}
+        public bool is_loading {get; private set; default = false;}
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
         public Window (Mingle.Application app) {
@@ -185,10 +185,10 @@ namespace Mingle {
             }
             uint added_count = 0;
             foreach (Json.Object combination_object in batch) {
-                string right_emoji_code = combination_object.get_member ("rightEmojiCodepoint").get_value ().get_string ();
+                string right_emoji_code = combination_object.get_string_member ("rightEmojiCodepoint");
 
                 if (right_emoji_code == curr_left_emoji) {
-                    right_emoji_code = combination_object.get_member ("leftEmojiCodepoint").get_value ().get_string ();
+                    right_emoji_code = combination_object.get_string_member ("leftEmojiCodepoint");
                 }
 
                 string combination_key = curr_left_emoji + "_" + right_emoji_code;

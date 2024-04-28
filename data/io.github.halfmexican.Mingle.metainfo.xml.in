@@ -38,14 +38,9 @@
     </screenshot>
   </screenshots>
    <releases>
-    <release version="0.10" date="2024-04-20">
+   <release version="0.11" date="2024-04-28">
       <description>
-        <p>Initial Release ;D</p>
-      </description>
-    </release>
-    <release version="0.11" date="2024-04-28">
-      <description>
-        <h3>New Emojis</h3>
+        <p>New Emojis</p>
         <ul>
           <li>🪂</li>
           <li>🌄</li>
@@ -53,10 +48,15 @@
           <li>🧊</li>
           <li>🖼️</li>
         </ul>
-        <h3>Minor Bug Fixes</h3>
+        <p>Minor Bug Fixes</p>
           <ul>
             <li>Fix issue of loading more emojis when out of combinations</li>
           </ul>
+      </description>
+    </release>
+    <release version="0.10" date="2024-04-20">
+      <description>
+        <p>Initial Release ;D</p>
       </description>
     </release>
   </releases>

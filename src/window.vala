@@ -41,7 +41,7 @@ namespace Mingle {
         private string prev_left_emoji;
         private string prev_right_emoji;
         
-        // Trasitions used for loading combined emojis
+        // Transitions used for loading combined emojis
         private enum Transition {
            NONE,
            CROSSFADE,

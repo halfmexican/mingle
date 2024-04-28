@@ -25,21 +25,38 @@
   </branding>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv1.png</image>
-      <caption>Funny Penguins</caption>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv2.png</image>
+      <caption>App Window</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv2.png</image>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv1.png</image>
+      <caption>Funny Penguins</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/halfmexican/mingle/1b97f64bb4563900279f34ac1ad0240faac6d2dc/data/pv3.png</image>
       <caption>Settings</caption>
     </screenshot>
   </screenshots>
-  <releases>
+   <releases>
     <release version="0.10" date="2024-04-20">
       <description>
         <p>Initial Release ;D</p>
+      </description>
+    </release>
+    <release version="0.11" date="2024-04-28">
+      <description>
+        <h3>New Emojis</h3>
+        <ul>
+          <li>🪂</li>
+          <li>🌄</li>
+          <li>🐉</li>
+          <li>🧊</li>
+          <li>🖼️</li>
+        </ul>
+        <h3>Minor Bug Fixes</h3>
+          <ul>
+            <li>Fix issue of loading more emojis when out of combinations</li>
+          </ul>
       </description>
     </release>
   </releases>

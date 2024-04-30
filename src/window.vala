@@ -112,7 +112,7 @@ namespace Mingle {
         }
 
         private void handle_left_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            curr_left_emoji = emoji_label.get_code_point_str ();
+            curr_left_emoji = emoji_label.code_point_str;
             message (@"←Left Unicode: $curr_left_emoji, Emoji: $emoji_label");
 
             // Check for first-launch to determine if we show a little tip
@@ -140,7 +140,7 @@ namespace Mingle {
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            curr_right_emoji = emoji_label.get_code_point_str ();
+            curr_right_emoji = emoji_label.code_point_str;
 
             message (@"→Right Unicode: $curr_right_emoji, Emoji: $emoji_label\n");
             if (curr_right_emoji != prev_right_emoji) {
@@ -304,7 +304,7 @@ namespace Mingle {
         // ChildFlowbox CSS
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
-            string right_emoji_code = emoji_label.get_code_point_str();
+            string right_emoji_code = emoji_label.code_point_str;
             string combination_key = curr_left_emoji + "_" + right_emoji_code;
             child.set_sensitive (combination_key in emoji_manager);
         }

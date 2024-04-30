@@ -21,25 +21,25 @@
 using Gtk;
 namespace Mingle {
     public class EmojiLabel : Adw.Bin {
-        private string code_point_str;
         private string emoji;
-        private string alt_name;
-        public Json.Array ? keywords;
+        public string code_point_str { get; private set; }
+        public string alt_name { get; private set; }
+        public Json.Array ? keywords { get; private set; }
 
         public EmojiLabel (string code_point_str, string alt_name, Json.Array ? keywords) {
+            this.emoji = code_point_str_to_emoji (code_point_str);
             this.code_point_str = code_point_str;
             this.alt_name = alt_name;
             this.keywords = keywords;
-            this.emoji = code_point_str_to_emoji (code_point_str);
             var label = new Gtk.Label (this.emoji) {
                 css_classes = { "emoji", "title-1" },
                 vexpand = true,
                 hexpand = true,
                 width_request = 50,
                 height_request = 50,
+                tooltip_text = alt_name,
             };
             this.child = label;
-            label.set_tooltip_text (alt_name);
         }
 
         private string code_point_str_to_emoji (string code_point_str) {
@@ -54,10 +54,6 @@ namespace Mingle {
 
         public string to_string() {
             return this.emoji;
-        }
-
-        public string get_code_point_str () {
-            return this.code_point_str;
         }
     }
 }

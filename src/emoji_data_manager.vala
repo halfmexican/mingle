@@ -207,7 +207,7 @@ namespace Mingle {
             return batch;
         }
 
-        public async Mingle.CombinedEmoji ? get_combined_emoji (string left_codepoint, string right_codepoint, Gtk.RevealerTransitionType transition) {
+        public async Mingle.CombinedEmoji ? create_combined_emoji (string left_codepoint, string right_codepoint, Gtk.RevealerTransitionType transition) {
             // Asynchronously instantiate and return a CombinedEmoji given both left and right code_points
             string combination_key = left_codepoint + "_" + right_codepoint;
 

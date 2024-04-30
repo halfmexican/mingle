@@ -150,7 +150,7 @@ namespace Mingle {
         }
 
         private async void add_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
-            var combined_emoji = yield emoji_manager.get_combined_emoji (left_emoji_code, right_emoji_code, transition);
+            var combined_emoji = yield emoji_manager.create_combined_emoji (left_emoji_code, right_emoji_code, transition);
 
             if (combined_emoji == null)
                 return;
@@ -194,7 +194,7 @@ namespace Mingle {
                 string combination_key = curr_left_emoji + "_" + right_emoji_code;
 
                 if (!emoji_manager.is_combination_added (combination_key)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.get_combined_emoji (curr_left_emoji, right_emoji_code, create_combined_emoji_revealer_transition (true));
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.create_combined_emoji (curr_left_emoji, right_emoji_code, create_combined_emoji_revealer_transition (true));
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {

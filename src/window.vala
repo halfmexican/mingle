@@ -31,8 +31,9 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
-        private bool breakpoint_applied;
+        private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
+        private bool breakpoint_applied;
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         // Codepoints
@@ -58,15 +59,18 @@ namespace Mingle {
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
         public Window (Mingle.Application app) {
+            // Init
             GLib.Object (application: app);
-            this.settings.changed.connect (handle_pref_change);
-            this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
-            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            popover_menu.add_child (style_switcher, "style-switcher");
             setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();
-            setup_style_switcher ();
             setup_emoji_flow_boxes ();
+
+            // Signals
+            this.settings.changed.connect (handle_pref_change);
+            this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
+            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
         }
 
         private void handle_pref_change (string key) {
@@ -97,11 +101,6 @@ namespace Mingle {
                 this.breakpoint_applied = false;
                 update_transition_type ();
             });
-        }
-
-        private void setup_style_switcher () {
-            Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
-            popover_menu.add_child (style_switcher, "style-switcher");
         }
 
         private void connect_flow_box_signals (Gtk.FlowBox flowbox, EmojiActionDelegate handler) {

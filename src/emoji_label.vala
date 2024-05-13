@@ -22,13 +22,12 @@ using Gtk;
 namespace Mingle {
     public class EmojiLabel : Adw.Bin {
         private string emoji;
-        public string code_point_str { get; private set; }
+        public string codepoint { get; private set; }
         public string alt_name { get; private set; }
         public Json.Array ? keywords { get; private set; }
-
-        public EmojiLabel (string code_point_str, string alt_name, Json.Array ? keywords) {
-            this.emoji = code_point_str_to_emoji (code_point_str);
-            this.code_point_str = code_point_str;
+        public EmojiLabel (string codepoint_str, string alt_name, Json.Array ? keywords) {
+            this.emoji = codepoint_str_to_emoji (codepoint_str);
+            this.codepoint = codepoint_str;
             this.alt_name = alt_name;
             this.keywords = keywords;
             var label = new Gtk.Label (this.emoji) {
@@ -42,11 +41,11 @@ namespace Mingle {
             this.child = label;
         }
 
-        private string code_point_str_to_emoji (string code_point_str) {
+        private string codepoint_str_to_emoji (string codepoint_str) {
             string emoji = "";
-            foreach (string part in code_point_str.split ("-")) {
-                int64 code_point = int64.parse ("0x" + part);
-                unichar emoji_char = (unichar) code_point;
+            foreach (string part in codepoint_str.split ("-")) {
+                int64 code = int64.parse ("0x" + part);
+                unichar emoji_char = (unichar) code;
                 emoji += @"$(emoji_char)";
             }
             return emoji;

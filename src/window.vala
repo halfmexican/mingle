@@ -31,14 +31,13 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
-        private bool breakpoint_applied;
-        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
+        private EmojiLabel left_emoji;
+        private EmojiLabel right_emoji;
 
         // Codepoints
-        private string curr_left_emoji;
-        private string curr_right_emoji;
         private string prev_left_emoji;
         private string prev_right_emoji;
         
@@ -55,6 +54,7 @@ namespace Mingle {
         // Lazy loading 
         private const int BATCH_SIZE = 20;
         private uint batch_offset = 0;
+        private bool breakpoint_applied;
         public bool is_loading {get; private set; default = false;}
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
@@ -111,8 +111,9 @@ namespace Mingle {
         }
 
         private void handle_left_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            curr_left_emoji = emoji_label.code_point_str;
-            message (@"←Left Unicode: $curr_left_emoji, Emoji: $emoji_label");
+            left_emoji = emoji_label;
+            string curr_left_emoji = left_emoji.codepoint;
+            message (@"←Left Unicode: $curr_left_emoji, Emoji: $left_emoji");
 
             // Check for first-launch to determine if we show a little tip
             if (settings.get_boolean ("first-launch")) {
@@ -130,8 +131,8 @@ namespace Mingle {
                 emoji_manager.clear_added_combinations ();
                 populate_center_flow_box_lazy.begin ();
 
-                if (curr_right_emoji != null) {
-                    add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (true));
+                if (right_emoji != null) {
+                    add_combined_emoji.begin (curr_left_emoji, right_emoji.codepoint, create_combined_emoji_revealer_transition (true));
                 }
                 right_emojis_flow_box.sensitive = true;
             }
@@ -139,12 +140,13 @@ namespace Mingle {
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
-            curr_right_emoji = emoji_label.code_point_str;
+            right_emoji = emoji_label;
+            string curr_right_emoji = right_emoji.codepoint;
 
-            message (@"→Right Unicode: $curr_right_emoji, Emoji: $emoji_label\n");
+            message (@"→Right Unicode: $curr_right_emoji, Emoji: $right_emoji\n");
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
-                add_combined_emoji.begin (curr_left_emoji, curr_right_emoji, create_combined_emoji_revealer_transition (false));
+                add_combined_emoji.begin (right_emoji.codepoint, curr_right_emoji, create_combined_emoji_revealer_transition (false));
             }
         }
 
@@ -173,7 +175,7 @@ namespace Mingle {
                 combined_emojis_flow_box.remove_all ();
             }
 
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (curr_left_emoji, batch_offset, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (left_emoji.codepoint, batch_offset, BATCH_SIZE);
             if (batch.size <= 0) {
                 message ("No more combinations to load.\n");
                 create_and_show_toast ("No more combinations", 4);
@@ -186,14 +188,14 @@ namespace Mingle {
             foreach (Json.Object combination_object in batch) {
                 string right_emoji_code = combination_object.get_string_member ("rightEmojiCodepoint");
 
-                if (right_emoji_code == curr_left_emoji) {
+                if (right_emoji_code == left_emoji.codepoint) {
                     right_emoji_code = combination_object.get_string_member ("leftEmojiCodepoint");
                 }
 
-                string combination_key = curr_left_emoji + "_" + right_emoji_code;
+                string combination_key = left_emoji.codepoint + "_" + right_emoji_code;
 
                 if (!emoji_manager.is_combination_added (combination_key)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.create_combined_emoji (curr_left_emoji, right_emoji_code, create_combined_emoji_revealer_transition (true));
+                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.create_combined_emoji (left_emoji.codepoint, right_emoji_code, create_combined_emoji_revealer_transition (true));
 
                     if (combined_emoji != null) {
                         combined_emoji.copied.connect (() => {
@@ -303,8 +305,8 @@ namespace Mingle {
         // ChildFlowbox CSS
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
-            string right_emoji_code = emoji_label.code_point_str;
-            string combination_key = curr_left_emoji + "_" + right_emoji_code;
+            string right_emoji_code = emoji_label.codepoint;
+            string combination_key = left_emoji.codepoint + "_" + right_emoji_code;
             child.set_sensitive (combination_key in emoji_manager);
         }
 

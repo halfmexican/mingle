@@ -150,67 +150,75 @@ namespace Mingle {
             }
         }
 
-        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
-            var combined_emoji = yield emoji_manager.create_combined_emoji (left_emoji_code, right_emoji_code, transition);
-
-            if (combined_emoji == null)
-                return;
-
-            combined_emojis_flow_box.prepend (combined_emoji);
-            combined_emoji.revealer.reveal_child = true;
-            combined_emoji.copied.connect (() => {
-                create_and_show_toast ("Image copied to clipboard", 3);
-            });
+        private async void add_combined_emoji(string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            string? gstatic_url = emoji_manager.get_combined_emoji_url(left_emoji_code, right_emoji_code);
+            if (gstatic_url != null) {
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, transition);
+                if (combined_emoji != null) {
+                    combined_emojis_flow_box.prepend(combined_emoji);
+                    combined_emoji.revealer.reveal_child = true;
+                    combined_emoji.copied.connect(() => {
+                        create_and_show_toast("Image copied to clipboard", 3);
+                    });
+                }
+            } else {
+                warning("No valid URL for the combined emoji.\n");
+            }
         }
 
-        private async void populate_center_flow_box_lazy () {
+        private async void populate_center_flow_box_lazy() {
             if (is_loading) {
-                warning ("Already loading, aborting new call.\n");
+                warning("Already loading, aborting new call.\n");
                 return; // Early return if already loading
             }
             is_loading = true;
 
             // Clear the flowbox if we're loading from the beginning
             if (batch_offset == 0) {
-                combined_emojis_flow_box.remove_all ();
+                combined_emojis_flow_box.remove_all();
             }
 
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (left_emoji.codepoint, batch_offset, BATCH_SIZE);
+            // Fetch a batch of combinations lazily
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy(left_emoji.codepoint, batch_offset, BATCH_SIZE);
+
             if (batch.size <= 0) {
-                message ("No more combinations to load.\n");
-                create_and_show_toast ("No more combinations", 4);
+                message("No more combinations to load.\n");
+                create_and_show_toast("No more combinations", 4);
                 is_loading = false; // Reset the loading state
                 return;
-            } else if (batch_offset > 1) {
+            } else if (batch_offset > 0) {
                 create_and_show_toast("Loading More Combinations…", 2);
             }
+
             uint added_count = 0;
             foreach (Json.Object combination_object in batch) {
-                string right_emoji_code = combination_object.get_string_member ("rightEmojiCodepoint");
+                string right_emoji_code = combination_object.get_string_member("rightEmojiCodepoint");
 
                 if (right_emoji_code == left_emoji.codepoint) {
-                    right_emoji_code = combination_object.get_string_member ("leftEmojiCodepoint");
+                    right_emoji_code = combination_object.get_string_member("leftEmojiCodepoint");
                 }
 
                 string combination_key = left_emoji.codepoint + "_" + right_emoji_code;
+                if (!emoji_manager.is_combination_added(combination_key)) {
+                    string? gstatic_url = emoji_manager.get_combined_emoji_url(left_emoji.codepoint, right_emoji_code);
+                    if (gstatic_url != null) {
+                        Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, create_combined_emoji_revealer_transition(true));
+                        if (combined_emoji != null) {
+                            combined_emoji.copied.connect(() => {
+                                create_and_show_toast("Image copied to clipboard", 3);
+                            });
+                            combined_emojis_flow_box.append(combined_emoji);
+                            combined_emoji.revealer.reveal_child = true;
 
-                if (!emoji_manager.is_combination_added (combination_key)) {
-                    Mingle.CombinedEmoji combined_emoji = yield emoji_manager.create_combined_emoji (left_emoji.codepoint, right_emoji_code, create_combined_emoji_revealer_transition (true));
-
-                    if (combined_emoji != null) {
-                        combined_emoji.copied.connect (() => {
-                            create_and_show_toast ("Image copied to clipboard", 3);
-                        });
-
-                        combined_emojis_flow_box.append (combined_emoji);
-                        combined_emoji.revealer.reveal_child = true;
-
-                        emoji_manager.add_combination (combination_key);
-                        added_count++;
+                            emoji_manager.add_combination(combination_key);
+                            added_count++;
+                        }
+                    } else {
+                        warning("No valid URL for the combined emoji: " + combination_key + "\n");
                     }
                 }
             }
-            batch_offset += added_count;
+            batch_offset += BATCH_SIZE;
             is_loading = false;
         }
 

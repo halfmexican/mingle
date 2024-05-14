@@ -185,6 +185,16 @@ namespace Mingle {
             return combinations_map.has_key (combination_key);
         }
 
+        public string? get_combined_emoji_url(string left_codepoint, string right_codepoint) {
+            string combination_key = left_codepoint + "_" + right_codepoint;
+            if (combinations_map.has_key(combination_key)) {
+                Json.Object combination_data = combinations_map.get(combination_key);
+                return combination_data.get_string_member("gStaticUrl");
+            }
+            return null; // Return null if the combination does not exist
+        }
+
+
         public Gee.List<Json.Object> get_combinations_for_emoji (string leftEmojiCode) {
             Gee.List<Json.Object> relevant_combinations = new Gee.ArrayList<Json.Object> ();
             foreach (var key in combinations_map.keys) {
@@ -204,27 +214,8 @@ namespace Mingle {
             for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_object_element (i));
             }
+            //message (end_index.to_string());
             return batch;
-        }
-
-        public async Mingle.CombinedEmoji ? create_combined_emoji (string left_codepoint, string right_codepoint, Gtk.RevealerTransitionType transition) {
-            // Asynchronously instantiate and return a CombinedEmoji given both left and right code_points
-            string combination_key = left_codepoint + "_" + right_codepoint;
-
-            Json.Object combination_object = combinations_map.get (combination_key);
-
-            if (combination_object != null) {
-                string gstatic_url = combination_object.get_string_member ("gStaticUrl");
-                if (gstatic_url != null) {
-                    Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
-                    return combined_emoji;
-                } else {
-                    error ("gStaticUrl is missing.\n");
-                }
-            } else {
-                warning ("Combination not found for the provided codepoints.\n");
-            }
-            return null;
         }
     }
 }

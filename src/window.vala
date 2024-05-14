@@ -137,6 +137,7 @@ namespace Mingle {
                 right_emojis_flow_box.sensitive = true;
             }
             update_sensitivity_of_right_flowbox ();
+            update_window_title();
         }
 
         private void handle_right_emoji_activation (Mingle.EmojiLabel emoji_label) {
@@ -148,6 +149,7 @@ namespace Mingle {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
                 add_combined_emoji.begin (right_emoji.codepoint, curr_right_emoji, create_combined_emoji_revealer_transition (false));
             }
+            update_window_title();
         }
 
         private async void add_combined_emoji(string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
@@ -335,6 +337,20 @@ namespace Mingle {
                 index++;
                 child = right_emojis_flow_box.get_child_at_index (index);
             }
+        }
+
+       private void update_window_title() {
+            string title = "Mingle: ";
+            if (left_emoji != null && right_emoji != null) {
+                title += @"$left_emoji + $right_emoji";  // Using interpolated strings
+            } else if (left_emoji != null) {
+                title += @"$left_emoji + ?";
+            } else if (right_emoji != null) {
+                title += @"? + $right_emoji";
+            } else {
+                title += "? + ?";
+            }
+            this.set_title(title);
         }
 
         private void on_edge_overshot (Gtk.PositionType pos_type) {

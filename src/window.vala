@@ -192,7 +192,6 @@ namespace Mingle {
                 create_and_show_toast("Loading More Combinations…", 2);
             }
 
-            uint added_count = 0;
             foreach (Json.Object combination_object in batch) {
                 string right_emoji_code = combination_object.get_string_member("rightEmojiCodepoint");
 
@@ -213,7 +212,6 @@ namespace Mingle {
                             combined_emoji.revealer.reveal_child = true;
 
                             emoji_manager.add_combination(combination_key);
-                            added_count++;
                         }
                     } else {
                         warning("No valid URL for the combined emoji: " + combination_key + "\n");

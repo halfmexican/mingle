@@ -342,7 +342,7 @@ namespace Mingle {
        private void update_window_title () {
             string title = "Mingle: ";
             if (left_emoji != null && right_emoji != null) {
-                title += @"$left_emoji + $right_emoji";  // Using interpolated strings
+                title += @"$left_emoji + $right_emoji";
             } else if (left_emoji != null) {
                 title += @"$left_emoji + ?";
             } else if (right_emoji != null) {

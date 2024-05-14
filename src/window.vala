@@ -153,11 +153,11 @@ namespace Mingle {
         }
 
         private async void add_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
-            string? gstatic_url = emoji_manager.get_combined_emoji_url(left_emoji_code, right_emoji_code);
+            string? gstatic_url = emoji_manager.get_combined_emoji_url (left_emoji_code, right_emoji_code);
             if (gstatic_url != null) {
-                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, transition);
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
                 if (combined_emoji != null) {
-                    combined_emojis_flow_box.prepend(combined_emoji);
+                    combined_emojis_flow_box.prepend (combined_emoji);
                     combined_emoji.revealer.reveal_child = true;
                     combined_emoji.copied.connect(() => {
                         create_and_show_toast ("Image copied to clipboard", 3);
@@ -177,7 +177,7 @@ namespace Mingle {
 
             // Clear the flowbox if we're loading from the beginning
             if (batch_offset == 0) {
-                combined_emojis_flow_box.remove_all();
+                combined_emojis_flow_box.remove_all ();
             }
 
             // Fetch a batch of combinations lazily

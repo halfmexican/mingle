@@ -5,4 +5,5 @@ Icon=io.github.halfmexican.Mingle
 Terminal=false
 Type=Application
 Categories=Utility;GTK;
+Keywords=emoji;mix;Google;kitchen;Noto;
 StartupNotify=true

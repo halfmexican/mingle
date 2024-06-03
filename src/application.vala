@@ -52,7 +52,11 @@ namespace Mingle {
         }
 
         private void on_about_action () {
-            string[] developers = { "José Hunter https://github.com/halfmexican", "kramo https://kramo.page" };
+            string[] developers = {
+                "José Hunter https://github.com/halfmexican",
+                "kramo https://kramo.page",
+                "QuazarOmega https://github.com/quazar-omega"
+            };
             var about = new Adw.AboutDialog () {
                 application_name = "mingle",
                 application_icon = "io.github.halfmexican.Mingle",

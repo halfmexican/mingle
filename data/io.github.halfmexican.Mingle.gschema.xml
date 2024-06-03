@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="mingle">
 	<schema id="io.github.halfmexican.Mingle" path="/io/github/halfmexican/Mingle/">
-	   <key name="first-launch" type="b">
+	  <key name="first-launch" type="b">
       <default>true</default>
       <summary>first-launch</summary>
+      <description></description>
+    </key>
+    <key name="shrink-emoji" type="b">
+      <default>true</default>
+      <summary>scales combined emoji size</summary>
       <description></description>
     </key>
 	  <key name="color-scheme" type="i">

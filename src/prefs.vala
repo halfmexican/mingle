@@ -22,15 +22,18 @@ using Gtk, Adw, GLib;
 namespace Mingle {
     [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/prefs.ui")]
     public class PrefsDialog : Adw.PreferencesDialog {
-    [GtkChild] private unowned Adw.ComboRow headerbar_row;
-    [GtkChild] private unowned Adw.ComboRow transition_row;
-    private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
+        [GtkChild] private unowned Adw.ComboRow headerbar_row;
+        [GtkChild] private unowned Adw.ComboRow transition_row;
+        [GtkChild] private unowned Adw.SwitchRow shrink_row;
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         public PrefsDialog () {
             headerbar_row.notify["selected"].connect (update_headerbar_style);
             headerbar_row.set_selected (this.settings.get_int ("headerbar-style"));
             transition_row.notify["selected"].connect (update_revealer_transition);
             transition_row.set_selected (this.settings.get_int ("transition-type"));
+            shrink_row.notify["active"].connect (update_shrink_setting);
+            shrink_row.set_active (this.settings.get_boolean ("shrink-emoji"));
         }
 
         private void update_headerbar_style () {
@@ -41,6 +44,10 @@ namespace Mingle {
         private void update_revealer_transition () {
             int selected = (int) transition_row.get_selected ();
             this.settings.set_int ("transition-type", selected);
+        }
+
+        private void update_shrink_setting () {
+            this.settings.set_boolean ("shrink-emoji", shrink_row.get_active ());
         }
     }
 }

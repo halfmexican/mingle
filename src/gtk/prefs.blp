@@ -17,6 +17,10 @@ template $MinglePrefsDialog : Adw.PreferencesDialog {
           ]
         };
       }
+      Adw.SwitchRow shrink_row {
+        title: _("Shrink Copied Emoji Size");
+        subtitle: _("scales images to 1/4 size.");
+      }
       Adw.ComboRow transition_row {
         title: _("Transition Type");
         subtitle: _("The transition used when loading combined emojis");

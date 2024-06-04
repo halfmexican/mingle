@@ -147,7 +147,7 @@ namespace Mingle {
             message (@"→Right Unicode: $curr_right_emoji, Emoji: $right_emoji\n");
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
-                add_combined_emoji.begin (right_emoji.codepoint, curr_right_emoji, create_combined_emoji_revealer_transition (false));
+                add_combined_emoji.begin (left_emoji.codepoint, curr_right_emoji, create_combined_emoji_revealer_transition (false));
             }
             update_window_title ();
         }

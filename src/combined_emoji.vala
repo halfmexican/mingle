@@ -24,14 +24,25 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition) {
             try {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
                 var input_stream = yield get_input_stream (gstatic_url);
-
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
+
+                bool shrink_emoji = settings.get_boolean ("shrink-emoji");
+
+                if (shrink_emoji) {
+                    int width = pixbuf.get_width ();
+                    int height = pixbuf.get_height ();
+                    int scaled_width = width / 4;
+                    int scaled_height = height / 4;
+                    pixbuf = pixbuf.scale_simple (scaled_width, scaled_height, Gdk.InterpType.BILINEAR);
+                }
+
                 _texture = Gdk.Texture.for_pixbuf (pixbuf);
 
                 var overlay = new Gtk.Overlay () {

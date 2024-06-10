@@ -38,6 +38,16 @@
     </screenshot>
   </screenshots>
    <releases>
+    <release version="0.12" date="2024-06-10">
+      <description>
+        <p>Fixes and Features</p>
+        <ul>
+          <li>Added current combination to headerbar</li>
+          <li>Added keywords to desktop file (QuazarOmega)</li>
+          <li>Added Setting to change the resolution of copied emojis</li>
+        </ul>
+      </description>
+    </release>
    <release version="0.11" date="2024-04-28">
       <description>
         <p>New Emojis</p>

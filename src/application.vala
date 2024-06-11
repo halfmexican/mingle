@@ -63,7 +63,7 @@ namespace Mingle {
                 website = "https://github.com/halfmexican/mingle",
                 issue_url = "https://github.com/halfmexican/mingle/issues",
                 developer_name = "José Hunter",
-                version = "0.1.1",
+                version = "0.12",
                 developers = developers,
                 copyright = "© 2024 José Hunter",
                 license_type = Gtk.License.GPL_3_0,

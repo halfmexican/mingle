@@ -158,7 +158,7 @@ namespace Mingle {
                 Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
                 if (combined_emoji != null) {
                     combined_emojis_flow_box.prepend (combined_emoji);
-                    combined_emoji.revealer.reveal_child = true;
+                    combined_emoji.reveal ();
                     combined_emoji.copied.connect(() => {
                         create_and_show_toast ("Image copied to clipboard", 3);
                     });

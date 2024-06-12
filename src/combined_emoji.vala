@@ -80,6 +80,10 @@ namespace Mingle {
             });
         }
 
+        public void reveal () {
+            revealer.reveal_child = true;
+        }
+
         private async InputStream ? get_input_stream (string url) throws Error {
             var session = new Soup.Session ();
             var message = new Soup.Message.from_uri ("GET", Uri.parse (url, NONE));

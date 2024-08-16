@@ -25,11 +25,12 @@ namespace Mingle {
         public string codepoint { get; private set; }
         public string alt_name { get; private set; }
         public Json.Array ? keywords { get; private set; }
-        public EmojiLabel (string codepoint_str, string alt_name, Json.Array ? keywords) {
-            this.emoji = codepoint_str_to_emoji (codepoint_str);
-            this.codepoint = codepoint_str;
-            this.alt_name = alt_name;
-            this.keywords = keywords;
+        public EmojiLabel (EmojiData emoji_data) {
+            this.emoji = codepoint_str_to_emoji(emoji_data.emoji_codepoint);
+            this.codepoint = emoji_data.emoji_codepoint;
+            this.alt_name = emoji_data.alt;
+            this.keywords = emoji_data.keywords;
+            
             var label = new Gtk.Label (this.emoji) {
                 css_classes = { "emoji", "title-1" },
                 vexpand = true,
@@ -40,6 +41,7 @@ namespace Mingle {
             };
             this.child = label;
         }
+        
 
         private string codepoint_str_to_emoji (string codepoint_str) {
             string emoji = "";

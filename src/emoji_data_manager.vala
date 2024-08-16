@@ -28,33 +28,12 @@ namespace Mingle {
         public HashSet<string> added_combinations = new HashSet<string> ();
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
 
-        public struct EmojiData {
-            public string alt;
-            public Json.Array keywords;
-            public string emoji_codepoint;
-            public int gboard_order;
-            public Gee.HashMap<string, Gee.List<EmojiCombination?>> combinations;
-        }
-    
-        public struct EmojiCombination {
-            public string g_static_url;
-            public string alt;
-            public string left_emoji;
-            public string left_emoji_codepoint;
-            public string right_emoji;
-            public string right_emoji_codepoint;
-            public string date;
-            public bool is_latest;
-            public int gboard_order;
-        }
-
         public EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             combinations_map = new Gee.HashMap<string, Json.Object> ();
             added_combinations = new HashSet<string> ();
             initialize_emoji_data_map ();
-
             initialize_combinations_map ();
         }
         
@@ -129,35 +108,29 @@ namespace Mingle {
         }
 
         public void add_emojis_to_flowbox (Gtk.FlowBox flowbox) {
-            // Adds all the emojis from this.supported_emojis to the flowbox
             if (supported_emojis == null)
                 supported_emojis = populate_supported_emojis_array ();
-
-            Json.Object data_object = root_object.get_object_member ("data");
-
+        
             ArrayForeach array_foreach_func = (array, index_, element_node) => {
                 if (element_node.get_node_type () == Json.NodeType.VALUE) {
                     string emoji_code = element_node.get_string ();
-                    Json.Object emoji_object = data_object.get_object_member (emoji_code);
-
-                    if (emoji_object != null) {
-                        string alt_name = prettify_alt_name (emoji_object.get_string_member ("alt"));
-                        Json.Array? keywords = emoji_object.get_array_member ("keywords");
-                        add_emoji_to_flowbox (emoji_code, alt_name, keywords, flowbox);
-                    }
+                    add_emoji_to_flowbox (emoji_code, flowbox);
                 }
             };
             supported_emojis.foreach_element (array_foreach_func);
         }
-
+        
         public Json.Array get_supported_emojis () {
             return supported_emojis;
         }
 
-        public void add_emoji_to_flowbox (string emoji_code, string alt_name, Json.Array? keywords, Gtk.FlowBox flowbox) {
-            var item = new Mingle.EmojiLabel (emoji_code, alt_name, keywords);
-            flowbox.append (item);
-            item.get_parent ().add_css_class ("card");
+        public void add_emoji_to_flowbox (string emoji_code, Gtk.FlowBox flowbox) {
+            EmojiData? emoji_data = get_emoji_data(emoji_code);
+            if (emoji_data != null) {
+                var item = new EmojiLabel (emoji_data);
+                flowbox.append (item);
+                item.get_parent ().add_css_class ("card");
+            }
         }
 
         public string prettify_alt_name (string alt_name) {

@@ -28,7 +28,7 @@ namespace Mingle {
         public EmojiLabel (EmojiData emoji_data) {
             this.emoji = codepoint_str_to_emoji(emoji_data.emoji_codepoint);
             this.codepoint = emoji_data.emoji_codepoint;
-            this.alt_name = emoji_data.alt;
+            this.alt_name = prettify_alt_name(emoji_data.alt);
             this.keywords = emoji_data.keywords;
             
             var label = new Gtk.Label (this.emoji) {
@@ -56,5 +56,17 @@ namespace Mingle {
         public string to_string() {
             return this.emoji;
         }
+
+        public string prettify_alt_name (string alt_name) {
+            var words = alt_name.replace ("_", " ").down ().split (" ");
+            string pretty_name = "";
+
+            foreach (var word in words) {
+                if (word.length > 0)
+                    pretty_name += word[0].to_string ().up () + word.substring (1) + " ";
+            }
+            return pretty_name;
+        }
+
     }
 }

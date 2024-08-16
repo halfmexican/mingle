@@ -225,7 +225,20 @@ namespace Mingle {
             for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_object_element (i));
             }
+
+            //shuffle_list(batch);
+
             return batch;
+        }
+
+        private void shuffle_list(Gee.List<Json.Object> list) {
+            var random = new GLib.Rand();
+            for (int i = list.size - 1; i > 0; i--) {
+                int j = random.int_range(0, i + 1);
+                var temp = list[i];
+                list[i] = list[j];
+                list[j] = temp;
+            }
         }
 
         private void initialize_emoji_data_map () {

@@ -26,12 +26,38 @@ namespace Mingle {
         private Json.Array supported_emojis;
         private Gee.HashMap<string, Json.Object> combinations_map;
         public HashSet<string> added_combinations = new HashSet<string> ();
+        private Gee.HashMap<string, EmojiData?> emoji_data_map;
+
+        public struct EmojiData {
+            public string alt;
+            public Json.Array keywords;
+            public string emoji_codepoint;
+            public int gboard_order;
+            public Gee.HashMap<string, Gee.List<EmojiCombination?>> combinations;
+        }
+    
+        public struct EmojiCombination {
+            public string g_static_url;
+            public string alt;
+            public string left_emoji;
+            public string left_emoji_codepoint;
+            public string right_emoji;
+            public string right_emoji_codepoint;
+            public string date;
+            public bool is_latest;
+            public int gboard_order;
+        }
 
         public EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
+            emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
+            combinations_map = new Gee.HashMap<string, Json.Object> ();
+            added_combinations = new HashSet<string> ();
+            initialize_emoji_data_map ();
+
             initialize_combinations_map ();
         }
-
+        
         private void initialize_combinations_map () {
             // Starts a separate thread if possible to populate this.combinations_map
             if (!Thread.supported ()) {
@@ -163,21 +189,33 @@ namespace Mingle {
 
         public Json.Array get_combinations_array_for_emoji (string emoji_code) {
             Json.Object data_object = root_object.get_object_member ("data");
-
+        
             // Get the specific emoji data by code
             Json.Object emoji_object = data_object.get_object_member (emoji_code);
             if (emoji_object == null) {
                 error ("Emoji code not found.");
             }
-
-            // Get the combinations array
-            Json.Array combinations_array = emoji_object.get_array_member ("combinations");
-            if (combinations_array == null) {
+        
+            // Get the combinations object
+            Json.Object combinations_object = emoji_object.get_object_member ("combinations");
+            if (combinations_object == null) {
                 error ("Combinations not found.");
             }
-
-            return combinations_array;
+        
+            // Create a new array to hold all combinations
+            Json.Array all_combinations = new Json.Array();
+        
+            // Iterate through all properties of the combinations object
+            foreach (string key in combinations_object.get_members()) {
+                Json.Array combination_array = combinations_object.get_array_member(key);
+                for (int i = 0; i < combination_array.get_length(); i++) {
+                    all_combinations.add_element(combination_array.get_element(i));
+                }
+            }
+        
+            return all_combinations;
         }
+        
 
         public bool contains (string combination_key) {
             // Returns true if the given combination is in our HashMap
@@ -216,5 +254,64 @@ namespace Mingle {
             }
             return batch;
         }
+
+        private void initialize_emoji_data_map () {
+            Json.Object data_object = root_object.get_object_member ("data");
+            foreach (string emoji_codepoint in data_object.get_members ()) {
+                Json.Object emoji_object = data_object.get_object_member (emoji_codepoint);
+                EmojiData emoji_data = EmojiData ();
+                emoji_data.alt = emoji_object.get_string_member ("alt");
+                emoji_data.keywords = emoji_object.get_array_member ("keywords");
+                emoji_data.emoji_codepoint = emoji_codepoint;
+                emoji_data.gboard_order = (int)emoji_object.get_int_member ("gBoardOrder");
+                emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
+                emoji_data_map[emoji_codepoint] = emoji_data;
+            }
+        }
+        
+        private Gee.HashMap<string, Gee.List<EmojiCombination?>> populate_combinations (Json.Object combinations_object) {
+            var combinations_map = new Gee.HashMap<string, Gee.List<EmojiCombination?>> ();
+            foreach (string other_emoji_codepoint in combinations_object.get_members ()) {
+                Json.Array combinations_array = combinations_object.get_array_member (other_emoji_codepoint);
+                var combinations_list = new Gee.ArrayList<EmojiCombination?> ();
+                foreach (Json.Node combination_node in combinations_array.get_elements ()) {
+                    Json.Object combination_object = combination_node.get_object ();
+                    EmojiCombination combination = EmojiCombination() {
+                        g_static_url = combination_object.get_string_member("gStaticUrl"),
+                        alt = combination_object.get_string_member("alt"),
+                        left_emoji = combination_object.get_string_member("leftEmoji"),
+                        left_emoji_codepoint = combination_object.get_string_member("leftEmojiCodepoint"),
+                        right_emoji = combination_object.get_string_member("rightEmoji"),
+                        right_emoji_codepoint = combination_object.get_string_member("rightEmojiCodepoint"),
+                        date = combination_object.get_string_member("date"),
+                        is_latest = combination_object.get_boolean_member("isLatest"),
+                        gboard_order = (int)combination_object.get_int_member("gBoardOrder")
+                    };
+                    combinations_list.add (combination);
+                }
+                combinations_map[other_emoji_codepoint] = combinations_list;
+            }
+            return combinations_map;
+        }
+
+        public EmojiData? get_emoji_data (string emoji_codepoint) {
+            return emoji_data_map[emoji_codepoint];
+        }
+        
+
+        public Gee.List<EmojiCombination?>? get_combinations (string left_emoji_codepoint, string right_emoji_codepoint) {
+            var emoji_data = get_emoji_data (left_emoji_codepoint);
+            if (emoji_data != null && emoji_data.combinations.has_key (right_emoji_codepoint)) {
+                var latest_combinations = new Gee.ArrayList<EmojiCombination?>();
+                foreach (var combination in emoji_data.combinations[right_emoji_codepoint]) {
+                    if (combination.is_latest) {
+                        latest_combinations.add(combination);
+                    }
+                }
+                return latest_combinations;
+            }
+            return null; // Return null if no combinations are found
+        }
+        
     }
 }

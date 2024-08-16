@@ -181,7 +181,7 @@ namespace Mingle {
             }
 
             // Fetch a batch of combinations lazily
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy(left_emoji.codepoint, batch_offset, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy(left_emoji.codepoint, batch_offset + 10, BATCH_SIZE);
 
             if (batch.size <= 0) {
                 message ("No more combinations to load.\n");

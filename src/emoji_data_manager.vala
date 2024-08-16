@@ -133,17 +133,6 @@ namespace Mingle {
             }
         }
 
-        public string prettify_alt_name (string alt_name) {
-            var words = alt_name.replace ("_", " ").down ().split (" ");
-            string pretty_name = "";
-
-            foreach (var word in words) {
-                if (word.length > 0)
-                    pretty_name += word[0].to_string ().up () + word.substring (1) + " ";
-            }
-            return pretty_name;
-        }
-
         public bool is_combination_added (string combination_key) {
             return added_combinations.contains (combination_key);
         }

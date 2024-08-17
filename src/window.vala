@@ -156,7 +156,7 @@ namespace Mingle {
             string? gstatic_url = emoji_manager.get_combined_emoji_url (left_emoji_code, right_emoji_code);
             if (gstatic_url != null) {
                 Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
-                if (combined_emoji != null) {
+                if (combined_emoji != null && combined_emoji.image_loaded) {
                     combined_emojis_flow_box.prepend (combined_emoji);
                     combined_emoji.reveal ();
                     combined_emoji.copied.connect(() => {

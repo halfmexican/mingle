@@ -27,6 +27,7 @@ namespace Mingle {
         private Gee.HashMap<string, Json.Object> combinations_map;
         public HashSet<string> added_combinations = new HashSet<string> ();
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         public EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
@@ -214,10 +215,13 @@ namespace Mingle {
             for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_object_element (i));
             }
-
-            //shuffle_list(batch);
-
-            return batch;
+            
+            if (settings.get_boolean ("shuffle-combinations")) {
+                shuffle_list (batch);
+                return batch;
+            } else {
+                return batch;
+            }
         }
 
         private void shuffle_list(Gee.List<Json.Object> list) {

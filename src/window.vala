@@ -181,7 +181,7 @@ namespace Mingle {
             }
 
             // Fetch a batch of combinations lazily
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy(left_emoji.codepoint, batch_offset, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy(left_emoji.codepoint, batch_offset + 12, BATCH_SIZE);
 
             if (batch.size <= 0) {
                 message ("No more combinations to load.\n");
@@ -204,7 +204,7 @@ namespace Mingle {
                     string? gstatic_url = emoji_manager.get_combined_emoji_url(left_emoji.codepoint, right_emoji_code);
                     if (gstatic_url != null) {
                         Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, create_combined_emoji_revealer_transition(true));
-                        if (combined_emoji != null) {
+                        if (combined_emoji.image_loaded) {
                             combined_emoji.copied.connect(() => {
                                 create_and_show_toast("Image copied to clipboard", 3);
                             });

@@ -24,6 +24,7 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
+        public bool image_loaded = false;
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition) {
@@ -70,8 +71,10 @@ namespace Mingle {
                 picture.set_paintable (_texture);
                 revealer.set_child (picture);
                 overlay.add_overlay (revealer);
+                image_loaded = true;
             } catch (GLib.Error error) {
                 stderr.printf (error.message);
+                image_loaded = false;
             }
 
             this.clicked.connect (() => {

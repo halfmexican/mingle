@@ -8,7 +8,12 @@
     </key>
     <key name="shrink-emoji" type="b">
       <default>true</default>
-      <summary>scales combined emoji size</summary>
+      <summary>Scales combined emoji size</summary>
+      <description></description>
+    </key>
+    <key name="shuffle-combinations" type="b">
+      <default>true</default>
+      <summary>Shuffles the batches of combined emojis</summary>
       <description></description>
     </key>
 	  <key name="color-scheme" type="i">

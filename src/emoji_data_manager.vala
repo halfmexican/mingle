@@ -164,18 +164,27 @@ namespace Mingle {
                 error ("Combinations not found.");
             }
 
-            // Create a new array to hold all combinations
-            Json.Array all_combinations = new Json.Array ();
+            // Create a new array to hold all combinations before shuffling
+            Json.Array unshuffled_combinations = new Json.Array ();
 
             // Iterate through all properties of the combinations object
             foreach (string key in combinations_object.get_members ()) {
                 Json.Array combination_array = combinations_object.get_array_member (key);
                 for (int i = 0; i < combination_array.get_length (); i++) {
-                    all_combinations.add_element (combination_array.get_element (i));
+                    unshuffled_combinations.add_element (combination_array.get_element (i));
                 }
             }
 
-            return all_combinations;
+            // Shuffle the unshuffled_combinations array
+            Json.Array shuffled_combinations = new Json.Array ();
+            GLib.Rand rng = new GLib.Rand ();
+            while (unshuffled_combinations.get_length () > 0) {
+                uint index = rng.int_range (0, (int32) unshuffled_combinations.get_length ());
+                shuffled_combinations.add_element (unshuffled_combinations.get_element ((int) index));
+                unshuffled_combinations.remove_element ((int) index);
+            }
+
+            return shuffled_combinations;
         }
 
         public bool contains (string combination_key) {
@@ -212,19 +221,8 @@ namespace Mingle {
             for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_object_element (i));
             }
-
-            shuffle_list (batch);
+            
             return batch;
-        }
-
-        private void shuffle_list (Gee.List<Json.Object> list) {
-            var random = new GLib.Rand ();
-            for (int i = list.size - 1; i > 0; i--) {
-                int j = random.int_range (0, i + 1);
-                var temp = list[i];
-                list[i] = list[j];
-                list[j] = temp;
-            }
         }
 
         private void initialize_emoji_data_map () {

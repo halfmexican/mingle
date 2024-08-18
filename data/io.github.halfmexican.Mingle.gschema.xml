@@ -11,11 +11,6 @@
       <summary>Scales combined emoji size</summary>
       <description></description>
     </key>
-    <key name="shuffle-combinations" type="b">
-      <default>true</default>
-      <summary>Shuffles the batches of combined emojis</summary>
-      <description></description>
-    </key>
 	  <key name="color-scheme" type="i">
       <default>0</default>
     </key>

@@ -40,22 +40,22 @@ namespace Mingle {
         // Codepoints
         private string prev_left_emoji;
         private string prev_right_emoji;
-        
+
         // Transitions used for loading combined emojis
         private enum Transition {
-           NONE,
-           CROSSFADE,
-           SLIDE,
-           SWING,
-           SWING_UP,
+            NONE,
+            CROSSFADE,
+            SLIDE,
+            SWING,
+            SWING_UP,
         }
         private Transition revealer_transition;
 
-        // Lazy loading 
+        // Lazy loading
         private const int BATCH_SIZE = 20;
         private uint batch_offset = 0;
         private bool breakpoint_applied;
-        public bool is_loading {get; private set; default = false;}
+        public bool is_loading { get; private set; default = false; }
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
         public Window (Mingle.Application app) {
@@ -75,12 +75,12 @@ namespace Mingle {
 
         private void handle_pref_change (string key) {
             switch (key) {
-                case "headerbar-style" :
-                    apply_toolbar_style ();
-                    break;
-                case "transition-type":
-                    update_transition_type ();
-                    break;
+            case "headerbar-style":
+                apply_toolbar_style ();
+                break;
+            case "transition-type":
+                update_transition_type ();
+                break;
             }
         }
 
@@ -132,7 +132,7 @@ namespace Mingle {
                 populate_center_flow_box_lazy.begin ();
 
                 if (right_emoji != null) {
-                    add_combined_emoji.begin (curr_left_emoji, right_emoji.codepoint, create_combined_emoji_revealer_transition (true));
+                    prepend_combined_emoji.begin (curr_left_emoji, right_emoji.codepoint, create_combined_emoji_revealer_transition (true));
                 }
                 right_emojis_flow_box.sensitive = true;
             }
@@ -147,21 +147,43 @@ namespace Mingle {
             message (@"→Right Unicode: $curr_right_emoji, Emoji: $right_emoji\n");
             if (curr_right_emoji != prev_right_emoji) {
                 prev_right_emoji = curr_right_emoji; // Update the last right emoji code
-                add_combined_emoji.begin (left_emoji.codepoint, curr_right_emoji, create_combined_emoji_revealer_transition (false));
+                prepend_combined_emoji.begin (left_emoji.codepoint, curr_right_emoji, create_combined_emoji_revealer_transition (false));
             }
             update_window_title ();
         }
 
-        private async void add_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+        private async void prepend_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            bool load_success;
             string? gstatic_url = emoji_manager.get_combined_emoji_url (left_emoji_code, right_emoji_code);
             if (gstatic_url != null) {
-                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition);
-                if (combined_emoji != null && combined_emoji.image_loaded) {
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition, out load_success);
+                if (load_success) {
                     combined_emojis_flow_box.prepend (combined_emoji);
                     combined_emoji.reveal ();
-                    combined_emoji.copied.connect(() => {
+                    combined_emoji.copied.connect (() => {
                         create_and_show_toast ("Image copied to clipboard", 3);
                     });
+                } else {
+                    combined_emoji.destroy ();
+                }
+            } else {
+                warning ("No valid URL for the combined emoji.\n");
+            }
+        }
+
+        private async void append_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            bool load_success;
+            string? gstatic_url = emoji_manager.get_combined_emoji_url (left_emoji_code, right_emoji_code);
+            if (gstatic_url != null) {
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition, out load_success);
+                if (load_success) {
+                    combined_emojis_flow_box.append (combined_emoji);
+                    combined_emoji.copied.connect (() => {
+                        create_and_show_toast ("Image copied to clipboard", 3);
+                    });
+                    combined_emoji.reveal ();
+                } else {
+                    combined_emoji.destroy ();
                 }
             } else {
                 warning ("No valid URL for the combined emoji.\n");
@@ -170,7 +192,7 @@ namespace Mingle {
 
         private async void populate_center_flow_box_lazy () {
             if (is_loading) {
-                warning("Already loading, aborting new call.\n");
+                warning ("Already loading, aborting new call.\n");
                 return; // Early return if already loading
             }
             is_loading = true;
@@ -181,42 +203,28 @@ namespace Mingle {
             }
 
             // Fetch a batch of combinations lazily
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy(left_emoji.codepoint, batch_offset + 12, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (left_emoji.codepoint, batch_offset + 12, BATCH_SIZE);
 
             if (batch.size <= 0) {
                 message ("No more combinations to load.\n");
-                create_and_show_toast("No more combinations", 4);
+                create_and_show_toast ("No more combinations", 4);
                 is_loading = false; // Reset the loading state
                 return;
             } else if (batch_offset > 0) {
-                create_and_show_toast("Loading More Combinations…", 2);
+                create_and_show_toast ("Loading More Combinations…", 2);
             }
 
             foreach (Json.Object combination_object in batch) {
-                string right_emoji_code = combination_object.get_string_member("rightEmojiCodepoint");
-
-                if (right_emoji_code == left_emoji.codepoint) {
-                    right_emoji_code = combination_object.get_string_member("leftEmojiCodepoint");
+                string right_emoji_codepoint = combination_object.get_string_member ("rightEmojiCodepoint");
+                if (right_emoji_codepoint == left_emoji.codepoint) {
+                    right_emoji_codepoint = combination_object.get_string_member ("leftEmojiCodepoint");
                 }
 
-                string combination_key = left_emoji.codepoint + "_" + right_emoji_code;
-                if (!emoji_manager.is_combination_added(combination_key)) {
-                    string? gstatic_url = emoji_manager.get_combined_emoji_url(left_emoji.codepoint, right_emoji_code);
-                    if (gstatic_url != null) {
-                        Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji(gstatic_url, create_combined_emoji_revealer_transition(true));
-                        if (combined_emoji.image_loaded) {
-                            combined_emoji.copied.connect(() => {
-                                create_and_show_toast("Image copied to clipboard", 3);
-                            });
-                            combined_emojis_flow_box.append(combined_emoji);
-                            combined_emoji.revealer.reveal_child = true;
+                string combination_key = left_emoji.codepoint + "_" + right_emoji_codepoint;
+                
+                append_combined_emoji.begin (left_emoji.codepoint, right_emoji_codepoint, create_combined_emoji_revealer_transition (true));
+                emoji_manager.add_combination (combination_key);
 
-                            emoji_manager.add_combination(combination_key);
-                        }
-                    } else {
-                        warning("No valid URL for the combined emoji: " + combination_key + "\n");
-                    }
-                }
             }
             batch_offset += BATCH_SIZE;
             is_loading = false;
@@ -250,14 +258,14 @@ namespace Mingle {
         private Adw.ToolbarStyle get_toolbar_style () {
             uint style = settings.get_int ("headerbar-style");
             switch (style) {
-                case 0:
-                    return Adw.ToolbarStyle.FLAT;
-                case 1:
-                    return Adw.ToolbarStyle.RAISED;
-                case 2:
-                    return Adw.ToolbarStyle.RAISED_BORDER;
-                default:
-                    return Adw.ToolbarStyle.RAISED;
+            case 0:
+                return Adw.ToolbarStyle.FLAT;
+            case 1:
+                return Adw.ToolbarStyle.RAISED;
+            case 2:
+                return Adw.ToolbarStyle.RAISED_BORDER;
+            default:
+                return Adw.ToolbarStyle.RAISED;
             }
         }
 
@@ -266,7 +274,7 @@ namespace Mingle {
             if (!breakpoint_applied) {
                 this.revealer_transition = get_transition_type ();
             } else {
-                 if (get_transition_type () == Transition.NONE) {
+                if (get_transition_type () == Transition.NONE) {
                     this.revealer_transition = Transition.NONE;
                 } else if (get_transition_type () == Transition.CROSSFADE) {
                     this.revealer_transition = Transition.CROSSFADE;
@@ -279,11 +287,11 @@ namespace Mingle {
         private Transition get_transition_type () {
             uint transition = settings.get_int ("transition-type");
             switch (transition) {
-                case 0: return Transition.NONE;
-                case 1: return Transition.CROSSFADE;
-                case 2: return Transition.SLIDE;
-                case 3: return Transition.SWING;
-                default: return Transition.NONE;
+            case 0: return Transition.NONE;
+            case 1: return Transition.CROSSFADE;
+            case 2: return Transition.SLIDE;
+            case 3: return Transition.SWING;
+            default: return Transition.NONE;
             }
         }
 
@@ -291,28 +299,28 @@ namespace Mingle {
             // Returns a RevealerTranstionType based on user settings
             // 0 is left, 1 is right
             switch (this.revealer_transition) {
-                case Transition.NONE:
-                    return Gtk.RevealerTransitionType.NONE;
-                case Transition.CROSSFADE:
-                    return Gtk.RevealerTransitionType.CROSSFADE;
-                case Transition.SLIDE:
-                    if (direction)
-                        return Gtk.RevealerTransitionType.SLIDE_RIGHT;
-                    return Gtk.RevealerTransitionType.SLIDE_LEFT;
-                case Transition.SWING:
-                    if (direction)
-                        return Gtk.RevealerTransitionType.SWING_RIGHT;
-                    return Gtk.RevealerTransitionType.SWING_LEFT;
-                case Transition.SWING_UP:
-                    return Gtk.RevealerTransitionType.SWING_UP;
-                default :
-                    return Gtk.RevealerTransitionType.CROSSFADE;
+            case Transition.NONE:
+                return Gtk.RevealerTransitionType.NONE;
+            case Transition.CROSSFADE:
+                return Gtk.RevealerTransitionType.CROSSFADE;
+            case Transition.SLIDE:
+                if (direction)
+                    return Gtk.RevealerTransitionType.SLIDE_RIGHT;
+                return Gtk.RevealerTransitionType.SLIDE_LEFT;
+            case Transition.SWING:
+                if (direction)
+                    return Gtk.RevealerTransitionType.SWING_RIGHT;
+                return Gtk.RevealerTransitionType.SWING_LEFT;
+            case Transition.SWING_UP:
+                return Gtk.RevealerTransitionType.SWING_UP;
+            default:
+                return Gtk.RevealerTransitionType.CROSSFADE;
             }
         }
 
         // ChildFlowbox CSS
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
-            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child();
+            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
             string right_emoji_code = emoji_label.codepoint;
             string combination_key = left_emoji.codepoint + "_" + right_emoji_code;
             child.set_sensitive (combination_key in emoji_manager);
@@ -337,7 +345,7 @@ namespace Mingle {
             }
         }
 
-       private void update_window_title () {
+        private void update_window_title () {
             string title = "Mingle: ";
             if (left_emoji != null && right_emoji != null) {
                 title += @"$left_emoji + $right_emoji";

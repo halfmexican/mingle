@@ -24,10 +24,9 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
-        public bool image_loaded = false;
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
-        public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition) {
+        public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition, out bool image_loaded) {
             try {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously

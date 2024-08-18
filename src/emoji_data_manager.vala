@@ -221,7 +221,7 @@ namespace Mingle {
             for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_object_element (i));
             }
-            
+
             return batch;
         }
 

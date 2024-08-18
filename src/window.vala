@@ -183,16 +183,17 @@ namespace Mingle {
                     });
                     combined_emoji.reveal ();
                 } else {
+                    warning ("Invalid Combination\n %s", gstatic_url);
                     combined_emoji.destroy ();
                 }
             } else {
-                warning ("No valid URL for the combined emoji.\n");
+                warning ("No valid URL for the combined emoji\n");
             }
         }
 
         private async void populate_center_flow_box_lazy () {
             if (is_loading) {
-                warning ("Already loading, aborting new call.\n");
+                warning ("Already loading, aborting new call\n");
                 return; // Early return if already loading
             }
             is_loading = true;
@@ -203,10 +204,10 @@ namespace Mingle {
             }
 
             // Fetch a batch of combinations lazily
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (left_emoji.codepoint, batch_offset + 12, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (left_emoji.codepoint, batch_offset, BATCH_SIZE);
 
             if (batch.size <= 0) {
-                message ("No more combinations to load.\n");
+                message ("No more combinations to load\n");
                 create_and_show_toast ("No more combinations", 4);
                 is_loading = false; // Reset the loading state
                 return;

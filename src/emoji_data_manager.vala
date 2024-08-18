@@ -174,7 +174,7 @@ namespace Mingle {
                     unshuffled_combinations.add_element (combination_array.get_element (i));
                 }
             }
-
+            
             // Shuffle the unshuffled_combinations array
             Json.Array shuffled_combinations = new Json.Array ();
             GLib.Rand rng = new GLib.Rand ();
@@ -193,24 +193,6 @@ namespace Mingle {
             return combinations_map.has_key (combination_key);
         }
 
-        public string ? get_combined_emoji_url (string left_codepoint, string right_codepoint) {
-            string combination_key = left_codepoint + "_" + right_codepoint;
-            if (combinations_map.has_key (combination_key)) {
-                Json.Object combination_data = combinations_map.get (combination_key);
-                return combination_data.get_string_member ("gStaticUrl");
-            }
-            return null; // Return null if the combination does not exist
-        }
-
-        public Gee.List<Json.Object> get_combinations_for_emoji (string leftEmojiCode) {
-            Gee.List<Json.Object> relevant_combinations = new Gee.ArrayList<Json.Object> ();
-            foreach (var key in combinations_map.keys) {
-                if (key.contains (leftEmojiCode)) {
-                    relevant_combinations.add (combinations_map.get (key));
-                }
-            }
-            return relevant_combinations;
-        }
 
         public Gee.List<Json.Object> get_combinations_for_emoji_lazy (string emoji_code, uint offset, int limit) {
             Json.Array all_combinations = get_combinations_array_for_emoji (emoji_code);
@@ -268,18 +250,16 @@ namespace Mingle {
             return emoji_data_map[emoji_codepoint];
         }
 
-        public Gee.List<EmojiCombination?>? get_combinations (string left_emoji_codepoint, string right_emoji_codepoint) {
+        public EmojiCombination? get_combination (string left_emoji_codepoint, string right_emoji_codepoint) {
             var emoji_data = get_emoji_data (left_emoji_codepoint);
             if (emoji_data != null && emoji_data.combinations.has_key (right_emoji_codepoint)) {
-                var latest_combinations = new Gee.ArrayList<EmojiCombination?> ();
                 foreach (var combination in emoji_data.combinations[right_emoji_codepoint]) {
                     if (combination.is_latest) {
-                        latest_combinations.add (combination);
+                        return combination;
                     }
                 }
-                return latest_combinations;
             }
-            return null; // Return null if no combinations are found
+            return null;
         }
     }
 }

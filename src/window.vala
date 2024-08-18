@@ -154,9 +154,9 @@ namespace Mingle {
 
         private async void prepend_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
             bool load_success;
-            string? gstatic_url = emoji_manager.get_combined_emoji_url (left_emoji_code, right_emoji_code);
-            if (gstatic_url != null) {
-                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition, out load_success);
+            EmojiCombination? new_emoji_combination = emoji_manager.get_combination (left_emoji_code, right_emoji_code);
+            if (new_emoji_combination != null) {
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (new_emoji_combination, transition, out load_success);
                 if (load_success) {
                     combined_emojis_flow_box.prepend (combined_emoji);
                     combined_emoji.reveal ();
@@ -164,6 +164,7 @@ namespace Mingle {
                         create_and_show_toast ("Image copied to clipboard", 3);
                     });
                 } else {
+                    warning ("Invalid Combination\n %s", new_emoji_combination.g_static_url);
                     combined_emoji.destroy ();
                 }
             } else {
@@ -173,9 +174,9 @@ namespace Mingle {
 
         private async void append_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
             bool load_success;
-            string? gstatic_url = emoji_manager.get_combined_emoji_url (left_emoji_code, right_emoji_code);
-            if (gstatic_url != null) {
-                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (gstatic_url, transition, out load_success);
+            EmojiCombination? new_emoji_combination = emoji_manager.get_combination (left_emoji_code, right_emoji_code);
+            if (new_emoji_combination != null) {
+                Mingle.CombinedEmoji combined_emoji = yield new Mingle.CombinedEmoji (new_emoji_combination, transition, out load_success);
                 if (load_success) {
                     combined_emojis_flow_box.append (combined_emoji);
                     combined_emoji.copied.connect (() => {
@@ -183,7 +184,7 @@ namespace Mingle {
                     });
                     combined_emoji.reveal ();
                 } else {
-                    warning ("Invalid Combination\n %s", gstatic_url);
+                    warning ("Invalid Combination\n %s", new_emoji_combination.g_static_url);
                     combined_emoji.destroy ();
                 }
             } else {

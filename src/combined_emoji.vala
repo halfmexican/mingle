@@ -22,16 +22,17 @@ using Adw, Gtk, Soup;
 namespace Mingle {
     public class CombinedEmoji : Gtk.Button {
         private Gdk.Texture _texture;
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
+        private EmojiCombination combined_emoji;
         public Gtk.Revealer revealer;
         public signal void copied ();
 
-        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
-
-        public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition, out bool image_loaded) {
+        public async CombinedEmoji (EmojiCombination combination_struct, Gtk.RevealerTransitionType transition, out bool image_loaded) {
             try {
+                this.combined_emoji = combination_struct;
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
-                var input_stream = yield get_input_stream (gstatic_url);
+                var input_stream = yield get_input_stream (combined_emoji.g_static_url);
 
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
 

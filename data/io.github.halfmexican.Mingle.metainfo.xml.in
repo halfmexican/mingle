@@ -38,6 +38,18 @@
     </screenshot>
   </screenshots>
    <releases>
+     <release version="0.13" date="2024-08-18">
+      <description>
+        <p>Fixes and Features</p>
+        <ul>
+          <li>Major refactor & Improved loading speeds</li>
+          <li>Loaded combinations are shuffled</li>
+          <li>Fixed bug where invalid combinations would be "displayed"</li>
+          <li>Updated list of supported emojis</li>
+          <li>Misc. bug fixes</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.12" date="2024-06-10">
       <description>
         <p>Fixes and Features</p>

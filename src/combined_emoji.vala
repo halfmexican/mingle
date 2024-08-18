@@ -74,7 +74,7 @@ namespace Mingle {
                 overlay.add_overlay (revealer);
                 image_loaded = true;
             } catch (GLib.Error error) {
-                stderr.printf (error.message);
+                //stderr.printf (error.message);
                 image_loaded = false;
             }
 
@@ -98,7 +98,7 @@ namespace Mingle {
             string reason = message.reason_phrase;
 
             if (status_code != 200) {
-                warning ("Status Code: %x\n Reason: %s", status_code, reason);
+                warning ("Status Code: %x Reason: %s", status_code, reason);
             }
 
             return input_stream;

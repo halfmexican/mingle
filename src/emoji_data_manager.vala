@@ -37,7 +37,7 @@ namespace Mingle {
             initialize_emoji_data_map ();
             initialize_combinations_map ();
         }
-        
+
         private void initialize_combinations_map () {
             // Starts a separate thread if possible to populate this.combinations_map
             if (!Thread.supported ()) {
@@ -68,7 +68,7 @@ namespace Mingle {
 
                 for (int j = 0; j < combinations.get_length (); j++) {
                     Json.Object combination_object = combinations.get_object_element (j);
-                    combination_object.ref();
+                    combination_object.ref ();
 
                     string left_emoji_code = combination_object.get_string_member ("leftEmojiCodepoint");
                     string right_emoji_code = combination_object.get_string_member ("rightEmojiCodepoint");
@@ -111,7 +111,7 @@ namespace Mingle {
         public void add_emojis_to_flowbox (Gtk.FlowBox flowbox) {
             if (supported_emojis == null)
                 supported_emojis = populate_supported_emojis_array ();
-        
+
             ArrayForeach array_foreach_func = (array, index_, element_node) => {
                 if (element_node.get_node_type () == Json.NodeType.VALUE) {
                     string emoji_code = element_node.get_string ();
@@ -120,13 +120,13 @@ namespace Mingle {
             };
             supported_emojis.foreach_element (array_foreach_func);
         }
-        
+
         public Json.Array get_supported_emojis () {
             return supported_emojis;
         }
 
         public void add_emoji_to_flowbox (string emoji_code, Gtk.FlowBox flowbox) {
-            EmojiData? emoji_data = get_emoji_data(emoji_code);
+            EmojiData? emoji_data = get_emoji_data (emoji_code);
             if (emoji_data != null) {
                 var item = new EmojiLabel (emoji_data);
                 flowbox.append (item);
@@ -152,33 +152,32 @@ namespace Mingle {
 
         public Json.Array get_combinations_array_for_emoji (string emoji_code) {
             Json.Object data_object = root_object.get_object_member ("data");
-        
+
             // Get the specific emoji data by code
             Json.Object emoji_object = data_object.get_object_member (emoji_code);
             if (emoji_object == null) {
                 error ("Emoji code not found.");
             }
-        
+
             // Get the combinations object
             Json.Object combinations_object = emoji_object.get_object_member ("combinations");
             if (combinations_object == null) {
                 error ("Combinations not found.");
             }
-        
+
             // Create a new array to hold all combinations
-            Json.Array all_combinations = new Json.Array();
-        
+            Json.Array all_combinations = new Json.Array ();
+
             // Iterate through all properties of the combinations object
-            foreach (string key in combinations_object.get_members()) {
-                Json.Array combination_array = combinations_object.get_array_member(key);
-                for (int i = 0; i < combination_array.get_length(); i++) {
-                    all_combinations.add_element(combination_array.get_element(i));
+            foreach (string key in combinations_object.get_members ()) {
+                Json.Array combination_array = combinations_object.get_array_member (key);
+                for (int i = 0; i < combination_array.get_length (); i++) {
+                    all_combinations.add_element (combination_array.get_element (i));
                 }
             }
-        
+
             return all_combinations;
         }
-        
 
         public bool contains (string combination_key) {
             // Returns true if the given combination is in our HashMap
@@ -186,15 +185,14 @@ namespace Mingle {
             return combinations_map.has_key (combination_key);
         }
 
-        public string? get_combined_emoji_url(string left_codepoint, string right_codepoint) {
+        public string ? get_combined_emoji_url (string left_codepoint, string right_codepoint) {
             string combination_key = left_codepoint + "_" + right_codepoint;
-            if (combinations_map.has_key(combination_key)) {
-                Json.Object combination_data = combinations_map.get(combination_key);
-                return combination_data.get_string_member("gStaticUrl");
+            if (combinations_map.has_key (combination_key)) {
+                Json.Object combination_data = combinations_map.get (combination_key);
+                return combination_data.get_string_member ("gStaticUrl");
             }
             return null; // Return null if the combination does not exist
         }
-
 
         public Gee.List<Json.Object> get_combinations_for_emoji (string leftEmojiCode) {
             Gee.List<Json.Object> relevant_combinations = new Gee.ArrayList<Json.Object> ();
@@ -215,7 +213,7 @@ namespace Mingle {
             for (uint i = offset; i < end_index; i++) {
                 batch.add (all_combinations.get_object_element (i));
             }
-            
+
             if (settings.get_boolean ("shuffle-combinations")) {
                 shuffle_list (batch);
                 return batch;
@@ -224,10 +222,10 @@ namespace Mingle {
             }
         }
 
-        private void shuffle_list(Gee.List<Json.Object> list) {
-            var random = new GLib.Rand();
+        private void shuffle_list (Gee.List<Json.Object> list) {
+            var random = new GLib.Rand ();
             for (int i = list.size - 1; i > 0; i--) {
-                int j = random.int_range(0, i + 1);
+                int j = random.int_range (0, i + 1);
                 var temp = list[i];
                 list[i] = list[j];
                 list[j] = temp;
@@ -242,12 +240,12 @@ namespace Mingle {
                 emoji_data.alt = emoji_object.get_string_member ("alt");
                 emoji_data.keywords = emoji_object.get_array_member ("keywords");
                 emoji_data.emoji_codepoint = emoji_codepoint;
-                emoji_data.gboard_order = (int)emoji_object.get_int_member ("gBoardOrder");
+                emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
                 emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
                 emoji_data_map[emoji_codepoint] = emoji_data;
             }
         }
-        
+
         private Gee.HashMap<string, Gee.List<EmojiCombination?>> populate_combinations (Json.Object combinations_object) {
             var combinations_map = new Gee.HashMap<string, Gee.List<EmojiCombination?>> ();
             foreach (string other_emoji_codepoint in combinations_object.get_members ()) {
@@ -255,16 +253,16 @@ namespace Mingle {
                 var combinations_list = new Gee.ArrayList<EmojiCombination?> ();
                 foreach (Json.Node combination_node in combinations_array.get_elements ()) {
                     Json.Object combination_object = combination_node.get_object ();
-                    EmojiCombination combination = EmojiCombination() {
-                        g_static_url = combination_object.get_string_member("gStaticUrl"),
-                        alt = combination_object.get_string_member("alt"),
-                        left_emoji = combination_object.get_string_member("leftEmoji"),
-                        left_emoji_codepoint = combination_object.get_string_member("leftEmojiCodepoint"),
-                        right_emoji = combination_object.get_string_member("rightEmoji"),
-                        right_emoji_codepoint = combination_object.get_string_member("rightEmojiCodepoint"),
-                        date = combination_object.get_string_member("date"),
-                        is_latest = combination_object.get_boolean_member("isLatest"),
-                        gboard_order = (int)combination_object.get_int_member("gBoardOrder")
+                    EmojiCombination combination = EmojiCombination () {
+                        g_static_url = combination_object.get_string_member ("gStaticUrl"),
+                        alt = combination_object.get_string_member ("alt"),
+                        left_emoji = combination_object.get_string_member ("leftEmoji"),
+                        left_emoji_codepoint = combination_object.get_string_member ("leftEmojiCodepoint"),
+                        right_emoji = combination_object.get_string_member ("rightEmoji"),
+                        right_emoji_codepoint = combination_object.get_string_member ("rightEmojiCodepoint"),
+                        date = combination_object.get_string_member ("date"),
+                        is_latest = combination_object.get_boolean_member ("isLatest"),
+                        gboard_order = (int) combination_object.get_int_member ("gBoardOrder")
                     };
                     combinations_list.add (combination);
                 }
@@ -273,24 +271,22 @@ namespace Mingle {
             return combinations_map;
         }
 
-        public EmojiData? get_emoji_data (string emoji_codepoint) {
+        public EmojiData ? get_emoji_data (string emoji_codepoint) {
             return emoji_data_map[emoji_codepoint];
         }
-        
 
         public Gee.List<EmojiCombination?>? get_combinations (string left_emoji_codepoint, string right_emoji_codepoint) {
             var emoji_data = get_emoji_data (left_emoji_codepoint);
             if (emoji_data != null && emoji_data.combinations.has_key (right_emoji_codepoint)) {
-                var latest_combinations = new Gee.ArrayList<EmojiCombination?>();
+                var latest_combinations = new Gee.ArrayList<EmojiCombination?> ();
                 foreach (var combination in emoji_data.combinations[right_emoji_codepoint]) {
                     if (combination.is_latest) {
-                        latest_combinations.add(combination);
+                        latest_combinations.add (combination);
                     }
                 }
                 return latest_combinations;
             }
             return null; // Return null if no combinations are found
         }
-        
     }
 }

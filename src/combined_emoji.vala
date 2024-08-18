@@ -24,6 +24,7 @@ namespace Mingle {
         private Gdk.Texture _texture;
         public Gtk.Revealer revealer;
         public signal void copied ();
+
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition, out bool image_loaded) {
@@ -31,6 +32,7 @@ namespace Mingle {
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
                 var input_stream = yield get_input_stream (gstatic_url);
+
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
 
                 bool shrink_emoji = settings.get_boolean ("shrink-emoji");

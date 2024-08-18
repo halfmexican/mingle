@@ -22,6 +22,7 @@ using Adw, Gtk, Soup;
 namespace Mingle {
     public class CombinedEmoji : Gtk.Button {
         private Gdk.Texture _texture;
+        private Gdk.Texture _scaled_texture;
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private EmojiCombination combined_emoji;
         public Gtk.Revealer revealer;
@@ -36,17 +37,14 @@ namespace Mingle {
 
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
 
-                bool shrink_emoji = settings.get_boolean ("shrink-emoji");
-
-                if (shrink_emoji) {
-                    int width = pixbuf.get_width ();
-                    int height = pixbuf.get_height ();
-                    int scaled_width = width / 4;
-                    int scaled_height = height / 4;
-                    pixbuf = pixbuf.scale_simple (scaled_width, scaled_height, Gdk.InterpType.BILINEAR);
-                }
-
                 _texture = Gdk.Texture.for_pixbuf (pixbuf);
+                int width = pixbuf.get_width ();
+                int height = pixbuf.get_height ();
+                int scaled_width = width / 4;
+                int scaled_height = height / 4;
+                pixbuf = pixbuf.scale_simple (scaled_width, scaled_height, Gdk.InterpType.BILINEAR);
+
+                _scaled_texture = Gdk.Texture.for_pixbuf (pixbuf);
 
                 var overlay = new Gtk.Overlay () {
                     child = new Gtk.Picture () {
@@ -80,7 +78,7 @@ namespace Mingle {
             }
 
             this.clicked.connect (() => {
-                this.copy_image_to_clipboard (this._texture);
+                this.copy_image_to_clipboard ();
                 this.copied ();
             });
         }
@@ -105,9 +103,14 @@ namespace Mingle {
             return input_stream;
         }
 
-        public void copy_image_to_clipboard (Gdk.Texture texture) {
+        public void copy_image_to_clipboard () {
             var clipboard = Gdk.Display.get_default ().get_clipboard ();
-            clipboard.set_texture (texture);
+
+            if (settings.get_boolean ("shrink-emoji")) {
+                clipboard.set_texture (_scaled_texture);
+            } else {
+                clipboard.set_texture (_texture);
+            }
         }
     }
 }

@@ -221,10 +221,9 @@ namespace Mingle {
                 }
 
                 string combination_key = left_emoji.codepoint + "_" + right_emoji_codepoint;
-                
+
                 append_combined_emoji.begin (left_emoji.codepoint, right_emoji_codepoint, create_combined_emoji_revealer_transition (true));
                 emoji_manager.add_combination (combination_key);
-
             }
             batch_offset += BATCH_SIZE;
             is_loading = false;
@@ -247,26 +246,6 @@ namespace Mingle {
                 timeout = duration
             };
             toast_overlay.add_toast (toast);
-        }
-
-        // Toolbar Style
-        private void apply_toolbar_style () {
-            var style = get_toolbar_style ();
-            toolbar.set_top_bar_style (style);
-        }
-
-        private Adw.ToolbarStyle get_toolbar_style () {
-            uint style = settings.get_int ("headerbar-style");
-            switch (style) {
-            case 0:
-                return Adw.ToolbarStyle.FLAT;
-            case 1:
-                return Adw.ToolbarStyle.RAISED;
-            case 2:
-                return Adw.ToolbarStyle.RAISED_BORDER;
-            default:
-                return Adw.ToolbarStyle.RAISED;
-            }
         }
 
         // Combined Emoji Loading Transitions
@@ -357,6 +336,26 @@ namespace Mingle {
                 title += "? + ?";
             }
             this.set_title (title);
+        }
+
+        // Toolbar Style
+        private void apply_toolbar_style () {
+            var style = get_toolbar_style ();
+            toolbar.set_top_bar_style (style);
+        }
+
+        private Adw.ToolbarStyle get_toolbar_style () {
+            uint style = settings.get_int ("headerbar-style");
+            switch (style) {
+            case 0:
+                return Adw.ToolbarStyle.FLAT;
+            case 1:
+                return Adw.ToolbarStyle.RAISED;
+            case 2:
+                return Adw.ToolbarStyle.RAISED_BORDER;
+            default:
+                return Adw.ToolbarStyle.RAISED;
+            }
         }
 
         private void on_edge_overshot (Gtk.PositionType pos_type) {

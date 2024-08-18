@@ -31,7 +31,26 @@ namespace Mingle {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             added_combinations = new HashSet<string> ();
-            initialize_emoji_data_map ();
+            start_emoji_data_map_thread ();
+        }
+
+        private void start_emoji_data_map_thread () {
+            // Starts a separate thread if possible to populate this.combinations_map
+            if (!Thread.supported ()) {
+                warning ("Threads are not supported!\n");
+                emoji_data_map = initialize_emoji_data_map ();
+                return;
+            }
+
+            try {
+                message ("data thread started\n");
+                Thread<Gee.HashMap<string, EmojiData?>> thread = new Thread<Gee.HashMap<string, EmojiData?>>.try ("combinations_map_thread", initialize_emoji_data_map);
+
+                emoji_data_map = thread.join ();
+                message ("data thread ended\n");
+            } catch (Error e) {
+                error ("Error: %s\n", e.message);
+            }
         }
 
         private Json.Array populate_supported_emojis_array () {
@@ -153,7 +172,8 @@ namespace Mingle {
             return batch;
         }
 
-        private void initialize_emoji_data_map () {
+        private Gee.HashMap<string, EmojiData?> initialize_emoji_data_map () {
+            Gee.HashMap<string, EmojiData?> emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             Json.Object data_object = root_object.get_object_member ("data");
             foreach (string emoji_codepoint in data_object.get_members ()) {
                 Json.Object emoji_object = data_object.get_object_member (emoji_codepoint);
@@ -165,6 +185,7 @@ namespace Mingle {
                 emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
                 emoji_data_map[emoji_codepoint] = emoji_data;
             }
+            return emoji_data_map;
         }
 
         private Gee.HashMap<string, Gee.List<EmojiCombination?>> populate_combinations (Json.Object combinations_object) {

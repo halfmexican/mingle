@@ -38,13 +38,13 @@ namespace Mingle {
             // Starts a separate thread if possible to populate this.combinations_map
             if (!Thread.supported ()) {
                 warning ("Threads are not supported!\n");
-                emoji_data_map = initialize_emoji_data_map ();
+                emoji_data_map = create_emoji_data_map ();
                 return;
             }
 
             try {
                 message ("data thread started\n");
-                Thread<Gee.HashMap<string, EmojiData?>> thread = new Thread<Gee.HashMap<string, EmojiData?>>.try ("combinations_map_thread", initialize_emoji_data_map);
+                Thread<Gee.HashMap<string, EmojiData?>> thread = new Thread<Gee.HashMap<string, EmojiData?>>.try ("combinations_map_thread", create_emoji_data_map);
 
                 emoji_data_map = thread.join ();
                 message ("data thread ended\n");
@@ -172,7 +172,7 @@ namespace Mingle {
             return batch;
         }
 
-        private Gee.HashMap<string, EmojiData?> initialize_emoji_data_map () {
+        private Gee.HashMap<string, EmojiData?> create_emoji_data_map () {
             Gee.HashMap<string, EmojiData?> emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             Json.Object data_object = root_object.get_object_member ("data");
             foreach (string emoji_codepoint in data_object.get_members ()) {

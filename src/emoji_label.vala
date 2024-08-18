@@ -25,11 +25,13 @@ namespace Mingle {
         public string codepoint { get; private set; }
         public string alt_name { get; private set; }
         public Json.Array? keywords { get; private set; }
+        public Gee.HashMap<string, Gee.List<EmojiCombination?>> combinations { get; private set; }
         public EmojiLabel (EmojiData emoji_data) {
             this.emoji = codepoint_str_to_emoji (emoji_data.emoji_codepoint);
             this.codepoint = emoji_data.emoji_codepoint;
             this.alt_name = prettify_alt_name (emoji_data.alt);
             this.keywords = emoji_data.keywords;
+            this.combinations = emoji_data.combinations;
 
             var label = new Gtk.Label (this.emoji) {
                 css_classes = { "emoji", "title-1" },

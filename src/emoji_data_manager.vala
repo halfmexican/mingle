@@ -24,61 +24,14 @@ namespace Mingle {
     public class EmojiDataManager {
         private Json.Object root_object;
         private Json.Array supported_emojis;
-        private Gee.HashMap<string, Json.Object> combinations_map;
         public HashSet<string> added_combinations = new HashSet<string> ();
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
 
         public EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
-            combinations_map = new Gee.HashMap<string, Json.Object> ();
             added_combinations = new HashSet<string> ();
             initialize_emoji_data_map ();
-            initialize_combinations_map ();
-        }
-
-        private void initialize_combinations_map () {
-            // Starts a separate thread if possible to populate this.combinations_map
-            if (!Thread.supported ()) {
-                warning ("Threads are not supported!\n");
-                combinations_map = populate_combinations_map ();
-                return;
-            }
-
-            try {
-                message ("populate_combinations_map thread started\n");
-                Thread<Gee.HashMap<string, Json.Object>> thread = new Thread<Gee.HashMap<string, Json.Object>>.try ("combinations_map_thread", populate_combinations_map);
-
-                combinations_map = thread.join ();
-                message ("populate_combinations_map thread end\n");
-            } catch (Error e) {
-                error ("Error: %s\n", e.message);
-            }
-        }
-
-        private Gee.HashMap<string, Json.Object> populate_combinations_map () {
-            // Returns a Hashmap of all possible emoji combinations
-            Json.Array emoji_data = get_supported_emojis ();
-            Gee.HashMap<string, Json.Object> combinations_map = new Gee.HashMap<string, Json.Object> ();
-
-            for (int i = 0; i < emoji_data.get_length (); i++) {
-                string emoji_code = emoji_data.get_string_element (i);
-                Json.Array combinations = get_combinations_array_for_emoji (emoji_code);
-
-                for (int j = 0; j < combinations.get_length (); j++) {
-                    Json.Object combination_object = combinations.get_object_element (j);
-                    combination_object.ref ();
-
-                    string left_emoji_code = combination_object.get_string_member ("leftEmojiCodepoint");
-                    string right_emoji_code = combination_object.get_string_member ("rightEmojiCodepoint");
-
-                    string combination_key1 = left_emoji_code + "_" + right_emoji_code;
-                    string combination_key2 = right_emoji_code + "_" + left_emoji_code;
-                    combinations_map.set (combination_key1, combination_object);
-                    combinations_map.set (combination_key2, combination_object);
-                }
-            }
-            return combinations_map;
         }
 
         private Json.Array populate_supported_emojis_array () {
@@ -186,13 +139,6 @@ namespace Mingle {
 
             return shuffled_combinations;
         }
-
-        public bool contains (string combination_key) {
-            // Returns true if the given combination is in our HashMap
-            // leftEmoji_rightEmoji
-            return combinations_map.has_key (combination_key);
-        }
-
 
         public Gee.List<Json.Object> get_combinations_for_emoji_lazy (string emoji_code, uint offset, int limit) {
             Json.Array all_combinations = get_combinations_array_for_emoji (emoji_code);

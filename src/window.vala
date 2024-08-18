@@ -299,22 +299,23 @@ namespace Mingle {
             }
         }
 
-        // ChildFlowbox CSS
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
             string right_emoji_code = emoji_label.codepoint;
-            string combination_key = left_emoji.codepoint + "_" + right_emoji_code;
-            child.set_sensitive (combination_key in emoji_manager);
+            
+            // Check if the combination exists in the left emoji's combinations
+            bool combination_exists = left_emoji.combinations.has_key(right_emoji_code);
+            child.set_sensitive (combination_exists);
         }
-
+        
         private void update_sensitivity_of_right_flowbox () {
             Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
             int index = 0;
-
+        
             while (child != null) {
                 if (child is Gtk.Widget) {
                     set_child_sensitivity (child);
-
+        
                     if (!child.get_sensitive ()) {
                         child.add_css_class ("invalid");
                     } else {
@@ -325,6 +326,7 @@ namespace Mingle {
                 child = right_emojis_flow_box.get_child_at_index (index);
             }
         }
+        
 
         private void update_window_title () {
             string title = "Mingle: ";

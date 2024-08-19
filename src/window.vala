@@ -213,7 +213,7 @@ namespace Mingle {
                 is_loading = false; // Reset the loading state
                 return;
             } else if (batch_offset > 0) {
-                create_and_show_toast ("Loading More Combinations…", 2);
+                create_and_show_toast ("Loading More Combinations…", 4);
             }
 
             foreach (Json.Object combination_object in batch) {

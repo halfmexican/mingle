@@ -79,6 +79,7 @@ namespace Mingle {
 
             this.clicked.connect (() => {
                 this.copy_image_to_clipboard ();
+                message ("emoji: %s\n", combined_emoji.alt);
                 this.copied ();
             });
         }

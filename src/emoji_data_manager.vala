@@ -24,33 +24,13 @@ namespace Mingle {
     public class EmojiDataManager {
         private Json.Object root_object;
         private Json.Array supported_emojis;
-        public HashSet<string> added_combinations = new HashSet<string> ();
+        public HashSet<string> added_combinations;
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
 
         public EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             added_combinations = new HashSet<string> ();
-            start_emoji_data_map_thread ();
-        }
-
-        private void start_emoji_data_map_thread () {
-            // Starts a separate thread if possible to populate this.combinations_map
-            if (!Thread.supported ()) {
-                warning ("Threads are not supported!\n");
-                emoji_data_map = create_emoji_data_map ();
-                return;
-            }
-
-            try {
-                message ("data thread started\n");
-                Thread<Gee.HashMap<string, EmojiData?>> thread = new Thread<Gee.HashMap<string, EmojiData?>>.try ("combinations_map_thread", create_emoji_data_map);
-
-                emoji_data_map = thread.join ();
-                message ("data thread ended\n");
-            } catch (Error e) {
-                error ("Error: %s\n", e.message);
-            }
         }
 
         private Json.Array populate_supported_emojis_array () {
@@ -146,7 +126,7 @@ namespace Mingle {
                     unshuffled_combinations.add_element (combination_array.get_element (i));
                 }
             }
-            
+
             // Shuffle the unshuffled_combinations array
             Json.Array shuffled_combinations = new Json.Array ();
             GLib.Rand rng = new GLib.Rand ();
@@ -214,10 +194,31 @@ namespace Mingle {
         }
 
         public EmojiData ? get_emoji_data (string emoji_codepoint) {
+            if (!emoji_data_map.has_key (emoji_codepoint)) {
+                emoji_data_map[emoji_codepoint] = create_emoji_data (emoji_codepoint);
+            }
             return emoji_data_map[emoji_codepoint];
         }
 
-        public EmojiCombination? get_combination (string left_emoji_codepoint, string right_emoji_codepoint) {
+        private EmojiData ? create_emoji_data (string emoji_codepoint) {
+            Json.Object data_object = root_object.get_object_member ("data");
+            Json.Object? emoji_object = data_object.get_object_member (emoji_codepoint);
+
+            if (emoji_object == null) {
+                return null;
+            }
+
+            EmojiData emoji_data = EmojiData ();
+            emoji_data.alt = emoji_object.get_string_member ("alt");
+            emoji_data.keywords = emoji_object.get_array_member ("keywords");
+            emoji_data.emoji_codepoint = emoji_codepoint;
+            emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
+            emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
+
+            return emoji_data;
+        }
+
+        public EmojiCombination ? get_combination (string left_emoji_codepoint, string right_emoji_codepoint) {
             var emoji_data = get_emoji_data (left_emoji_codepoint);
             if (emoji_data != null && emoji_data.combinations.has_key (right_emoji_codepoint)) {
                 foreach (var combination in emoji_data.combinations[right_emoji_codepoint]) {

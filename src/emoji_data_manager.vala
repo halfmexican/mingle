@@ -152,22 +152,6 @@ namespace Mingle {
             return batch;
         }
 
-        private Gee.HashMap<string, EmojiData?> create_emoji_data_map () {
-            Gee.HashMap<string, EmojiData?> emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
-            Json.Object data_object = root_object.get_object_member ("data");
-            foreach (string emoji_codepoint in data_object.get_members ()) {
-                Json.Object emoji_object = data_object.get_object_member (emoji_codepoint);
-                EmojiData emoji_data = EmojiData ();
-                emoji_data.alt = emoji_object.get_string_member ("alt");
-                emoji_data.keywords = emoji_object.get_array_member ("keywords");
-                emoji_data.emoji_codepoint = emoji_codepoint;
-                emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
-                emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
-                emoji_data_map[emoji_codepoint] = emoji_data;
-            }
-            return emoji_data_map;
-        }
-
         private Gee.HashMap<string, Gee.List<EmojiCombination?>> populate_combinations (Json.Object combinations_object) {
             var combinations_map = new Gee.HashMap<string, Gee.List<EmojiCombination?>> ();
             foreach (string other_emoji_codepoint in combinations_object.get_members ()) {

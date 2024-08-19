@@ -42,7 +42,7 @@
       <description>
         <p>Fixes and Features</p>
         <ul>
-          <li>Major refactor & Improved loading speeds</li>
+          <li>Major refactor and Improved loading speeds</li>
           <li>Loaded combinations are shuffled</li>
           <li>Fixed bug where invalid combinations would be "displayed"</li>
           <li>Updated list of supported emojis</li>

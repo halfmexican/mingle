@@ -28,6 +28,7 @@ namespace Mingle {
         construct {
             ActionEntry[] action_entries = {
                 { "select_random", this.select_random },
+                { "load_batch", this.load_batch },
                 { "about", this.on_about_action },
                 { "preferences", this.on_preferences_action },
                 { "quit", this.quit }
@@ -35,6 +36,7 @@ namespace Mingle {
             this.add_action_entries (action_entries, this);
             this.set_accels_for_action ("app.quit", { "<primary>q" });
             this.set_accels_for_action ("app.select_random", { "<Ctrl>R", "R" });
+            this.set_accels_for_action ("app.load_batch", {"L"});
         }
 
         public override void activate () {
@@ -49,6 +51,11 @@ namespace Mingle {
         private void select_random () {
             var win = (Mingle.Window) this.active_window;
             win.select_random ();
+        }
+
+        private void load_batch () {
+            var win = (Mingle.Window) this.active_window;
+            win.populate_center_flow_box_lazy.begin ();
         }
 
         private void on_about_action () {

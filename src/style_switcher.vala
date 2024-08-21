@@ -33,19 +33,19 @@ namespace Mingle {
 
         public StyleSwitcher () {
             this.style_manager = Adw.StyleManager.get_default ();
-            switch (this.settings.get_int ("color-scheme") ) {
-                case 0:
-                    style_manager.set_color_scheme (Adw.ColorScheme.DEFAULT);
-                    system_selector.activate ();
-                    break;
-                case 1:
-                    style_manager.set_color_scheme (Adw.ColorScheme.FORCE_LIGHT);
-                    light_selector.activate ();
-                    break;
-                case 2:
-                    style_manager.set_color_scheme (Adw.ColorScheme.FORCE_DARK);
-                    dark_selector.activate ();
-                    break;
+            switch (this.settings.get_int ("color-scheme")) {
+            case 0:
+                style_manager.set_color_scheme (Adw.ColorScheme.DEFAULT);
+                system_selector.activate ();
+                break;
+            case 1:
+                style_manager.set_color_scheme (Adw.ColorScheme.FORCE_LIGHT);
+                light_selector.activate ();
+                break;
+            case 2:
+                style_manager.set_color_scheme (Adw.ColorScheme.FORCE_DARK);
+                dark_selector.activate ();
+                break;
             }
         }
 
@@ -68,4 +68,3 @@ namespace Mingle {
         }
     }
 }
-

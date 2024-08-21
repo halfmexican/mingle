@@ -31,12 +31,12 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
+        // Class variables
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
         private EmojiDataManager emoji_manager = new EmojiDataManager ();
         private EmojiLabel left_emoji;
         private EmojiLabel right_emoji;
-
         // Codepoints
         private string prev_left_emoji;
         private string prev_right_emoji;
@@ -164,7 +164,7 @@ namespace Mingle {
                         create_and_show_toast ("Image copied to clipboard", 3);
                     });
                 } else {
-                    warning ("Invalid Combination\n %s", new_emoji_combination.g_static_url);
+                    warning ("Invalid Combination\n %s", new_emoji_combination.gstatic_url);
                     combined_emoji.destroy ();
                 }
             } else {
@@ -184,7 +184,7 @@ namespace Mingle {
                     });
                     combined_emoji.reveal ();
                 } else {
-                    warning ("Invalid Combination\n %s", new_emoji_combination.g_static_url);
+                    warning ("Invalid Combination\n %s", new_emoji_combination.gstatic_url);
                     combined_emoji.destroy ();
                 }
             } else {
@@ -192,7 +192,7 @@ namespace Mingle {
             }
         }
 
-        private async void populate_center_flow_box_lazy () {
+        public async void populate_center_flow_box_lazy () {
             if (is_loading) {
                 warning ("Already loading, aborting new call\n");
                 return; // Early return if already loading

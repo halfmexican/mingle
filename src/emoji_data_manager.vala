@@ -139,8 +139,8 @@ namespace Mingle {
             return shuffled_combinations;
         }
 
-        public Gee.List<Json.Object> get_combinations_for_emoji_lazy (string emoji_code, uint offset, int limit) {
-            Json.Array all_combinations = get_combinations_array_for_emoji (emoji_code);
+        public Gee.List<Json.Object> get_combinations_for_emoji_lazy (string codepoint, uint offset, int limit) {
+            Json.Array all_combinations = get_combinations_array_for_emoji (codepoint);
             Gee.List<Json.Object> batch = new Gee.ArrayList<Json.Object> ();
 
             // Ensure we do not go out of bounds
@@ -160,7 +160,7 @@ namespace Mingle {
                 foreach (Json.Node combination_node in combinations_array.get_elements ()) {
                     Json.Object combination_object = combination_node.get_object ();
                     EmojiCombination combination = EmojiCombination () {
-                        g_static_url = combination_object.get_string_member ("gStaticUrl"),
+                        gstatic_url = combination_object.get_string_member ("gStaticUrl"),
                         alt = combination_object.get_string_member ("alt"),
                         left_emoji = combination_object.get_string_member ("leftEmoji"),
                         left_emoji_codepoint = combination_object.get_string_member ("leftEmojiCodepoint"),

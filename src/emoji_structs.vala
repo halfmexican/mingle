@@ -11,7 +11,7 @@ namespace Mingle {
     }
 
     public struct EmojiCombination {
-        public string g_static_url;
+        public string gstatic_url;
         public string alt;
         public string left_emoji;
         public string left_emoji_codepoint;

@@ -33,7 +33,7 @@ namespace Mingle {
                 this.combined_emoji = combination_struct;
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
-                var input_stream = yield get_input_stream (combined_emoji.g_static_url);
+                var input_stream = yield get_input_stream (combined_emoji.gstatic_url);
 
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
 

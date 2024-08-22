@@ -146,7 +146,13 @@ namespace Mingle {
             // Ensure we do not go out of bounds
             uint end_index = offset + limit < all_combinations.get_length () ? offset + limit : all_combinations.get_length ();
             for (uint i = offset; i < end_index; i++) {
-                batch.add (all_combinations.get_object_element (i));
+                Json.Object combination = all_combinations.get_object_element (i);
+                string left_codepoint = combination.get_string_member ("leftEmojiCodepoint");
+                string right_codepoint = combination.get_string_member ("rightEmojiCodepoint");
+                string combination_key = left_codepoint + "_" + right_codepoint;
+                if (!added_combinations.contains (combination_key)) {
+                    batch.add (combination);
+                }
             }
 
             return batch;

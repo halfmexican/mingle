@@ -153,6 +153,8 @@ namespace Mingle {
         }
 
         private async void prepend_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            string combination_key = left_emoji_code + right_emoji_code;
+
             bool load_success;
             EmojiCombination? new_emoji_combination = emoji_manager.get_combination (left_emoji_code, right_emoji_code);
             if (new_emoji_combination != null) {
@@ -163,6 +165,7 @@ namespace Mingle {
                     combined_emoji.copied.connect (() => {
                         create_and_show_toast ("Image copied to clipboard", 3);
                     });
+                    emoji_manager.add_combination(combination_key);
                 } else {
                     warning ("Invalid Combination\n %s", new_emoji_combination.gstatic_url);
                     combined_emoji.destroy ();
@@ -173,6 +176,11 @@ namespace Mingle {
         }
 
         private async void append_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
+            string combination_key = left_emoji_code + right_emoji_code;
+            if (emoji_manager.is_combination_added(combination_key)) {
+                return;
+            }
+
             bool load_success;
             EmojiCombination? new_emoji_combination = emoji_manager.get_combination (left_emoji_code, right_emoji_code);
             if (new_emoji_combination != null) {
@@ -183,6 +191,7 @@ namespace Mingle {
                         create_and_show_toast ("Image copied to clipboard", 3);
                     });
                     combined_emoji.reveal ();
+                    emoji_manager.add_combination(combination_key);
                 } else {
                     warning ("Invalid Combination\n %s", new_emoji_combination.gstatic_url);
                     combined_emoji.destroy ();

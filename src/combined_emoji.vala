@@ -22,29 +22,29 @@ using Adw, Gtk, Soup;
 namespace Mingle {
     public class CombinedEmoji : Gtk.Button {
         private Gdk.Texture _texture;
+        private Gdk.Texture _scaled_texture;
+        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
+        private EmojiCombination combined_emoji;
         public Gtk.Revealer revealer;
         public signal void copied ();
-        public bool image_loaded = false;
-        private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
-        public async CombinedEmoji (string gstatic_url, Gtk.RevealerTransitionType transition) {
+        public async CombinedEmoji (EmojiCombination combination_struct, Gtk.RevealerTransitionType transition, out bool image_loaded) {
             try {
+                this.combined_emoji = combination_struct;
                 this.add_css_class ("flat");
                 // Fetch the image asynchronously
-                var input_stream = yield get_input_stream (gstatic_url);
+                var input_stream = yield get_input_stream (combined_emoji.gstatic_url);
+
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
 
-                bool shrink_emoji = settings.get_boolean ("shrink-emoji");
-
-                if (shrink_emoji) {
-                    int width = pixbuf.get_width ();
-                    int height = pixbuf.get_height ();
-                    int scaled_width = width / 4;
-                    int scaled_height = height / 4;
-                    pixbuf = pixbuf.scale_simple (scaled_width, scaled_height, Gdk.InterpType.BILINEAR);
-                }
-
                 _texture = Gdk.Texture.for_pixbuf (pixbuf);
+                int width = pixbuf.get_width ();
+                int height = pixbuf.get_height ();
+                int scaled_width = width / 4;
+                int scaled_height = height / 4;
+                pixbuf = pixbuf.scale_simple (scaled_width, scaled_height, Gdk.InterpType.BILINEAR);
+
+                _scaled_texture = Gdk.Texture.for_pixbuf (pixbuf);
 
                 var overlay = new Gtk.Overlay () {
                     child = new Gtk.Picture () {
@@ -73,12 +73,13 @@ namespace Mingle {
                 overlay.add_overlay (revealer);
                 image_loaded = true;
             } catch (GLib.Error error) {
-                stderr.printf (error.message);
+                // stderr.printf (error.message);
                 image_loaded = false;
             }
 
             this.clicked.connect (() => {
-                this.copy_image_to_clipboard (this._texture);
+                this.copy_image_to_clipboard ();
+                message ("combined emoji: %s\n", combined_emoji.alt);
                 this.copied ();
             });
         }
@@ -97,15 +98,20 @@ namespace Mingle {
             string reason = message.reason_phrase;
 
             if (status_code != 200) {
-                warning ("Status Code: %x\n Reason: %s", status_code, reason);
+                warning ("Status Code: %x Reason: %s", status_code, reason);
             }
 
             return input_stream;
         }
 
-        public void copy_image_to_clipboard (Gdk.Texture texture) {
+        public void copy_image_to_clipboard () {
             var clipboard = Gdk.Display.get_default ().get_clipboard ();
-            clipboard.set_texture (texture);
+
+            if (settings.get_boolean ("shrink-emoji")) {
+                clipboard.set_texture (_scaled_texture);
+            } else {
+                clipboard.set_texture (_texture);
+            }
         }
     }
 }

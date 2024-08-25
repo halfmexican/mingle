@@ -25,7 +25,6 @@ namespace Mingle {
         [GtkChild] private unowned Adw.ComboRow headerbar_row;
         [GtkChild] private unowned Adw.ComboRow transition_row;
         [GtkChild] private unowned Adw.SwitchRow shrink_row;
-        [GtkChild] private unowned Adw.SwitchRow shuffle_row;
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
 
         public PrefsDialog () {
@@ -35,8 +34,6 @@ namespace Mingle {
             transition_row.set_selected (this.settings.get_int ("transition-type"));
             shrink_row.notify["active"].connect (update_shrink_setting);
             shrink_row.set_active (this.settings.get_boolean ("shrink-emoji"));
-            shuffle_row.notify["active"].connect (update_shuffle_setting);
-            shuffle_row.set_active (this.settings.get_boolean ("shuffle-combinations"));
         }
 
         private void update_headerbar_style () {
@@ -51,10 +48,6 @@ namespace Mingle {
 
         private void update_shrink_setting () {
             this.settings.set_boolean ("shrink-emoji", shrink_row.get_active ());
-        }
-
-        private void update_shuffle_setting () {
-            this.settings.set_boolean ("shuffle-combinations", shuffle_row.get_active ());
         }
     }
 }

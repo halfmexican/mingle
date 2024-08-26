@@ -139,7 +139,7 @@ namespace Mingle {
             return shuffled_combinations;
         }
 
-        public Gee.List<Json.Object> get_combinations_for_emoji_lazy (string codepoint, uint offset, int limit) {
+        public Gee.List<Json.Object> lazy_load_combination_batch (string codepoint, uint offset, int limit) {
             Json.Array all_combinations = get_combinations_array_for_emoji (codepoint);
             Gee.List<Json.Object> batch = new Gee.ArrayList<Json.Object> ();
 

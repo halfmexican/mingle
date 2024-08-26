@@ -163,7 +163,7 @@ namespace Mingle {
                     combined_emojis_flow_box.prepend (combined_emoji);
                     combined_emoji.reveal ();
                     combined_emoji.copied.connect (() => {
-                        create_and_show_toast ("Image copied to clipboard", 3);
+                        create_and_show_toast ("Image copied to clipboard", 2);
                     });
                     emoji_manager.add_combination(combination_key);
                 } else {
@@ -188,7 +188,7 @@ namespace Mingle {
                 if (load_success) {
                     combined_emojis_flow_box.append (combined_emoji);
                     combined_emoji.copied.connect (() => {
-                        create_and_show_toast ("Image copied to clipboard", 3);
+                        create_and_show_toast ("Image copied to clipboard", 2);
                     });
                     combined_emoji.reveal ();
                     emoji_manager.add_combination(combination_key);
@@ -214,7 +214,7 @@ namespace Mingle {
             }
 
             // Fetch a batch of combinations lazily
-            Gee.List<Json.Object> batch = emoji_manager.get_combinations_for_emoji_lazy (left_emoji.codepoint, batch_offset, BATCH_SIZE);
+            Gee.List<Json.Object> batch = emoji_manager.lazy_load_combination_batch (left_emoji.codepoint, batch_offset, BATCH_SIZE);
 
             if (batch.size <= 0) {
                 message ("No more combinations to load\n");
@@ -222,7 +222,7 @@ namespace Mingle {
                 is_loading = false; // Reset the loading state
                 return;
             } else if (batch_offset > 0) {
-                create_and_show_toast ("Loading More Combinations…", 4);
+                create_and_show_toast ("Loading More Combinations…", 2);
             }
 
             foreach (Json.Object combination_object in batch) {

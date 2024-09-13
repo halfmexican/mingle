@@ -351,6 +351,8 @@ namespace Mingle {
             this.set_title (title);
         }
 
+        
+
         // Toolbar Style
         private void apply_toolbar_style () {
             var style = get_toolbar_style ();

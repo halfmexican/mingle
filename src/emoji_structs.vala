@@ -7,7 +7,7 @@ namespace Mingle {
         public Json.Array keywords;
         public string emoji_codepoint;
         public int gboard_order;
-        public Gee.HashMap<string, Gee.List<EmojiCombination?>> combinations;
+        public Gee.HashMap<string, Gee.List<EmojiCombination?>>? combinations;
     }
 
     public struct EmojiCombination {

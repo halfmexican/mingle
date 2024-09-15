@@ -12,7 +12,11 @@ Mingle is available on Flathub.
     <img width='240' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en'/>
   </a>  
   
-``flatpak install flathub io.github.halfmexican.Mingle``
+**or**
+```
+flatpak install flathub io.github.halfmexican.Mingle
+```
+**or**
 
 Download latest build from [actions](https://github.com/halfmexican/mingle/actions)
 

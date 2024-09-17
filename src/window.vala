@@ -165,7 +165,7 @@ namespace Mingle {
                     combined_emoji.copied.connect (() => {
                         create_and_show_toast ("Image copied to clipboard", 2);
                     });
-                    emoji_manager.add_combination(combination_key);
+                    emoji_manager.add_combination (combination_key);
                 } else {
                     warning ("Invalid Combination\n %s", new_emoji_combination.gstatic_url);
                     combined_emoji.destroy ();
@@ -177,7 +177,7 @@ namespace Mingle {
 
         private async void append_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
             string combination_key = left_emoji_code + right_emoji_code;
-            if (emoji_manager.is_combination_added(combination_key)) {
+            if (emoji_manager.is_combination_added (combination_key)) {
                 return;
             }
 
@@ -191,7 +191,7 @@ namespace Mingle {
                         create_and_show_toast ("Image copied to clipboard", 2);
                     });
                     combined_emoji.reveal ();
-                    emoji_manager.add_combination(combination_key);
+                    emoji_manager.add_combination (combination_key);
                 } else {
                     warning ("Invalid Combination\n %s", new_emoji_combination.gstatic_url);
                     combined_emoji.destroy ();
@@ -277,8 +277,8 @@ namespace Mingle {
         private Transition get_transition_type () {
             uint transition = settings.get_int ("transition-type");
             switch (transition) {
-            case 0: return Transition.NONE;
-            case 1: return Transition.CROSSFADE;
+            case 0 : return Transition.NONE;
+            case 1 : return Transition.CROSSFADE;
             case 2: return Transition.SLIDE;
             case 3: return Transition.SWING;
             default: return Transition.NONE;
@@ -311,20 +311,20 @@ namespace Mingle {
         private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
             string right_emoji_code = emoji_label.codepoint;
-            
+
             // Check if the combination exists in the left emoji's combinations
-            bool combination_exists = left_emoji.combinations.has_key(right_emoji_code);
+            bool combination_exists = left_emoji.combinations.has_key (right_emoji_code);
             child.set_sensitive (combination_exists);
         }
-        
+
         private void update_sensitivity_of_right_flowbox () {
             Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
             int index = 0;
-        
+
             while (child != null) {
                 if (child is Gtk.Widget) {
                     set_child_sensitivity (child);
-        
+
                     if (!child.get_sensitive ()) {
                         child.add_css_class ("invalid");
                     } else {
@@ -335,7 +335,6 @@ namespace Mingle {
                 child = right_emojis_flow_box.get_child_at_index (index);
             }
         }
-        
 
         private void update_window_title () {
             string title = "Mingle: ";

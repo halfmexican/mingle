@@ -2,9 +2,29 @@
 
 An application to combine emojis using Google's Emoji Kitchen.
 
-![image](https://github.com/halfmexican/mingle/assets/103920890/57dec847-e622-4540-a75c-f59d53433139)
+![image](https://github.com/halfmexican/mingle/blob/main/data/pv2.png?raw=true)
 
-## Download
+## Installation
+### Flatpak
+Mingle is available on Flathub. 
+
 <a href='https://flathub.org/apps/io.github.halfmexican.Mingle'>
     <img width='240' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en'/>
   </a>  
+  
+**or**
+```
+flatpak install flathub io.github.halfmexican.Mingle
+```
+**or**
+
+Download latest build from [actions](https://github.com/halfmexican/mingle/actions)
+
+
+### Appimage
+Download latest release as an [appimage](https://github.com/halfmexican/mingle/releases/)
+
+```
+chmod +x Mingle.AppImage
+./Mingle.AppImage
+```

@@ -38,6 +38,16 @@
     </screenshot>
   </screenshots>
    <releases>
+   <release version="0.14" date="2024-09-15">
+      <description>
+        <p>Fixes and Features</p>
+        <ul>
+          <li>No longer loads all combinations on startup</li>
+          <li>Add keyboard shortcut to load another batch</li>
+          <li>Misc. bug fixes</li>
+        </ul>
+      </description>
+    </release>
      <release version="0.13" date="2024-08-18">
       <description>
         <p>Fixes and Features</p>

@@ -187,7 +187,17 @@ namespace Mingle {
             if (!emoji_data_map.has_key (emoji_codepoint)) {
                 emoji_data_map[emoji_codepoint] = create_emoji_data (emoji_codepoint);
             }
-            return emoji_data_map[emoji_codepoint];
+
+            EmojiData? emoji_data = emoji_data_map[emoji_codepoint];
+            if (emoji_data != null && emoji_data.combinations == null) {
+                Json.Object data_object = root_object.get_object_member ("data");
+                Json.Object? emoji_object = data_object.get_object_member (emoji_codepoint);
+                if (emoji_object != null) {
+                    emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
+                }
+            }
+
+            return emoji_data;
         }
 
         private EmojiData ? create_emoji_data (string emoji_codepoint) {
@@ -203,7 +213,7 @@ namespace Mingle {
             emoji_data.keywords = emoji_object.get_array_member ("keywords");
             emoji_data.emoji_codepoint = emoji_codepoint;
             emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
-            emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
+            emoji_data.combinations = null; // Initialize combinations to null
 
             return emoji_data;
         }

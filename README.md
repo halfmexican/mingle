@@ -28,3 +28,6 @@ Download latest release as an [appimage](https://github.com/halfmexican/mingle/r
 chmod +x Mingle.AppImage
 ./Mingle.AppImage
 ```
+___
+### Contributing
+Please check out [the styleguide](https://github.com/halfmexican/mingle/blob/main/src/STYLEGUIDE.md)

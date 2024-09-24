@@ -31,6 +31,7 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
+        [GtkChild] private unowned Gtk.SearchBar search_bar;
         // Class variables
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
@@ -257,6 +258,12 @@ namespace Mingle {
                 timeout = duration
             };
             toast_overlay.add_toast (toast);
+        }
+
+        [GtkCallback]
+        private void search () {
+        search_bar.search_mode_enabled = true;
+
         }
 
         // Combined Emoji Loading Transitions

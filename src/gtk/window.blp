@@ -36,8 +36,25 @@ template $MingleWindow : Adw.ApplicationWindow {
           tooltip-text: _("Randomize");
           clicked => $select_random();
         }
+        [start]
+        Button {
+          icon-name: "edit-find-symbolic";
+          clicked => $search();
+        }
       }
-      content: CenterBox {
+      content: Box content_box {
+        orientation: vertical;
+
+        SearchBar search_bar {
+          visible: true;
+          key-capture-widget: content_box;
+          SearchEntry searchentry {
+            search-delay: 100;
+            placeholder-text: _("Search emojis");
+          }
+        }
+
+      CenterBox {
         shrink-center-last: true;
 
         [start]
@@ -120,6 +137,7 @@ template $MingleWindow : Adw.ApplicationWindow {
             sensitive: false;
           }
         }
+      }
       };
     }
   };

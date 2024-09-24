@@ -35,7 +35,7 @@ namespace Mingle {
         // Class variables
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
-        private EmojiDataManager emoji_manager = new EmojiDataManager ();
+        private EmojiDataManager emoji_manager;
         private EmojiLabel left_emoji;
         private EmojiLabel right_emoji;
         // Codepoints
@@ -61,18 +61,31 @@ namespace Mingle {
 
         public Window (Mingle.Application app) {
             // Init
+            int64 start_time = GLib.get_monotonic_time();
             GLib.Object (application: app);
             popover_menu.add_child (style_switcher, "style-switcher");
+            setup_emoji_manager_async.begin ();
+           // emoji_manager = new EmojiDataManager ();
             setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();
-            setup_emoji_flow_boxes ();
 
             // Signals
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            // Calculate the total time in milliseconds and print/log the result
+            int64 end_time = GLib.get_monotonic_time();
+            double elapsed_time_ms = (end_time - start_time) / 1000.0;
+            message(@"Window initialization took $elapsed_time_ms ms.");
         }
+
+            private async void setup_emoji_manager_async () {
+                // Asynchronously initialize the emoji_manager to avoid blocking the UI thread
+                emoji_manager = yield new EmojiDataManager ();
+                // Once the emoji_manager is ready, proceed to initialize the flow boxes
+                setup_emoji_flow_boxes ();
+            }
 
         private void handle_pref_change (string key) {
             switch (key) {

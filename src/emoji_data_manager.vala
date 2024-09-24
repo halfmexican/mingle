@@ -27,7 +27,7 @@ namespace Mingle {
         public HashSet<string> added_combinations;
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
 
-        public EmojiDataManager () {
+        public async EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             added_combinations = new HashSet<string> ();

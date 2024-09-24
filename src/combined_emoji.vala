@@ -18,14 +18,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Adw, Gtk, Soup;
+using Adw, Gtk, Gdk, Soup;
 namespace Mingle {
     public class CombinedEmoji : Gtk.Button {
-        private Gdk.Texture _texture;
-        private Gdk.Texture _scaled_texture;
+        private Texture _texture;
+        private Texture _scaled_texture;
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private EmojiCombination combined_emoji;
-        public Gtk.Revealer revealer;
+        public Revealer revealer;
         public signal void copied ();
 
         public async CombinedEmoji (EmojiCombination combination_struct, Gtk.RevealerTransitionType transition, out bool image_loaded) {

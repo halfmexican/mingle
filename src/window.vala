@@ -33,6 +33,9 @@ namespace Mingle {
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
         [GtkChild] private unowned Gtk.SearchBar search_bar;
         [GtkChild] private unowned Gtk.SearchEntry search_entry;
+        [GtkChild] private unowned Gtk.ScrolledWindow left_scrolled_window;
+        [GtkChild] private unowned Gtk.ScrolledWindow right_scrolled_window;
+        private GLib.Binding? scroll_binding;
 
         // Class variables
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
@@ -63,14 +66,16 @@ namespace Mingle {
 
         public Window (Mingle.Application app) {
             // Init
-            int64 start_time = GLib.get_monotonic_time();
-            GLib.Object (application: app);
-            popover_menu.add_child (style_switcher, "style-switcher");
-            setup_emoji_manager_async.begin ();
-           // emoji_manager = new EmojiDataManager ();
+            int64 start_time = GLib.get_monotonic_time (); // For measuring load time
+
+            GLib.Object (application : app); // constructor
+            popover_menu.add_child (style_switcher, "style-switcher"); // Add style switcher to popover menu
+            setup_emoji_manager_async.begin (); // Setup emoji manager and flowboxes
             setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();
+            bind_scroll_adjustments ();
+
 
             // Signals
             this.settings.changed.connect (handle_pref_change);
@@ -81,18 +86,44 @@ namespace Mingle {
             });
             left_emojis_flow_box.set_filter_func (filter_emojis);
 
+            search_bar.notify["search-mode-enabled"].connect (() => {
+                if (!search_bar.search_mode_enabled) {
+                    bind_scroll_adjustments ();
+                } else {
+                    unbind_scroll_adjustments ();
+                }
+            });
+
             // Calculate the total time in milliseconds and print/log the result
-            int64 end_time = GLib.get_monotonic_time();
+            int64 end_time = GLib.get_monotonic_time ();
             double elapsed_time_ms = (end_time - start_time) / 1000.0;
-            message(@"Window initialization took $elapsed_time_ms ms.");
+            message (@"Window initialization took $elapsed_time_ms ms.");
         }
 
-            private async void setup_emoji_manager_async () {
-                // Asynchronously initialize the emoji_manager to avoid blocking the UI thread
-                emoji_manager = yield new EmojiDataManager ();
-                // Once the emoji_manager is ready, proceed to initialize the flow boxes
-                setup_emoji_flow_boxes ();
+        private async void setup_emoji_manager_async () {
+            // Asynchronously initialize the emoji_manager to avoid blocking the UI thread
+            emoji_manager = yield new EmojiDataManager ();
+            // Once the emoji_manager is ready, proceed to initialize the flow boxes
+            setup_emoji_flow_boxes ();
+        }
+
+        private void bind_scroll_adjustments () {
+            Gtk.Adjustment left_adjustment = left_scrolled_window.get_vadjustment ();
+            Gtk.Adjustment right_adjustment = right_scrolled_window.get_vadjustment ();
+            scroll_binding = left_adjustment.bind_property (
+                                                            "value",
+                                                            right_adjustment,
+                                                            "value",
+                                                            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
+            );
+        }
+
+        private void unbind_scroll_adjustments () {
+            if (scroll_binding != null) {
+                scroll_binding.unbind ();
+                scroll_binding = null;
             }
+        }
 
         private void handle_pref_change (string key) {
             switch (key) {
@@ -114,11 +145,6 @@ namespace Mingle {
                 }
             }
             return false;
-        }
-
-        [GtkCallback]
-        private void search () {
-            search_bar.search_mode_enabled = true;
         }
 
         private void setup_emoji_flow_boxes () {
@@ -289,7 +315,10 @@ namespace Mingle {
             child.activate ();
         }
 
-        
+        [GtkCallback]
+        private void search () {
+            search_bar.search_mode_enabled = true;
+        }
 
         private void create_and_show_toast (string message, int duration) {
             var toast = new Adw.Toast (message) {

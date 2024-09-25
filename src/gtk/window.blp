@@ -52,7 +52,7 @@ template $MingleWindow : Adw.ApplicationWindow {
           SearchEntry search_entry {
             search-delay: 100;
             placeholder-text: _("Search emojis");
-            width-request: 350;
+            width-request: 345;
           }
         }
 
@@ -63,7 +63,6 @@ template $MingleWindow : Adw.ApplicationWindow {
         ScrolledWindow left_scrolled_window {
           propagate-natural-height: true;
           hscrollbar-policy: never;
-          vadjustment: bind right_scrolled_window.vadjustment bidirectional;
           hexpand: true;
           has-frame: false;
           window-placement: top_right;
@@ -80,6 +79,7 @@ template $MingleWindow : Adw.ApplicationWindow {
             max-children-per-line: 6;
             min-children-per-line: 1;
             selection-mode: single;
+            valign: start;
           }
         }
 
@@ -120,7 +120,6 @@ template $MingleWindow : Adw.ApplicationWindow {
         ScrolledWindow right_scrolled_window {
           propagate-natural-height: true;
           hscrollbar-policy: never;
-          vadjustment: bind left_scrolled_window.vadjustment bidirectional;
           hexpand: true;
           has-frame: false;
 
@@ -137,6 +136,7 @@ template $MingleWindow : Adw.ApplicationWindow {
             min-children-per-line: 1;
             selection-mode: single;
             sensitive: false;
+            valign: start;
           }
         }
       }

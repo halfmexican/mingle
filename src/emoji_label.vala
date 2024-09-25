@@ -24,7 +24,7 @@ namespace Mingle {
         private string emoji;
         public string codepoint { get; private set; }
         public string alt_name { get; private set; }
-        public string[]? keywords { get; private set; }
+        public string[] ? keywords { get; private set; }
         public Gee.HashMap<string, Gee.List<EmojiCombination?>> combinations { get; private set; }
         public EmojiLabel (EmojiData emoji_data) {
             this.emoji = codepoint_str_to_emoji (emoji_data.emoji_codepoint);

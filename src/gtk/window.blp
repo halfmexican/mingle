@@ -40,6 +40,7 @@ template $MingleWindow : Adw.ApplicationWindow {
         Button {
           icon-name: "edit-find-symbolic";
           clicked => $search();
+          visible: bind search_bar.search-mode-enabled inverted;
         }
       }
       content: Box content_box {
@@ -51,6 +52,7 @@ template $MingleWindow : Adw.ApplicationWindow {
           SearchEntry search_entry {
             search-delay: 100;
             placeholder-text: _("Search emojis");
+            width-request: 350;
           }
         }
 

@@ -22,12 +22,12 @@ using Json, Soup, Gee;
 
 namespace Mingle {
     public class EmojiDataManager {
-        private Json.Object root_object;
+        private Json.Object data_object;
         private Json.Array supported_emojis;
         public HashSet<string> added_combinations;
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
 
-        public EmojiDataManager () {
+        public async EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
             added_combinations = new HashSet<string> ();
@@ -49,7 +49,8 @@ namespace Mingle {
                 input_stream.close (null);
                 data_stream.close (null);
 
-                root_object = parser.get_root ().get_object ();
+                Json.Object root_object = parser.get_root ().get_object ();
+                data_object = root_object.get_object_member ("data");
 
                 // Navigate to known_supported_emoji
                 Json.Array known_supported_array = root_object.get_array_member ("knownSupportedEmoji");
@@ -102,8 +103,6 @@ namespace Mingle {
         }
 
         public Json.Array get_combinations_array_for_emoji (string emoji_code) {
-            Json.Object data_object = root_object.get_object_member ("data");
-
             // Get the specific emoji data by code
             Json.Object emoji_object = data_object.get_object_member (emoji_code);
             if (emoji_object == null) {
@@ -172,9 +171,9 @@ namespace Mingle {
                         left_emoji_codepoint = combination_object.get_string_member ("leftEmojiCodepoint"),
                         right_emoji = combination_object.get_string_member ("rightEmoji"),
                         right_emoji_codepoint = combination_object.get_string_member ("rightEmojiCodepoint"),
-                        date = combination_object.get_string_member ("date"),
+                        //date = combination_object.get_string_member ("date"),
                         is_latest = combination_object.get_boolean_member ("isLatest"),
-                        gboard_order = (int) combination_object.get_int_member ("gBoardOrder")
+                      //  gboard_order = (int) combination_object.get_int_member ("gBoardOrder")
                     };
                     combinations_list.add (combination);
                 }
@@ -190,7 +189,6 @@ namespace Mingle {
 
             EmojiData? emoji_data = emoji_data_map[emoji_codepoint];
             if (emoji_data != null && emoji_data.combinations == null) {
-                Json.Object data_object = root_object.get_object_member ("data");
                 Json.Object? emoji_object = data_object.get_object_member (emoji_codepoint);
                 if (emoji_object != null) {
                     emoji_data.combinations = populate_combinations (emoji_object.get_object_member ("combinations"));
@@ -201,7 +199,6 @@ namespace Mingle {
         }
 
         private EmojiData ? create_emoji_data (string emoji_codepoint) {
-            Json.Object data_object = root_object.get_object_member ("data");
             Json.Object? emoji_object = data_object.get_object_member (emoji_codepoint);
 
             if (emoji_object == null) {
@@ -210,7 +207,18 @@ namespace Mingle {
 
             EmojiData emoji_data = EmojiData ();
             emoji_data.alt = emoji_object.get_string_member ("alt");
-            emoji_data.keywords = emoji_object.get_array_member ("keywords");
+            
+            // Convert Json.Array to string[]
+            Json.Array? keywords_array = emoji_object.get_array_member ("keywords");
+            if (keywords_array != null) {
+                emoji_data.keywords = new string[keywords_array.get_length ()];
+                for (int i = 0; i < keywords_array.get_length (); i++) {
+                    emoji_data.keywords[i] = keywords_array.get_string_element (i);
+                }
+            } else {
+                emoji_data.keywords = new string[0];
+            }
+            
             emoji_data.emoji_codepoint = emoji_codepoint;
             emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
             emoji_data.combinations = null; // Initialize combinations to null

@@ -32,6 +32,8 @@ namespace Mingle {
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
         [GtkChild] private unowned Gtk.SearchBar search_bar;
+        [GtkChild] private unowned Gtk.SearchEntry search_entry;
+
         // Class variables
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
@@ -74,6 +76,11 @@ namespace Mingle {
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            search_entry.search_changed.connect (() => {
+                left_emojis_flow_box.invalidate_filter ();
+            });
+            left_emojis_flow_box.set_filter_func (filter_emojis);
+
             // Calculate the total time in milliseconds and print/log the result
             int64 end_time = GLib.get_monotonic_time();
             double elapsed_time_ms = (end_time - start_time) / 1000.0;
@@ -96,6 +103,22 @@ namespace Mingle {
                 update_transition_type ();
                 break;
             }
+        }
+
+        private bool filter_emojis (Gtk.FlowBoxChild child) {
+            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
+            string search_text = search_entry.text.up ();
+            foreach (string keyword in emoji_label.keywords) {
+                if (keyword.up ().contains (search_text)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [GtkCallback]
+        private void search () {
+            search_bar.search_mode_enabled = true;
         }
 
         private void setup_emoji_flow_boxes () {
@@ -266,17 +289,13 @@ namespace Mingle {
             child.activate ();
         }
 
+        
+
         private void create_and_show_toast (string message, int duration) {
             var toast = new Adw.Toast (message) {
                 timeout = duration
             };
             toast_overlay.add_toast (toast);
-        }
-
-        [GtkCallback]
-        private void search () {
-        search_bar.search_mode_enabled = true;
-
         }
 
         // Combined Emoji Loading Transitions

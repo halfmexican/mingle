@@ -207,7 +207,18 @@ namespace Mingle {
 
             EmojiData emoji_data = EmojiData ();
             emoji_data.alt = emoji_object.get_string_member ("alt");
-            emoji_data.keywords = emoji_object.get_array_member ("keywords");
+            
+            // Convert Json.Array to string[]
+            Json.Array? keywords_array = emoji_object.get_array_member ("keywords");
+            if (keywords_array != null) {
+                emoji_data.keywords = new string[keywords_array.get_length ()];
+                for (int i = 0; i < keywords_array.get_length (); i++) {
+                    emoji_data.keywords[i] = keywords_array.get_string_element (i);
+                }
+            } else {
+                emoji_data.keywords = new string[0];
+            }
+            
             emoji_data.emoji_codepoint = emoji_codepoint;
             emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
             emoji_data.combinations = null; // Initialize combinations to null

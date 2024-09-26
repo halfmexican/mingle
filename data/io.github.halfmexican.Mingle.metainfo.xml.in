@@ -38,6 +38,16 @@
     </screenshot>
   </screenshots>
    <releases>
+      <release version="0.15" date="2024-09-26">
+      <description>
+        <p>Fixes and Features</p>
+        <ul>
+          <li>App startup time decreased</li>
+          <li>Updated keyboard shortcuts</li>
+          <li>Add Search feature</li>
+        </ul>
+      </description>
+    </release>
    <release version="0.14" date="2024-09-15">
       <description>
         <p>Fixes and Features</p>

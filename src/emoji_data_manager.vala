@@ -171,9 +171,9 @@ namespace Mingle {
                         left_emoji_codepoint = combination_object.get_string_member ("leftEmojiCodepoint"),
                         right_emoji = combination_object.get_string_member ("rightEmoji"),
                         right_emoji_codepoint = combination_object.get_string_member ("rightEmojiCodepoint"),
-                        //date = combination_object.get_string_member ("date"),
+                        // date = combination_object.get_string_member ("date"),
                         is_latest = combination_object.get_boolean_member ("isLatest"),
-                      //  gboard_order = (int) combination_object.get_int_member ("gBoardOrder")
+                        // gboard_order = (int) combination_object.get_int_member ("gBoardOrder")
                     };
                     combinations_list.add (combination);
                 }
@@ -207,7 +207,7 @@ namespace Mingle {
 
             EmojiData emoji_data = EmojiData ();
             emoji_data.alt = emoji_object.get_string_member ("alt");
-            
+
             // Convert Json.Array to string[]
             Json.Array? keywords_array = emoji_object.get_array_member ("keywords");
             if (keywords_array != null) {
@@ -218,7 +218,7 @@ namespace Mingle {
             } else {
                 emoji_data.keywords = new string[0];
             }
-            
+
             emoji_data.emoji_codepoint = emoji_codepoint;
             emoji_data.gboard_order = (int) emoji_object.get_int_member ("gBoardOrder");
             emoji_data.combinations = null; // Initialize combinations to null

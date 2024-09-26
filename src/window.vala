@@ -31,10 +31,16 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
+        [GtkChild] private unowned Gtk.SearchBar search_bar;
+        [GtkChild] private unowned Gtk.SearchEntry search_entry;
+        [GtkChild] private unowned Gtk.ScrolledWindow left_scrolled_window;
+        [GtkChild] private unowned Gtk.ScrolledWindow right_scrolled_window;
+        private GLib.Binding? scroll_binding;
+
         // Class variables
         private GLib.Settings settings = new GLib.Settings ("io.github.halfmexican.Mingle");
         private Mingle.StyleSwitcher style_switcher = new Mingle.StyleSwitcher ();
-        private EmojiDataManager emoji_manager = new EmojiDataManager ();
+        private EmojiDataManager emoji_manager;
         private EmojiLabel left_emoji;
         private EmojiLabel right_emoji;
         // Codepoints
@@ -60,17 +66,63 @@ namespace Mingle {
 
         public Window (Mingle.Application app) {
             // Init
-            GLib.Object (application: app);
-            popover_menu.add_child (style_switcher, "style-switcher");
+            int64 start_time = GLib.get_monotonic_time (); // For measuring load time
+
+            GLib.Object (application : app); // constructor
+            popover_menu.add_child (style_switcher, "style-switcher"); // Add style switcher to popover menu
+            setup_emoji_manager_async.begin (); // Setup emoji manager and flowboxes
             setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();
-            setup_emoji_flow_boxes ();
+            bind_scroll_adjustments ();
+
 
             // Signals
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            search_entry.search_changed.connect (() => {
+                left_emojis_flow_box.invalidate_filter ();
+            });
+            left_emojis_flow_box.set_filter_func (filter_emojis);
+
+            search_bar.notify["search-mode-enabled"].connect (() => {
+                if (!search_bar.search_mode_enabled) {
+                    bind_scroll_adjustments ();
+                } else {
+                    unbind_scroll_adjustments ();
+                }
+            });
+
+            // Calculate the total time in milliseconds and print/log the result
+            int64 end_time = GLib.get_monotonic_time ();
+            double elapsed_time_ms = (end_time - start_time) / 1000.0;
+            message (@"Window initialization took $elapsed_time_ms ms.");
+        }
+
+        private async void setup_emoji_manager_async () {
+            // Asynchronously initialize the emoji_manager to avoid blocking the UI thread
+            emoji_manager = yield new EmojiDataManager ();
+            // Once the emoji_manager is ready, proceed to initialize the flow boxes
+            setup_emoji_flow_boxes ();
+        }
+
+        private void bind_scroll_adjustments () {
+            Gtk.Adjustment left_adjustment = left_scrolled_window.get_vadjustment ();
+            Gtk.Adjustment right_adjustment = right_scrolled_window.get_vadjustment ();
+            scroll_binding = left_adjustment.bind_property (
+                                                            "value",
+                                                            right_adjustment,
+                                                            "value",
+                                                            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
+            );
+        }
+
+        private void unbind_scroll_adjustments () {
+            if (scroll_binding != null) {
+                scroll_binding.unbind ();
+                scroll_binding = null;
+            }
         }
 
         private void handle_pref_change (string key) {
@@ -82,6 +134,17 @@ namespace Mingle {
                 update_transition_type ();
                 break;
             }
+        }
+
+        private bool filter_emojis (Gtk.FlowBoxChild child) {
+            Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
+            string search_text = search_entry.text.up ();
+            foreach (string keyword in emoji_label.keywords) {
+                if (keyword.up ().contains (search_text)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void setup_emoji_flow_boxes () {
@@ -250,6 +313,11 @@ namespace Mingle {
             var child = left_emojis_flow_box.get_child_at_index ((int) random_index);
             left_emojis_flow_box.select_child (child);
             child.activate ();
+        }
+
+        [GtkCallback]
+        private void search () {
+            search_bar.search_mode_enabled = true;
         }
 
         private void create_and_show_toast (string message, int duration) {

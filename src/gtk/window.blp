@@ -36,15 +36,33 @@ template $MingleWindow : Adw.ApplicationWindow {
           tooltip-text: _("Randomize");
           clicked => $select_random();
         }
+        [start]
+        Button {
+          icon-name: "edit-find-symbolic";
+          clicked => $search();
+          visible: bind search_bar.search-mode-enabled inverted;
+        }
       }
-      content: CenterBox {
+      content: Box content_box {
+        orientation: vertical;
+
+        SearchBar search_bar {
+          visible: true;
+          key-capture-widget: content_box;
+          SearchEntry search_entry {
+            search-delay: 100;
+            placeholder-text: _("Search emojis");
+            width-request: 345;
+          }
+        }
+
+      CenterBox {
         shrink-center-last: true;
 
         [start]
         ScrolledWindow left_scrolled_window {
           propagate-natural-height: true;
           hscrollbar-policy: never;
-          vadjustment: bind right_scrolled_window.vadjustment bidirectional;
           hexpand: true;
           has-frame: false;
           window-placement: top_right;
@@ -61,6 +79,7 @@ template $MingleWindow : Adw.ApplicationWindow {
             max-children-per-line: 6;
             min-children-per-line: 1;
             selection-mode: single;
+            valign: start;
           }
         }
 
@@ -101,7 +120,6 @@ template $MingleWindow : Adw.ApplicationWindow {
         ScrolledWindow right_scrolled_window {
           propagate-natural-height: true;
           hscrollbar-policy: never;
-          vadjustment: bind left_scrolled_window.vadjustment bidirectional;
           hexpand: true;
           has-frame: false;
 
@@ -118,8 +136,10 @@ template $MingleWindow : Adw.ApplicationWindow {
             min-children-per-line: 1;
             selection-mode: single;
             sensitive: false;
+            valign: start;
           }
         }
+      }
       };
     }
   };

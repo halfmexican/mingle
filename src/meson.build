@@ -41,5 +41,6 @@ executable('mingle', mingle_sources,
   dependencies: mingle_deps,
 	vala_args: [ '--gresourcesdir=src/' ],
   install: true,
+  c_args: [ '-w' ],
 )
 

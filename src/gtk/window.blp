@@ -18,10 +18,22 @@ template $MingleWindow: Adw.ApplicationWindow {
 
   content: Gtk.Stack window_stack {
     transition-type: crossfade;
-    Adw.Spinner loading_spinner {
-      visible: true;
-    }
 
+    Gtk.Box {
+    halign : center;
+    valign: center;
+    orientation: vertical;
+     Adw.Spinner loading_spinner {
+        visible: true;
+        width-request: 64;
+        height-request: 64;
+        margin-bottom: 12;
+      }
+      Gtk.Label {
+      label: "Loading Emojis...";
+       styles ["title-1"]
+      }
+    }
     Adw.ToastOverlay toast_overlay {
       Adw.ToolbarView toolbar {
         top-bar-style: raised;

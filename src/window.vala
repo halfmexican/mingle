@@ -23,6 +23,8 @@ namespace Mingle {
     [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/window.ui")]
     public class Window : Adw.ApplicationWindow {
         // UI
+        [GtkChild] private unowned Gtk.Stack window_stack;
+        [GtkChild] private unowned Adw.Spinner loading_spinner;
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
@@ -70,12 +72,10 @@ namespace Mingle {
 
             GLib.Object (application : app); // constructor
             popover_menu.add_child (style_switcher, "style-switcher"); // Add style switcher to popover menu
-            setup_emoji_manager_async.begin (); // Setup emoji manager and flowboxes
             setup_breakpoints ();
             apply_toolbar_style ();
             update_transition_type ();
             bind_scroll_adjustments ();
-
 
             // Signals
             this.settings.changed.connect (handle_pref_change);
@@ -98,6 +98,11 @@ namespace Mingle {
             int64 end_time = GLib.get_monotonic_time ();
             double elapsed_time_ms = (end_time - start_time) / 1000.0;
             message (@"Window initialization took $elapsed_time_ms ms.");
+
+            this.show.connect (() => {
+                setup_emoji_manager_async.begin (); // Setup emoji manager and flowboxes
+            });
+
         }
 
         private async void setup_emoji_manager_async () {
@@ -105,6 +110,8 @@ namespace Mingle {
             emoji_manager = yield new EmojiDataManager ();
             // Once the emoji_manager is ready, proceed to initialize the flow boxes
             setup_emoji_flow_boxes ();
+            window_stack.remove (loading_spinner);
+            window_stack.set_visible_child (toast_overlay);
         }
 
         private void bind_scroll_adjustments () {

@@ -24,7 +24,6 @@ namespace Mingle {
     public class Window : Adw.ApplicationWindow {
         // UI
         [GtkChild] private unowned Gtk.Stack window_stack;
-        [GtkChild] private unowned Adw.Spinner loading_spinner;
         [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
@@ -66,11 +65,10 @@ namespace Mingle {
         public bool is_loading { get; private set; default = false; }
         private delegate void EmojiActionDelegate (Mingle.EmojiLabel emoji_label);
 
+        // Constructor
         public Window (Mingle.Application app) {
             // Init
-            int64 start_time = GLib.get_monotonic_time (); // For measuring load time
-
-            GLib.Object (application : app); // constructor
+            GLib.Object (application : app); // base constructor
             popover_menu.add_child (style_switcher, "style-switcher"); // Add style switcher to popover menu
             setup_breakpoints ();
             apply_toolbar_style ();
@@ -81,10 +79,10 @@ namespace Mingle {
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            left_emojis_flow_box.set_filter_func (filter_emojis);
             search_entry.search_changed.connect (() => {
                 left_emojis_flow_box.invalidate_filter ();
             });
-            left_emojis_flow_box.set_filter_func (filter_emojis);
 
             search_bar.notify["search-mode-enabled"].connect (() => {
                 if (!search_bar.search_mode_enabled) {
@@ -94,24 +92,35 @@ namespace Mingle {
                 }
             });
 
-            // Calculate the total time in milliseconds and print/log the result
-            int64 end_time = GLib.get_monotonic_time ();
-            double elapsed_time_ms = (end_time - start_time) / 1000.0;
-            message (@"Window initialization took $elapsed_time_ms ms.");
-
+            // Start thread to setup Emoji Manager once the window has been displayed
             this.show.connect (() => {
-                setup_emoji_manager_async.begin (); // Setup emoji manager and flowboxes
+                start_setup_thread ();
             });
-
         }
+           private async void setup_emoji_manager () {
+                emoji_manager = yield new EmojiDataManager ();
+                setup_emoji_flow_boxes ();
+            }
 
-        private async void setup_emoji_manager_async () {
-            // Asynchronously initialize the emoji_manager to avoid blocking the UI thread
-            emoji_manager = yield new EmojiDataManager ();
-            // Once the emoji_manager is ready, proceed to initialize the flow boxes
-            setup_emoji_flow_boxes ();
-            window_stack.remove (loading_spinner);
-            window_stack.set_visible_child (toast_overlay);
+        private void start_setup_thread () {
+            if (!Thread.supported ()) {
+                warning ("Threads are not supported!\n");
+                setup_emoji_manager.begin();
+                return;
+            }
+            try {
+                message ("Starting setup_emoji_manager thread\n");
+                Thread<void> thread = new Thread<void>.try ("setup_emoji_manager_thread", () => {
+                    setup_emoji_manager.begin ();
+                    Idle.add (() => {
+                        window_stack.set_visible_child (toast_overlay); // Switch to ToolbarView (Which is wrapped by toast overlay)
+                        return false; // Remove the idle source
+                    });
+                });
+            } catch (Error e) {
+                error ("Error: %s\n", e.message);
+            }
+
         }
 
         private void bind_scroll_adjustments () {

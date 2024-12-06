@@ -1,146 +1,169 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $MingleWindow : Adw.ApplicationWindow {
+template $MingleWindow: Adw.ApplicationWindow {
   width-request: 360;
   height-request: 200;
   default-width: 600;
-  default-height: 300;
+  default-height: 600;
   title: "Mingle";
+
   Adw.Breakpoint breakpoint {
     condition ("min-width: 900sp")
+
     setters {
       combined_scrolled_window.width-request: 400;
     }
   }
-  content: Adw.ToastOverlay toast_overlay {
-    Adw.ToolbarView toolbar {
-      top-bar-style: raised;
 
-      [top]
-      Adw.HeaderBar header_bar {
-        [end]
-        MenuButton {
-          primary: true;
-          icon-name: "open-menu-symbolic";
-          tooltip-text: _("Menu");
+  content: Gtk.Stack window_stack {
+    transition-type: crossfade;
 
-          popover: Gtk.PopoverMenu popover_menu {
-            menu-model: primary_menu;
-          };
-        }
-
-        [start]
-        Button {
-          icon-name: "dice3-symbolic";
-          tooltip-text: _("Randomize");
-          clicked => $select_random();
-        }
-        [start]
-        Button {
-          icon-name: "edit-find-symbolic";
-          clicked => $search();
-          visible: bind search_bar.search-mode-enabled inverted;
-        }
+    Gtk.Box {
+    halign : center;
+    valign: center;
+    orientation: vertical;
+     Adw.Spinner loading_spinner {
+        visible: true;
+        width-request: 64;
+        height-request: 64;
+        margin-bottom: 12;
       }
-      content: Box content_box {
-        orientation: vertical;
+      Gtk.Label {
+      label: "Loading Emojis...";
+       styles ["title-1"]
+      }
+    }
+    Adw.ToastOverlay toast_overlay {
+      Adw.ToolbarView toolbar {
+        top-bar-style: raised;
 
-        SearchBar search_bar {
-          visible: true;
-          key-capture-widget: content_box;
-          SearchEntry search_entry {
-            search-delay: 100;
-            placeholder-text: _("Search emojis");
-            width-request: 345;
+        [top]
+        Adw.HeaderBar header_bar {
+          [end]
+          MenuButton {
+            primary: true;
+            icon-name: "open-menu-symbolic";
+            tooltip-text: _("Menu");
+
+            popover: Gtk.PopoverMenu popover_menu {
+              menu-model: primary_menu;
+            };
           }
-        }
 
-      CenterBox {
-        shrink-center-last: true;
-
-        [start]
-        ScrolledWindow left_scrolled_window {
-          propagate-natural-height: true;
-          hscrollbar-policy: never;
-          hexpand: true;
-          has-frame: false;
-          window-placement: top_right;
-
-          FlowBox left_emojis_flow_box {
-            margin-start: 6;
-            margin-end: 6;
-            margin-top: 6;
-            margin-bottom: 6;
-            orientation: horizontal;
-            row-spacing: 12;
-            column-spacing: 12;
-            homogeneous: true;
-            max-children-per-line: 6;
-            min-children-per-line: 1;
-            selection-mode: single;
-            valign: start;
-          }
-        }
-
-        [center]
-        CenterBox combined_emoji_box {
           [start]
-          Separator {
+          Button {
+            icon-name: "dice3-symbolic";
+            tooltip-text: _("Randomize");
+            clicked => $select_random();
           }
 
-          [center]
-          ScrolledWindow combined_scrolled_window {
-            width-request: 200;
-            hexpand: true;
-            propagate-natural-height: true;
-            has-frame: false;
+          [start]
+          Button {
+            icon-name: "edit-find-symbolic";
+            clicked => $search();
+            visible: bind search_bar.search-mode-enabled inverted;
+          }
+        }
 
-            FlowBox combined_emojis_flow_box {
-              margin-start: 6;
-              margin-end: 6;
-              margin-top: 6;
-              margin-bottom: 6;
-              orientation: horizontal;
-              row-spacing: 0;
-              column-spacing: 6;
-              homogeneous: true;
-              max-children-per-line: 3;
-              min-children-per-line: 1;
-              selection-mode: none;
+        content: Box content_box {
+          orientation: vertical;
+
+          SearchBar search_bar {
+            visible: true;
+            key-capture-widget: content_box;
+
+            SearchEntry search_entry {
+              search-delay: 100;
+              placeholder-text: _("Search emojis");
+              width-request: 345;
             }
           }
 
-          [end]
-          Separator {
-          }
-        }
+          CenterBox {
+            shrink-center-last: true;
 
-        [end]
-        ScrolledWindow right_scrolled_window {
-          propagate-natural-height: true;
-          hscrollbar-policy: never;
-          hexpand: true;
-          has-frame: false;
+            [start]
+            ScrolledWindow left_scrolled_window {
+              propagate-natural-height: true;
+              hscrollbar-policy: never;
+              hexpand: true;
+              has-frame: false;
+              window-placement: top_right;
 
-          FlowBox right_emojis_flow_box {
-            margin-start: 6;
-            margin-end: 6;
-            margin-top: 6;
-            margin-bottom: 6;
-            orientation: horizontal;
-            row-spacing: 12;
-            column-spacing: 12;
-            homogeneous: true;
-            max-children-per-line: 6;
-            min-children-per-line: 1;
-            selection-mode: single;
-            sensitive: false;
-            valign: start;
+              FlowBox left_emojis_flow_box {
+                margin-start: 6;
+                margin-end: 6;
+                margin-top: 6;
+                margin-bottom: 6;
+                orientation: horizontal;
+                row-spacing: 12;
+                column-spacing: 12;
+                homogeneous: true;
+                max-children-per-line: 6;
+                min-children-per-line: 1;
+                selection-mode: single;
+                valign: start;
+              }
+            }
+
+            [center]
+            CenterBox combined_emoji_box {
+              [start]
+              Separator {}
+
+              [center]
+              ScrolledWindow combined_scrolled_window {
+                width-request: 200;
+                hexpand: true;
+                propagate-natural-height: true;
+                has-frame: false;
+
+                FlowBox combined_emojis_flow_box {
+                  margin-start: 6;
+                  margin-end: 6;
+                  margin-top: 6;
+                  margin-bottom: 6;
+                  orientation: horizontal;
+                  row-spacing: 0;
+                  column-spacing: 6;
+                  homogeneous: true;
+                  max-children-per-line: 3;
+                  min-children-per-line: 1;
+                  selection-mode: none;
+                }
+              }
+
+              [end]
+              Separator {}
+            }
+
+            [end]
+            ScrolledWindow right_scrolled_window {
+              propagate-natural-height: true;
+              hscrollbar-policy: never;
+              hexpand: true;
+              has-frame: false;
+
+              FlowBox right_emojis_flow_box {
+                margin-start: 6;
+                margin-end: 6;
+                margin-top: 6;
+                margin-bottom: 6;
+                orientation: horizontal;
+                row-spacing: 12;
+                column-spacing: 12;
+                homogeneous: true;
+                max-children-per-line: 6;
+                min-children-per-line: 1;
+                selection-mode: single;
+                sensitive: false;
+                valign: start;
+              }
+            }
           }
-        }
+        };
       }
-      };
     }
   };
 }
@@ -151,6 +174,7 @@ menu primary_menu {
       custom: "style-switcher";
     }
   }
+
   section {
     item {
       label: _("_Preferences");

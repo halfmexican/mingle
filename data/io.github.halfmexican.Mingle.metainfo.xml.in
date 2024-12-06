@@ -38,6 +38,15 @@
     </screenshot>
   </screenshots>
    <releases>
+    <release version="0.16" date="2024-12-05">
+      <description>
+        <p>Fixes and Features</p>
+        <ul>
+          <li>Add pizza 🍕</li>
+          <li>Add Loading Screen</li>
+        </ul>
+      </description>
+    </release>
       <release version="0.15" date="2024-09-26">
       <description>
         <p>Fixes and Features</p>

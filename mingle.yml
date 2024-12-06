@@ -7,7 +7,7 @@ AppDir:
     id: io.github.halfmexican.Mingle
     name: Mingle
     icon: io.github.halfmexican.Mingle
-    version: 0.14.0
+    version: 0.16.0
     exec: usr/bin/mingle
     exec_args: $@
 

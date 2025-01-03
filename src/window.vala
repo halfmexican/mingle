@@ -1,6 +1,6 @@
 /* window.vala
  *
- * Copyright 2023-2024 José Hunter
+ * Copyright 2023-2025 José Hunter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,14 +28,16 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
         [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
         [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
+        [GtkChild] private unowned Gtk.ScrolledWindow left_scrolled_window;
+        [GtkChild] private unowned Gtk.ScrolledWindow right_scrolled_window;
         [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
-        [GtkChild] private unowned Adw.ToolbarView toolbar;
+        [GtkChild] private unowned Adw.ToolbarView toolbar_view;
+        [GtkChild] private unowned Gtk.Button randomize_button;
+        [GtkChild] private unowned Gtk.Button search_button;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
         [GtkChild] private unowned Gtk.SearchBar search_bar;
         [GtkChild] private unowned Gtk.SearchEntry search_entry;
-        [GtkChild] private unowned Gtk.ScrolledWindow left_scrolled_window;
-        [GtkChild] private unowned Gtk.ScrolledWindow right_scrolled_window;
         private GLib.Binding? scroll_binding;
 
         // Class variables
@@ -44,6 +46,7 @@ namespace Mingle {
         private EmojiDataManager emoji_manager;
         private EmojiLabel left_emoji;
         private EmojiLabel right_emoji;
+
         // Codepoints
         private string prev_left_emoji;
         private string prev_right_emoji;
@@ -71,7 +74,6 @@ namespace Mingle {
             GLib.Object (application : app); // base constructor
             popover_menu.add_child (style_switcher, "style-switcher"); // Add style switcher to popover menu
             setup_breakpoints ();
-            apply_toolbar_style ();
             update_transition_type ();
             bind_scroll_adjustments ();
 
@@ -97,10 +99,12 @@ namespace Mingle {
                 start_setup_thread ();
             });
         }
-           private async void setup_emoji_manager () {
-                emoji_manager = yield new EmojiDataManager ();
-                setup_emoji_flow_boxes ();
-            }
+
+        private async void setup_emoji_manager () {
+            emoji_manager = yield new EmojiDataManager ();
+            setup_emoji_flow_boxes ();
+            apply_toolbar_view_style ();
+        }
 
         private void start_setup_thread () {
             if (!Thread.supported ()) {
@@ -144,7 +148,7 @@ namespace Mingle {
         private void handle_pref_change (string key) {
             switch (key) {
             case "headerbar-style":
-                apply_toolbar_style ();
+                apply_toolbar_view_style ();
                 break;
             case "transition-type":
                 update_transition_type ();
@@ -435,12 +439,14 @@ namespace Mingle {
         }
 
         // Toolbar Style
-        private void apply_toolbar_style () {
-            var style = get_toolbar_style ();
-            toolbar.set_top_bar_style (style);
+        private void apply_toolbar_view_style () {
+            var style = get_toolbar_view_style ();
+            toolbar_view.set_top_bar_style (style);
+            randomize_button.visible = true;
+            search_button.visible = true;
         }
 
-        private Adw.ToolbarStyle get_toolbar_style () {
+        private Adw.ToolbarStyle get_toolbar_view_style () {
             uint style = settings.get_int ("headerbar-style");
             switch (style) {
             case 0:

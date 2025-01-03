@@ -17,7 +17,7 @@ template $MingleWindow: Adw.ApplicationWindow {
   }
 
   content: Adw.ToolbarView toolbar {
-    top-bar-style: raised;
+    top-bar-style: flat;
 
     [top]
     Adw.HeaderBar header_bar {
@@ -33,17 +33,18 @@ template $MingleWindow: Adw.ApplicationWindow {
       }
 
       [start]
-      Button {
+      Button randomize_button {
         icon-name: "dice3-symbolic";
         tooltip-text: _("Randomize");
         clicked => $select_random();
+        visible: false;
       }
 
       [start]
-      Button {
+      Button search_button {
         icon-name: "edit-find-symbolic";
         clicked => $search();
-        visible: bind search_bar.search-mode-enabled inverted;
+        visible: false;
       }
     }
 

@@ -25,19 +25,28 @@
   </branding>
   <screenshots>
     <screenshot type="default">
-      <image>https://github.com/halfmexican/mingle/blob/3df69293a81462abef12f56018644e7e31d10315/data/pv2.png</image>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/refs/heads/main/data/pv2.png</image>
       <caption>App Window</caption>
     </screenshot>
     <screenshot>
-      <image>https://github.com/halfmexican/mingle/blob/3df69293a81462abef12f56018644e7e31d10315/data/pv1.png</image>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/refs/heads/main/data/pv1.png</image>
       <caption>Funny Penguins</caption>
     </screenshot>
     <screenshot>
-      <image>https://github.com/halfmexican/mingle/blob/3df69293a81462abef12f56018644e7e31d10315/data/pv3.png</image>
+      <image>https://raw.githubusercontent.com/halfmexican/mingle/refs/heads/main/data/pv3.png</image>
       <caption>Settings</caption>
     </screenshot>
   </screenshots>
    <releases>
+    <release version="0.16" date="2024-12-05">
+      <description>
+        <p>Fixes and Features</p>
+        <ul>
+          <li>Add pizza 🍕</li>
+          <li>Add Loading Screen</li>
+        </ul>
+      </description>
+    </release>
       <release version="0.15" date="2024-09-26">
       <description>
         <p>Fixes and Features</p>

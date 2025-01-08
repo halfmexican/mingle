@@ -34,7 +34,7 @@ namespace Mingle {
         [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
         [GtkChild] private unowned Adw.ToolbarView toolbar_view;
         [GtkChild] private unowned Gtk.Button randomize_button;
-        [GtkChild] private unowned Gtk.Button search_button;
+        [GtkChild] private unowned Gtk.ToggleButton search_button;
         [GtkChild] private unowned Adw.Breakpoint breakpoint;
         [GtkChild] private unowned Gtk.SearchBar search_bar;
         [GtkChild] private unowned Gtk.SearchEntry search_entry;
@@ -87,10 +87,12 @@ namespace Mingle {
             });
 
             search_bar.notify["search-mode-enabled"].connect (() => {
+                search_button.active = search_bar.search_mode_enabled;
                 if (!search_bar.search_mode_enabled) {
                     bind_scroll_adjustments ();
                 } else {
                     unbind_scroll_adjustments ();
+                    toggle_search ();
                 }
             });
 
@@ -334,12 +336,15 @@ namespace Mingle {
             left_emojis_flow_box.select_child (child);
             child.activate ();
         }
-
         [GtkCallback]
-        private void search () {
-            search_bar.search_mode_enabled = true;
+        private void toggle_search () {
+            // Check the state of the search button and update the search mode
+            if (search_button.active) {
+                search_bar.search_mode_enabled = true;
+            } else {
+                search_bar.search_mode_enabled = false;
+            }
         }
-
         private void create_and_show_toast (string message, int duration) {
             var toast = new Adw.Toast (message) {
                 timeout = duration

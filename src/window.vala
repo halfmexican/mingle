@@ -336,6 +336,7 @@ namespace Mingle {
             left_emojis_flow_box.select_child (child);
             child.activate ();
         }
+
         [GtkCallback]
         private void toggle_search () {
             // Check the state of the search button and update the search mode
@@ -345,6 +346,7 @@ namespace Mingle {
                 search_bar.search_mode_enabled = false;
             }
         }
+
         private void create_and_show_toast (string message, int duration) {
             var toast = new Adw.Toast (message) {
                 timeout = duration

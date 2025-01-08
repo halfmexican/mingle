@@ -41,9 +41,9 @@ template $MingleWindow: Adw.ApplicationWindow {
       }
 
       [start]
-      Button search_button {
+      ToggleButton search_button {
         icon-name: "edit-find-symbolic";
-        clicked => $search();
+        toggled => $toggle_search();
         visible: false;
       }
     }

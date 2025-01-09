@@ -1,6 +1,6 @@
 /* combined_emojji.vala
  *
- * Copyright 2023-2024 José Hunter
+ * Copyright 2023-2025 José Hunter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,21 +31,23 @@ namespace Mingle {
         public async CombinedEmoji (EmojiCombination combination_struct, Gtk.RevealerTransitionType transition, out bool image_loaded) {
             try {
                 this.combined_emoji = combination_struct;
+                this.tooltip_text = prettify_combined_alt_name (this.combined_emoji.alt);
                 this.add_css_class ("flat");
+
                 // Fetch the image asynchronously
                 var input_stream = yield get_input_stream (combined_emoji.gstatic_url);
-
                 var pixbuf = yield new Gdk.Pixbuf.from_stream_async (input_stream, null);
 
+                // Textures
                 _texture = Gdk.Texture.for_pixbuf (pixbuf);
                 int width = pixbuf.get_width ();
                 int height = pixbuf.get_height ();
                 int scaled_width = width / 4;
                 int scaled_height = height / 4;
                 pixbuf = pixbuf.scale_simple (scaled_width, scaled_height, Gdk.InterpType.BILINEAR);
-
                 _scaled_texture = Gdk.Texture.for_pixbuf (pixbuf);
 
+                // Widgets
                 var overlay = new Gtk.Overlay () {
                     child = new Gtk.Picture () {
                         width_request = 100,
@@ -73,7 +75,7 @@ namespace Mingle {
                 overlay.add_overlay (revealer);
                 image_loaded = true;
             } catch (GLib.Error error) {
-                // stderr.printf (error.message);
+                warning (error.message);
                 image_loaded = false;
             }
 
@@ -112,6 +114,25 @@ namespace Mingle {
             } else {
                 clipboard.set_texture (_texture);
             }
+        }
+
+        public string prettify_combined_alt_name(string alt_name) {
+            // Replace underscores with spaces and hyphens with ' + '
+            string parsed_name = alt_name.replace("_", " ").replace("-", " + ");
+
+            // Split into words
+            var words = parsed_name.down().split(" ");
+            string pretty_name = "";
+
+            foreach (var word in words) {
+                if (word.length > 0 && word != "+") { // Skip single '+'
+                    pretty_name += word[0].to_string().up() + word.substring(1) + " ";
+                } else if (word == "+") {
+                    pretty_name += "+ "; // Add '+' with a space
+                }
+            }
+
+            return pretty_name.strip(); // Remove any trailing space
         }
     }
 }

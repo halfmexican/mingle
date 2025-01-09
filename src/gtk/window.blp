@@ -16,57 +16,63 @@ template $MingleWindow: Adw.ApplicationWindow {
     }
   }
 
-  content: Gtk.Stack window_stack {
-    transition-type: crossfade;
+  content: Adw.ToolbarView toolbar_view {
+    top-bar-style: flat;
 
-    Gtk.Box {
-    halign : center;
-    valign: center;
-    orientation: vertical;
-     Adw.Spinner loading_spinner {
-        visible: true;
-        width-request: 64;
-        height-request: 64;
-        margin-bottom: 12;
+    [top]
+    Adw.HeaderBar header_bar {
+      [end]
+      MenuButton {
+        primary: true;
+        icon-name: "open-menu-symbolic";
+        tooltip-text: _("Menu");
+
+        popover: Gtk.PopoverMenu popover_menu {
+          menu-model: primary_menu;
+        };
       }
-      Gtk.Label {
-      label: "Loading Emojis...";
-       styles ["title-1"]
+
+      [start]
+      Button randomize_button {
+        icon-name: "dice3-symbolic";
+        tooltip-text: _("Randomize");
+        clicked => $select_random();
+        visible: false;
+      }
+
+      [start]
+      ToggleButton search_button {
+        icon-name: "edit-find-symbolic";
+        toggled => $toggle_search();
+        visible: false;
       }
     }
-    Adw.ToastOverlay toast_overlay {
-      Adw.ToolbarView toolbar {
-        top-bar-style: raised;
 
-        [top]
-        Adw.HeaderBar header_bar {
-          [end]
-          MenuButton {
-            primary: true;
-            icon-name: "open-menu-symbolic";
-            tooltip-text: _("Menu");
+    content: Gtk.Stack window_stack {
+      transition-type: crossfade;
 
-            popover: Gtk.PopoverMenu popover_menu {
-              menu-model: primary_menu;
-            };
-          }
+      // Loading State
+      Gtk.Box {
+        halign: center;
+        valign: center;
+        orientation: vertical;
 
-          [start]
-          Button {
-            icon-name: "dice3-symbolic";
-            tooltip-text: _("Randomize");
-            clicked => $select_random();
-          }
-
-          [start]
-          Button {
-            icon-name: "edit-find-symbolic";
-            clicked => $search();
-            visible: bind search_bar.search-mode-enabled inverted;
-          }
+        Adw.Spinner loading_spinner {
+          visible: true;
+          width-request: 64;
+          height-request: 64;
+          margin-bottom: 12;
         }
 
-        content: Box content_box {
+        Gtk.Label {
+          label: "Loading Emojis...";
+          styles ["title-1"]
+        }
+      }
+
+      // Main Content State
+      Adw.ToastOverlay toast_overlay {
+        Box content_box {
           orientation: vertical;
 
           SearchBar search_bar {
@@ -89,7 +95,6 @@ template $MingleWindow: Adw.ApplicationWindow {
               hscrollbar-policy: never;
               hexpand: true;
               has-frame: false;
-              window-placement: top_right;
 
               FlowBox left_emojis_flow_box {
                 margin-start: 6;
@@ -162,12 +167,13 @@ template $MingleWindow: Adw.ApplicationWindow {
               }
             }
           }
-        };
+        }
       }
-    }
+    };
   };
 }
 
+// Menu Definitions
 menu primary_menu {
   section {
     item {

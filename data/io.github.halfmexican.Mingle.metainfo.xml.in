@@ -38,6 +38,16 @@
     </screenshot>
   </screenshots>
    <releases>
+    <release version="0.20" date="2025-2-17">
+      <description>
+        <p>What's New</p>
+        <ul>
+          <li>Fixed headerbar visibility</li>
+          <li>Add tooltip text to emoji combinations</li>
+          <li>Misc Fixes</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.16" date="2024-12-05">
       <description>
         <p>Fixes and Features</p>

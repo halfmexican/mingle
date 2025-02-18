@@ -1,7 +1,7 @@
 {
     "app-id" : "io.github.halfmexican.Mingle",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "47",
+    "runtime-version" : "48",
     "sdk" : "org.gnome.Sdk",
     "sdk-extensions" : [
         "org.freedesktop.Sdk.Extension.vala"
@@ -39,7 +39,7 @@
             {
               "type": "git",
               "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler",
-              "tag": "v0.12.0"
+              "tag": "v0.16.0"
             }
           ]
         },
@@ -51,7 +51,7 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/halfmexican/mingle.git",
-                    "branch": "0.2"
+                    "branch": "main"
                 }
             ]
         }

@@ -51,7 +51,7 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/halfmexican/mingle.git",
-                    "branch": "0.2"
+                    "branch": "main"
                 }
             ]
         }

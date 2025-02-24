@@ -80,7 +80,8 @@ namespace Mingle {
             // Signals
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
-            this.combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
+            right_scrolled_window.window_placement = CornerType.TOP_RIGHT;
             left_emojis_flow_box.set_filter_func (filter_emojis);
             search_entry.search_changed.connect (() => {
                 left_emojis_flow_box.invalidate_filter ();

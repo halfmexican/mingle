@@ -116,7 +116,7 @@ namespace Mingle {
             }
             try {
                 message ("Starting setup_emoji_manager thread\n");
-                Thread<void> thread = new Thread<void>.try ("setup_emoji_manager_thread", () => {
+                    new Thread<void>.try ("setup_emoji_manager_thread", () => {
                     setup_emoji_manager.begin ();
                     Idle.add (() => {
                         window_stack.set_visible_child (toast_overlay); // Switch to ToolbarView (Which is wrapped by toast overlay)

@@ -432,18 +432,10 @@ namespace Mingle {
             }
         }
 
-        private void update_window_title () {
-            string title = "Mingle: ";
-            if (left_emoji != null && right_emoji != null) {
-                title += @"$left_emoji + $right_emoji";
-            } else if (left_emoji != null) {
-                title += @"$left_emoji + ?";
-            } else if (right_emoji != null) {
-                title += @"? + $right_emoji";
-            } else {
-                title += "? + ?";
-            }
-            this.set_title (title);
+      private void update_window_title () {
+            string ? left = left_emoji?.to_string () ?? "?";
+            string ? right = right_emoji?.to_string () ?? "?";
+            this.set_title (@"Mingle: $left + $right");
         }
 
         // Toolbar Style

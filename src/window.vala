@@ -18,26 +18,26 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Json, Soup, Gee;
+using Gtk, Adw, Json, Soup, Gee;
 namespace Mingle {
     [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/window.ui")]
     public class Window : Adw.ApplicationWindow {
         // UI
-        [GtkChild] private unowned Gtk.Stack window_stack;
-        [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
-        [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
-        [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
-        [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
-        [GtkChild] private unowned Gtk.ScrolledWindow left_scrolled_window;
-        [GtkChild] private unowned Gtk.ScrolledWindow right_scrolled_window;
-        [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
-        [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
-        [GtkChild] private unowned Adw.ToolbarView toolbar_view;
-        [GtkChild] private unowned Gtk.Button randomize_button;
-        [GtkChild] private unowned Gtk.ToggleButton search_button;
-        [GtkChild] private unowned Adw.Breakpoint breakpoint;
-        [GtkChild] private unowned Gtk.SearchBar search_bar;
-        [GtkChild] private unowned Gtk.SearchEntry search_entry;
+        [GtkChild] private unowned Stack window_stack;
+        [GtkChild] private unowned FlowBox left_emojis_flow_box;
+        [GtkChild] private unowned FlowBox right_emojis_flow_box;
+        [GtkChild] private unowned FlowBox combined_emojis_flow_box;
+        [GtkChild] private unowned ScrolledWindow combined_scrolled_window;
+        [GtkChild] private unowned ScrolledWindow left_scrolled_window;
+        [GtkChild] private unowned ScrolledWindow right_scrolled_window;
+        [GtkChild] private unowned ToastOverlay toast_overlay;
+        [GtkChild] private unowned PopoverMenu popover_menu;
+        [GtkChild] private unowned ToolbarView toolbar_view;
+        [GtkChild] private unowned Button randomize_button;
+        [GtkChild] private unowned ToggleButton search_button;
+        [GtkChild] private unowned Breakpoint breakpoint;
+        [GtkChild] private unowned SearchBar search_bar;
+        [GtkChild] private unowned SearchEntry search_entry;
         private GLib.Binding? scroll_binding;
 
         // Class variables

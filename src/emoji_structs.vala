@@ -1,5 +1,3 @@
-using Gtk, Mingle;
-
 namespace Mingle {
 
     public struct EmojiData {

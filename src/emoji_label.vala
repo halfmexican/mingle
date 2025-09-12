@@ -18,7 +18,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Gtk;
 namespace Mingle {
     public class EmojiLabel : Adw.Bin {
         private string emoji;

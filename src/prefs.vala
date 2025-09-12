@@ -18,7 +18,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Gtk, Adw, GLib;
 namespace Mingle {
     [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/prefs.ui")]
     public class PrefsDialog : Adw.PreferencesDialog {

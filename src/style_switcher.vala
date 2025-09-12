@@ -17,7 +17,6 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
-using Adw;
 
 namespace Mingle {
     [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/style-switcher.ui")]

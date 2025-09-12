@@ -18,36 +18,28 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Json, Soup, Gee;
-
 namespace Mingle {
     public class EmojiDataManager {
         private Json.Object data_object;
         private Json.Array supported_emojis;
-        public HashSet<string> added_combinations;
+        public Gee.HashSet<string> added_combinations;
         private Gee.HashMap<string, EmojiData?> emoji_data_map;
 
         public async EmojiDataManager () {
             supported_emojis = populate_supported_emojis_array ();
             emoji_data_map = new Gee.HashMap<string, EmojiData?> ();
-            added_combinations = new HashSet<string> ();
+            added_combinations = new Gee.HashSet<string> ();
         }
 
         private Json.Array populate_supported_emojis_array () {
             // Returns the known_supported_array by parsing metadata.json
-            string file_contents;
-            size_t length;
-
             try {
                 var input_stream = GLib.resources_open_stream ("/io/github/halfmexican/Mingle/emoji_data/metadata.json", GLib.ResourceLookupFlags.NONE);
-                var data_stream = new GLib.DataInputStream (input_stream);
-                file_contents = data_stream.read_upto ("", -1, out length);
 
                 Json.Parser parser = new Json.Parser ();
-                parser.load_from_data (file_contents, -1);
+                parser.load_from_stream (input_stream, null);
 
                 input_stream.close (null);
-                data_stream.close (null);
 
                 Json.Object root_object = parser.get_root ().get_object ();
                 data_object = root_object.get_object_member ("data");
@@ -64,7 +56,7 @@ namespace Mingle {
             if (supported_emojis == null)
                 supported_emojis = populate_supported_emojis_array ();
 
-            ArrayForeach array_foreach_func = (array, index_, element_node) => {
+            Json.ArrayForeach array_foreach_func = (array, index_, element_node) => {
                 if (element_node.get_node_type () == Json.NodeType.VALUE) {
                     string emoji_code = element_node.get_string ();
                     add_emoji_to_flowbox (emoji_code, flowbox);

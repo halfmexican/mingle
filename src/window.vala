@@ -18,26 +18,25 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Gtk, Adw, Json, Soup, Gee;
 namespace Mingle {
     [GtkTemplate (ui = "/io/github/halfmexican/Mingle/gtk/window.ui")]
     public class Window : Adw.ApplicationWindow {
         // UI
-        [GtkChild] private unowned Stack window_stack;
-        [GtkChild] private unowned FlowBox left_emojis_flow_box;
-        [GtkChild] private unowned FlowBox right_emojis_flow_box;
-        [GtkChild] private unowned FlowBox combined_emojis_flow_box;
-        [GtkChild] private unowned ScrolledWindow combined_scrolled_window;
-        [GtkChild] private unowned ScrolledWindow left_scrolled_window;
-        [GtkChild] private unowned ScrolledWindow right_scrolled_window;
-        [GtkChild] private unowned ToastOverlay toast_overlay;
-        [GtkChild] private unowned PopoverMenu popover_menu;
-        [GtkChild] private unowned ToolbarView toolbar_view;
-        [GtkChild] private unowned Button randomize_button;
-        [GtkChild] private unowned ToggleButton search_button;
-        [GtkChild] private unowned Breakpoint breakpoint;
-        [GtkChild] private unowned SearchBar search_bar;
-        [GtkChild] private unowned SearchEntry search_entry;
+        [GtkChild] private unowned Gtk.Stack window_stack;
+        [GtkChild] private unowned Gtk.FlowBox left_emojis_flow_box;
+        [GtkChild] private unowned Gtk.FlowBox right_emojis_flow_box;
+        [GtkChild] private unowned Gtk.FlowBox combined_emojis_flow_box;
+        [GtkChild] private unowned Gtk.ScrolledWindow combined_scrolled_window;
+        [GtkChild] private unowned Gtk.ScrolledWindow left_scrolled_window;
+        [GtkChild] private unowned Gtk.ScrolledWindow right_scrolled_window;
+        [GtkChild] private unowned Adw.ToastOverlay toast_overlay;
+        [GtkChild] private unowned Gtk.PopoverMenu popover_menu;
+        [GtkChild] private unowned Adw.ToolbarView toolbar_view;
+        [GtkChild] private unowned Gtk.Button randomize_button;
+        [GtkChild] private unowned Gtk.ToggleButton search_button;
+        [GtkChild] private unowned Adw.Breakpoint breakpoint;
+        [GtkChild] private unowned Gtk.SearchBar search_bar;
+        [GtkChild] private unowned Gtk.SearchEntry search_entry;
         private GLib.Binding? scroll_binding;
 
         // Class variables
@@ -81,7 +80,7 @@ namespace Mingle {
             this.settings.changed.connect (handle_pref_change);
             this.bind_property ("is-loading", left_emojis_flow_box, "sensitive", BindingFlags.INVERT_BOOLEAN);
             combined_scrolled_window.edge_overshot.connect (on_edge_overshot); // Handles loading more emojis on scroll
-            right_scrolled_window.window_placement = CornerType.TOP_RIGHT;
+            right_scrolled_window.window_placement = TOP_RIGHT;
             left_emojis_flow_box.set_filter_func (filter_emojis);
             search_entry.search_changed.connect (() => {
                 left_emojis_flow_box.invalidate_filter ();
@@ -131,8 +130,8 @@ namespace Mingle {
         }
 
         private void bind_scroll_adjustments () {
-            Adjustment left_adjustment = left_scrolled_window.get_vadjustment ();
-            Adjustment right_adjustment = right_scrolled_window.get_vadjustment ();
+            Gtk.Adjustment left_adjustment = left_scrolled_window.get_vadjustment ();
+            Gtk.Adjustment right_adjustment = right_scrolled_window.get_vadjustment ();
             scroll_binding = left_adjustment.bind_property (
                                                             "value",
                                                             right_adjustment,
@@ -159,7 +158,7 @@ namespace Mingle {
             }
         }
 
-        private bool filter_emojis (FlowBoxChild child) {
+        private bool filter_emojis (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
             string search_text = search_entry.text.up ();
             foreach (string keyword in emoji_label.keywords) {
@@ -189,7 +188,7 @@ namespace Mingle {
             });
         }
 
-        private void connect_flow_box_signals (FlowBox flowbox, EmojiActionDelegate handler) {
+        private void connect_flow_box_signals (Gtk.FlowBox flowbox, EmojiActionDelegate handler) {
             flowbox.child_activated.connect ((item) => {
                 Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) item.child;
                 handler (emoji_label);
@@ -238,7 +237,7 @@ namespace Mingle {
             update_window_title ();
         }
 
-        private async void prepend_combined_emoji (string left_emoji_code, string right_emoji_code, RevealerTransitionType transition) {
+        private async void prepend_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
             string combination_key = left_emoji_code + right_emoji_code;
 
             bool load_success;
@@ -261,7 +260,7 @@ namespace Mingle {
             }
         }
 
-        private async void append_combined_emoji (string left_emoji_code, string right_emoji_code, RevealerTransitionType transition) {
+        private async void append_combined_emoji (string left_emoji_code, string right_emoji_code, Gtk.RevealerTransitionType transition) {
             string combination_key = left_emoji_code + right_emoji_code;
             if (emoji_manager.is_combination_added (combination_key)) {
                 return;
@@ -381,30 +380,30 @@ namespace Mingle {
             }
         }
 
-        private RevealerTransitionType create_combined_emoji_revealer_transition (bool direction) {
+        private Gtk.RevealerTransitionType create_combined_emoji_revealer_transition (bool direction) {
             // Returns a RevealerTranstionType based on user settings
             // 0 is left, 1 is right
             switch (this.revealer_transition) {
             case Transition.NONE:
-                return RevealerTransitionType.NONE;
+                return Gtk.RevealerTransitionType.NONE;
             case Transition.CROSSFADE:
-                return RevealerTransitionType.CROSSFADE;
+                return Gtk.RevealerTransitionType.CROSSFADE;
             case Transition.SLIDE:
                 if (direction)
-                    return RevealerTransitionType.SLIDE_RIGHT;
-                return RevealerTransitionType.SLIDE_LEFT;
+                    return Gtk.RevealerTransitionType.SLIDE_RIGHT;
+                return Gtk.RevealerTransitionType.SLIDE_LEFT;
             case Transition.SWING:
                 if (direction)
-                    return RevealerTransitionType.SWING_RIGHT;
-                return RevealerTransitionType.SWING_LEFT;
+                    return Gtk.RevealerTransitionType.SWING_RIGHT;
+                return Gtk.RevealerTransitionType.SWING_LEFT;
             case Transition.SWING_UP:
-                return RevealerTransitionType.SWING_UP;
+                return Gtk.RevealerTransitionType.SWING_UP;
             default:
-                return RevealerTransitionType.CROSSFADE;
+                return Gtk.RevealerTransitionType.CROSSFADE;
             }
         }
 
-        private void set_child_sensitivity (FlowBoxChild child) {
+        private void set_child_sensitivity (Gtk.FlowBoxChild child) {
             Mingle.EmojiLabel emoji_label = (Mingle.EmojiLabel) child.get_child ();
             string right_emoji_code = emoji_label.codepoint;
 
@@ -414,7 +413,7 @@ namespace Mingle {
         }
 
         private void update_sensitivity_of_right_flowbox () {
-            FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
+            Gtk.FlowBoxChild child = right_emojis_flow_box.get_child_at_index (0);
             int index = 0;
 
             while (child != null) {
@@ -460,9 +459,9 @@ namespace Mingle {
             }
         }
 
-        private void on_edge_overshot (PositionType pos_type) {
+        private void on_edge_overshot (Gtk.PositionType pos_type) {
             // Loads more emojis when we scroll
-            if (pos_type != PositionType.BOTTOM) {
+            if (pos_type != BOTTOM) {
                 return; // We are only interested in the bottom edge
             }
 

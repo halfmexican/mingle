@@ -62,7 +62,8 @@ namespace Mingle {
             string[] developers = {
                 "José Hunter https://github.com/halfmexican",
                 "kramo https://kramo.page",
-                "QuazarOmega https://github.com/quazar-omega"
+                "QuazarOmega https://github.com/quazar-omega",
+                "Valeri https://github.com/v1993"
             };
             var about = new Adw.AboutDialog () {
                 application_name = "mingle",

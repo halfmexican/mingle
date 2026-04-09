@@ -38,6 +38,16 @@
     </screenshot>
   </screenshots>
    <releases>
+      <release version="0.30" date="2026-4-9">
+      <description>
+        <p>What's New</p>
+        <ul>
+          <li>10x installation size reduction</li>
+          <li>Various Fixes</li>
+        </ul>
+        <p>Thank you @v1993 for your contributions</p>
+      </description>
+    </release>
     <release version="0.20" date="2025-2-17">
       <description>
         <p>What's New</p>

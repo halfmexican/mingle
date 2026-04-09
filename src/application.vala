@@ -1,6 +1,6 @@
 /* application.vala
  *
- * Copyright 2023-2024 José Hunter
+ * Copyright 2023-2026 José Hunter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,9 +70,9 @@ namespace Mingle {
                 website = "https://github.com/halfmexican/mingle",
                 issue_url = "https://github.com/halfmexican/mingle/issues",
                 developer_name = "José Hunter",
-                version = "0.20",
+                version = "0.3",
                 developers = developers,
-                copyright = "© 2025 José Hunter",
+                copyright = "© 2026 José Hunter",
                 license_type = Gtk.License.GPL_3_0,
             };
             about.present (this.active_window);
